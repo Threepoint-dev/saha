@@ -1,0 +1,17 @@
+ 
+# Frontend
+frontend/node_modules
+frontend/.env
+frontend/dist
+
+# Backend
+backend/.env
+backend/target
+backend/*.jar
+
+# Supabase
+supabase/.env
+
+# OS
+.DS_Store
+Thumbs.db
