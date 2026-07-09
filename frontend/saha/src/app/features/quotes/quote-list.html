@@ -1,0 +1,133 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Commercial Quotes</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
+        <p class="text-[#34203a] text-[10px] font-semibold">SAHA ADMIN</p>
+      </div>
+      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
+      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
+        <p class="text-white text-[12px] font-semibold">SA</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1000px] mx-auto">
+    <!-- Title -->
+    <div class="flex items-end justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Quotes</h1>
+        <p class="text-[#55514a] text-[13px] leading-none">All commercial quotes prepared for this inquiry</p>
+      </div>
+      <button
+        type="button"
+        (click)="newQuote()"
+        [disabled]="creating()"
+        class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 disabled:cursor-not-allowed rounded-[12px] px-5 py-3 text-white text-[13px] font-semibold transition-colors">
+        {{ creating() ? 'Creating...' : '+ New Quote' }}
+      </button>
+    </div>
+
+    <!-- Inquiry summary -->
+    <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-4">
+      @if (inquiry(); as inq) {
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.14px]">Client</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ inq.clientName || '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.14px]">Event Date</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ inq.eventDate ? (inq.eventDate | date:'mediumDate') : '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.14px]">Guests</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ inq.guestCount ?? '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.14px]">Contact</p>
+            <p class="text-[#34203a] text-[13px] font-medium">{{ inq.clientPhone || inq.clientEmail || '—' }}</p>
+          </div>
+        </div>
+      } @else {
+        <div class="flex items-center gap-2">
+          <p class="text-[#55514a] text-[13px]">Inquiry</p>
+          <p class="text-[#34203a] text-[13px] font-mono">{{ inquiryId() }}</p>
+          <span class="text-[#8a8478] text-[12px]">— summary unavailable</span>
+        </div>
+      }
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- Quotes list -->
+    @if (loading()) {
+      <div class="rounded-[12px] bg-white border border-[#e4dfd5] px-5 py-4 text-[#55514a] text-[13px]">Loading quotes...</div>
+    } @else if (quoteCount() === 0) {
+      <div class="rounded-[12px] bg-white border border-dashed border-[#d8d2c6] px-5 py-10 flex flex-col items-center gap-2 text-center">
+        <p class="text-[#34203a] text-[14px] font-semibold">No quotes yet</p>
+        <p class="text-[#8a8478] text-[12px]">Create the first quote for this inquiry to get started.</p>
+      </div>
+    } @else {
+      <div class="flex flex-col gap-2.5">
+        <!-- Column header -->
+        <div class="hidden md:grid grid-cols-[1.4fr_1fr_1fr_1fr_auto] gap-3 px-4 pb-1">
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px]">Quote</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px]">Status</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px]">Issued</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-right">Total</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-right">Actions</p>
+        </div>
+
+        @for (quote of quotes(); track quote.id) {
+          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3.5 grid grid-cols-1 md:grid-cols-[1.4fr_1fr_1fr_1fr_auto] gap-3 items-center">
+            <!-- Quote number + current -->
+            <div class="flex items-center gap-2">
+              <p class="text-[#34203a] text-[14px] font-semibold">{{ quote.quoteNumber || 'Draft' }}</p>
+              @if (quote.isCurrent) {
+                <span class="bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[10px] font-semibold px-2 py-0.5 rounded-full">CURRENT</span>
+              }
+            </div>
+            <!-- Status -->
+            <div>
+              <span
+                class="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full border capitalize"
+                [ngStyle]="{ 'background-color': statusStyle(quote.status).bg, 'border-color': statusStyle(quote.status).border, 'color': statusStyle(quote.status).text }">
+                {{ quote.status || 'draft' }}
+              </span>
+            </div>
+            <!-- Issued -->
+            <p class="text-[#55514a] text-[13px]">{{ quote.issuedDate ? (quote.issuedDate | date:'mediumDate') : '—' }}</p>
+            <!-- Total -->
+            <p class="text-[#34203a] text-[14px] font-semibold md:text-right">SAR {{ (quote.total ?? 0) | number:'1.2-2' }}</p>
+            <!-- Actions -->
+            <div class="flex items-center gap-2 md:justify-end">
+              <button type="button" (click)="openBuilder(quote.id)"
+                class="text-[#34203a] border border-[#34203a] hover:bg-[#34203a] hover:text-white text-[12px] font-semibold px-3 py-1.5 rounded-[8px] transition-colors">View</button>
+              <button type="button" (click)="duplicate(quote)"
+                class="text-[#55514a] border border-[#d8d2c6] hover:border-[#34203a] hover:text-[#34203a] text-[12px] font-medium px-3 py-1.5 rounded-[8px] transition-colors">Duplicate</button>
+              @if ((quote.status || '').toLowerCase() !== 'cancelled') {
+                <button type="button" (click)="cancel(quote)"
+                  class="text-[#a02f2f] border border-[#e8c9c9] hover:bg-[#f7dede] text-[12px] font-medium px-3 py-1.5 rounded-[8px] transition-colors">Cancel</button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

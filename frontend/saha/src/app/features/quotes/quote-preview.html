@@ -1,0 +1,141 @@
+<div class="min-h-screen bg-[#faf7f2] py-10 px-4 flex justify-center">
+  @if (loading()) {
+    <div class="text-[#55514a] text-[14px] mt-20">Loading quote…</div>
+  } @else if (notFound()) {
+    <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-8 py-12 max-w-[520px] text-center mt-10">
+      <p class="text-[#34203a] text-[18px] font-bold mb-2">Quote not available</p>
+      <p class="text-[#8a8478] text-[13px]">This link may have expired or the quote is no longer shared.</p>
+    </div>
+  } @else if (quote(); as q) {
+    <div class="w-full max-w-[820px] flex flex-col gap-5">
+      <!-- Document -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden shadow-sm">
+        <!-- Letterhead -->
+        <div class="bg-[#34203a] px-8 py-7 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-[12px] bg-white/10 flex items-center justify-center overflow-hidden">
+              @if (q.hotel?.logoUrl) {
+                <img [src]="q.hotel!.logoUrl" alt="Hotel logo" class="w-full h-full object-contain" />
+              } @else {
+                <span class="text-[#f6ddae] font-bold text-lg">{{ (q.hotel?.name || 'S')[0] }}</span>
+              }
+            </div>
+            <div class="flex flex-col gap-1">
+              <p class="text-white font-bold text-[20px] leading-none">{{ q.hotel?.name || 'Hotel' }}</p>
+              <p class="text-[#f6ddae] text-[12px]">
+                {{ q.hotel?.district ? q.hotel!.district + ', ' : '' }}{{ q.hotel?.city || '' }}
+              </p>
+              @if (q.hotel?.phone) { <p class="text-[#e9d7f0] text-[11px]">{{ q.hotel!.phone }}</p> }
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-[#f6ddae] text-[11px] font-semibold uppercase tracking-[0.16px]">Quotation</p>
+            <p class="text-white text-[18px] font-bold">{{ q.quoteNumber || '' }}</p>
+          </div>
+        </div>
+
+        <!-- Meta -->
+        <div class="px-8 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-[#efebf3]">
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Prepared For</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.client?.clientName || '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Event Date</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.client?.eventDate ? (q.client!.eventDate | date:'mediumDate') : '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Issued</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.issuedDate ? (q.issuedDate | date:'mediumDate') : '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Valid Until</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.validUntil ? (q.validUntil | date:'mediumDate') : '—' }}</p>
+          </div>
+        </div>
+
+        <!-- Line items table -->
+        <div class="px-8 py-6">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b-2 border-[#34203a]">
+                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px]">Item</th>
+                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-center w-[60px]">Qty</th>
+                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-right w-[120px]">Unit</th>
+                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-right w-[130px]">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of q.lineItems; track item.id) {
+                  <tr class="border-b border-[#efebf3]">
+                    <td class="py-3 pr-3">
+                      <p class="text-[#34203a] text-[13px] font-medium">{{ item.itemName }}</p>
+                      @if (item.description) { <p class="text-[#8a8478] text-[11px]">{{ item.description }}</p> }
+                      @if (!item.isTaxable) { <span class="text-[#8a8478] text-[10px] italic">VAT exempt</span> }
+                    </td>
+                    <td class="py-3 text-center text-[#55514a] text-[13px]">{{ item.quantity ?? 0 }}</td>
+                    <td class="py-3 text-right text-[#55514a] text-[13px]">{{ (item.unitPrice ?? 0) | number:'1.2-2' }}</td>
+                    <td class="py-3 text-right text-[#34203a] text-[13px] font-semibold">{{ (item.total ?? 0) | number:'1.2-2' }}</td>
+                  </tr>
+                }
+                @if (q.lineItems.length === 0) {
+                  <tr><td colspan="4" class="py-6 text-center text-[#8a8478] text-[12px]">No items on this quote.</td></tr>
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Totals -->
+          <div class="flex justify-end mt-5">
+            <div class="w-full max-w-[300px] flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[#55514a] text-[13px]">Subtotal</span>
+                <span class="text-[#34203a] text-[13px] font-medium">SAR {{ (q.subtotal ?? 0) | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[#55514a] text-[13px]">VAT ({{ (q.vatRate ?? 0) | number:'1.0-2' }}%)</span>
+                <span class="text-[#34203a] text-[13px] font-medium">SAR {{ (q.vatAmount ?? 0) | number:'1.2-2' }}</span>
+              </div>
+              <div class="flex items-center justify-between border-t-2 border-[#34203a] pt-2 mt-1">
+                <span class="text-[#34203a] text-[15px] font-bold">Total</span>
+                <span class="text-[#34203a] text-[17px] font-bold">SAR {{ (q.total ?? 0) | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes / terms -->
+          @if (q.notes || q.hotel?.termsNotes) {
+            <div class="mt-6 pt-4 border-t border-[#efebf3] flex flex-col gap-2">
+              @if (q.notes) {
+                <div>
+                  <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1">Notes</p>
+                  <p class="text-[#55514a] text-[12px] whitespace-pre-line">{{ q.notes }}</p>
+                </div>
+              }
+              @if (q.hotel?.termsNotes) {
+                <div>
+                  <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1">Terms</p>
+                  <p class="text-[#55514a] text-[12px] whitespace-pre-line">{{ q.hotel!.termsNotes }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-[#faf7f2] px-8 py-4 border-t border-[#efebf3] text-center">
+          <p class="text-[#8a8478] text-[11px]">{{ q.hotel?.quoteFooterText || 'Thank you for your business.' }}</p>
+        </div>
+      </div>
+
+      <!-- Print action (hidden on print) -->
+      <div class="flex justify-center print:hidden">
+        <button type="button" (click)="print()"
+          class="bg-[#34203a] hover:bg-[#46294f] rounded-[12px] px-6 py-3 text-white text-[13px] font-semibold transition-colors">
+          Print / Save as PDF
+        </button>
+      </div>
+    </div>
+  }
+</div>

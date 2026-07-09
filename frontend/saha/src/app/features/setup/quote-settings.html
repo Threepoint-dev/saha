@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Quote / VAT Settings</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
+        <p class="text-[#34203a] text-[10px] font-semibold">SAHA ADMIN</p>
+      </div>
+      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
+      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
+        <p class="text-white text-[12px] font-semibold">SA</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[760px] mx-auto">
+    <!-- Title -->
+    <div class="flex flex-col gap-1">
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Quote &amp; VAT Settings</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">Defaults applied to every quote you generate.</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+        {{ errorMessage() }}
+      </div>
+    }
+    @if (successMessage()) {
+      <div class="bg-emerald-50 border border-emerald-300 rounded-[10px] px-4 py-3 text-emerald-700 text-[13px]">
+        {{ successMessage() }}
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-6 text-[#55514a] text-[13px]">Loading...</div>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-5">
+        <!-- Numbers card -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Pricing &amp; Numbering</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[#34203a] text-[12px] font-medium" for="vatRate">VAT Rate (%)</label>
+              <input id="vatRate" type="number" formControlName="vatRate" min="0" max="100" step="0.01" placeholder="15"
+                class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
+                [class.border-red-500]="form.controls.vatRate.invalid && form.controls.vatRate.touched" />
+              @if (form.controls.vatRate.invalid && form.controls.vatRate.touched) {
+                <span class="text-red-600 text-[11px]">Enter a value between 0 and 100.</span>
+              }
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[#34203a] text-[12px] font-medium" for="validityDays">Quote Validity (days)</label>
+              <input id="validityDays" type="number" formControlName="validityDays" min="0" step="1" placeholder="7"
+                class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
+                [class.border-red-500]="form.controls.validityDays.invalid && form.controls.validityDays.touched" />
+              @if (form.controls.validityDays.invalid && form.controls.validityDays.touched) {
+                <span class="text-red-600 text-[11px]">Enter a positive number.</span>
+              }
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[#34203a] text-[12px] font-medium" for="quotePrefix">Quote Number Prefix</label>
+              <input id="quotePrefix" type="text" formControlName="quotePrefix" placeholder="QT"
+                class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Text card -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Terms &amp; Footer</p>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[#34203a] text-[12px] font-medium" for="defaultTerms">Default Terms</label>
+            <textarea id="defaultTerms" formControlName="defaultTerms" rows="4" placeholder="Terms and conditions shown on each quote"
+              class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
+          </div>
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[#34203a] text-[12px] font-medium" for="footerText">Footer Text</label>
+            <textarea id="footerText" formControlName="footerText" rows="3" placeholder="Footer shown at the bottom of the quote PDF"
+              class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Toggles card -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Options</p>
+
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#34203a] text-[13px] font-medium">Enable PDF Branding</span>
+              <span class="text-[#8a8478] text-[11px]">Show your workspace logo and colors on generated PDFs.</span>
+            </div>
+            <button type="button" (click)="form.controls.enablePdfBranding.setValue(!form.controls.enablePdfBranding.value)"
+              [attr.aria-pressed]="form.controls.enablePdfBranding.value"
+              [ngClass]="form.controls.enablePdfBranding.value ? 'bg-[#34203a]' : 'bg-[#d8d2c6]'"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shrink-0">
+              <span [ngClass]="form.controls.enablePdfBranding.value ? 'translate-x-6' : 'translate-x-1'"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+            </button>
+          </div>
+
+          <div class="border-t border-[#e4dfd5]"></div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#34203a] text-[13px] font-medium">Allow Manual Discount</span>
+              <span class="text-[#8a8478] text-[11px]">Let staff apply a custom discount when building a quote.</span>
+            </div>
+            <button type="button" (click)="form.controls.allowManualDiscount.setValue(!form.controls.allowManualDiscount.value)"
+              [attr.aria-pressed]="form.controls.allowManualDiscount.value"
+              [ngClass]="form.controls.allowManualDiscount.value ? 'bg-[#34203a]' : 'bg-[#d8d2c6]'"
+              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shrink-0">
+              <span [ngClass]="form.controls.allowManualDiscount.value ? 'translate-x-6' : 'translate-x-1'"
+                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <div class="flex justify-end">
+          <button type="submit" [disabled]="saving()"
+            class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-6 py-2.5 text-white text-[13px] font-semibold transition-colors">
+            {{ saving() ? 'Saving...' : 'Save Settings' }}
+          </button>
+        </div>
+      </form>
+    }
+  </main>
+</div>

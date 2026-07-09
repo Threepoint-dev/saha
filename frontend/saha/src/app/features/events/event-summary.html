@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-[#faf7f2] py-10 px-4 flex justify-center">
+  @if (loading()) {
+    <div class="text-[#55514a] text-[14px] mt-20">Loading event summary…</div>
+  } @else if (notFound()) {
+    <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-8 py-12 max-w-[520px] text-center mt-10">
+      <p class="text-[#34203a] text-[18px] font-bold mb-2">Event not available</p>
+      <p class="text-[#8a8478] text-[13px]">This link may have expired or the event is no longer shared.</p>
+    </div>
+  } @else if (summary(); as s) {
+    <div class="w-full max-w-[820px] flex flex-col gap-5">
+      <!-- Document -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden shadow-sm">
+        <!-- Letterhead -->
+        <div class="bg-[#34203a] px-8 py-7 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-[12px] bg-white/10 flex items-center justify-center overflow-hidden">
+              @if (s.hotel?.logoUrl) {
+                <img [src]="s.hotel!.logoUrl" alt="Hotel logo" class="w-full h-full object-contain" />
+              } @else {
+                <span class="text-[#f6ddae] font-bold text-lg">{{ (s.hotel?.name || 'S')[0] }}</span>
+              }
+            </div>
+            <div class="flex flex-col gap-1">
+              <p class="text-white font-bold text-[20px] leading-none">{{ s.hotel?.name || 'Hotel' }}</p>
+              <p class="text-[#f6ddae] text-[12px]">
+                {{ s.hotel?.district ? s.hotel!.district + ', ' : '' }}{{ s.hotel?.city || '' }}
+              </p>
+              @if (s.hotel?.phone) { <p class="text-[#e9d7f0] text-[11px]">{{ s.hotel!.phone }}</p> }
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-[#f6ddae] text-[11px] font-semibold uppercase tracking-[0.16px]">Event Confirmation</p>
+            @if (s.confirmed) {
+              <p class="text-white text-[14px] font-bold">Confirmed</p>
+            } @else {
+              <p class="text-[#e9d7f0] text-[13px] font-semibold">Pending confirmation</p>
+            }
+          </div>
+        </div>
+
+        <!-- Meta -->
+        <div class="px-8 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-[#efebf3]">
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Prepared For</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ s.clientName || '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Event Date</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ s.eventDate ? (s.eventDate | date:'fullDate') : '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Hall</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ s.hallName || '—' }}</p>
+          </div>
+          <div class="flex flex-col gap-1">
+            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Guests</p>
+            <p class="text-[#34203a] text-[14px] font-semibold">{{ s.guestCount ?? '—' }}</p>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="px-8 py-6 flex flex-col gap-6">
+          <div>
+            <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-3">Setup</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="flex flex-col gap-1">
+                <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Setup Type</p>
+                <p class="text-[#34203a] text-[13px] font-medium">{{ s.setupType || '—' }}</p>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Catering</p>
+                <p class="text-[#34203a] text-[13px] font-medium">{{ s.cateringStyle || '—' }}</p>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Main Meal</p>
+                <p class="text-[#34203a] text-[13px] font-medium">{{ s.mainMeal || '—' }}</p>
+              </div>
+              <div class="flex flex-col gap-1">
+                <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Time</p>
+                <p class="text-[#34203a] text-[13px] font-medium">
+                  @if (s.startTime || s.endTime) { {{ s.startTime || '—' }} – {{ s.endTime || '—' }} } @else { — }
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add-ons -->
+          @if (s.addons.length) {
+            <div>
+              <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-3">Selected Add-ons</p>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b-2 border-[#34203a]">
+                      <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px]">Add-on</th>
+                      <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-right w-[100px]">Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (a of s.addons; track a.name) {
+                      <tr class="border-b border-[#efebf3]">
+                        <td class="py-3 text-[#34203a] text-[13px] font-medium">{{ a.name || '—' }}</td>
+                        <td class="py-3 text-right text-[#55514a] text-[13px]">{{ a.quantity ?? 0 }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          }
+
+          <!-- Quote total -->
+          @if (s.quoteTotal != null) {
+            <div class="flex justify-end">
+              <div class="w-full max-w-[300px] flex items-center justify-between border-t-2 border-[#34203a] pt-3">
+                <span class="text-[#34203a] text-[15px] font-bold">Estimated Total</span>
+                <span class="text-[#34203a] text-[17px] font-bold">SAR {{ s.quoteTotal | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-[#faf7f2] px-8 py-4 border-t border-[#efebf3] text-center">
+          <p class="text-[#8a8478] text-[11px]">Thank you for choosing {{ s.hotel?.name || 'us' }}. We look forward to hosting your event.</p>
+        </div>
+      </div>
+
+      <!-- Print action (hidden on print) -->
+      <div class="flex justify-center print:hidden">
+        <button type="button" (click)="print()"
+          class="bg-[#34203a] hover:bg-[#46294f] rounded-[12px] px-6 py-3 text-white text-[13px] font-semibold transition-colors">
+          Print / Save as PDF
+        </button>
+      </div>
+    </div>
+  }
+</div>
