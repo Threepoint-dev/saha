@@ -1,0 +1,360 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Reference Data Setup</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
+        <p class="text-[#34203a] text-[10px] font-semibold">SAHA ADMIN</p>
+      </div>
+      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
+      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
+        <p class="text-white text-[12px] font-semibold">SA</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1440px] mx-auto">
+    <!-- Title -->
+    <div class="flex flex-col gap-1">
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Reference Data</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">Halls, packages, and add-ons available in your workspace</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex items-center gap-1 border-b border-[#e4dfd5]">
+      <button
+        type="button"
+        (click)="setTab('halls')"
+        [ngClass]="activeTab() === 'halls' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
+        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        Halls
+      </button>
+      <button
+        type="button"
+        (click)="setTab('packages')"
+        [ngClass]="activeTab() === 'packages' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
+        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        Packages
+      </button>
+      <button
+        type="button"
+        (click)="setTab('addons')"
+        [ngClass]="activeTab() === 'addons' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
+        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        Add-ons
+      </button>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+        {{ errorMessage() }}
+      </div>
+    }
+    @if (successMessage()) {
+      <div class="bg-emerald-50 border border-emerald-300 rounded-[10px] px-4 py-3 text-emerald-700 text-[13px]">
+        {{ successMessage() }}
+      </div>
+    }
+
+    <!-- Section Header Pill -->
+    <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2 flex items-center justify-between">
+      <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">
+        @switch (activeTab()) {
+          @case ('halls') { HALLS }
+          @case ('packages') { PACKAGES }
+          @case ('addons') { ADD-ONS }
+        }
+      </p>
+      <span class="text-[#34203a] text-[11px] font-medium">{{ rowCount() }} active</span>
+    </div>
+
+    <!-- Toolbar: Add button -->
+    <div class="flex justify-end">
+      <button
+        type="button"
+        (click)="openCreate()"
+        class="bg-[#34203a] hover:bg-[#46294f] rounded-[10px] px-4 py-2.5 text-white text-[13px] font-semibold transition-colors">
+        {{ addButtonLabel() }}
+      </button>
+    </div>
+
+    <!-- Content: Table per tab -->
+    <div class="bg-white border border-[#e4dfd5] rounded-[12px] overflow-hidden">
+      @if (loading()) {
+        <div class="px-5 py-6 text-[#55514a] text-[13px]">Loading...</div>
+      } @else {
+        @switch (activeTab()) {
+          @case ('halls') {
+            @if (halls().length === 0) {
+              <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
+                No active halls. Click <span class="font-semibold text-[#34203a]">Add Hall</span> to create one.
+              </div>
+            } @else {
+              <table class="w-full text-[13px]">
+                <thead class="bg-[#efebf3]">
+                  <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
+                    <th class="text-left px-5 py-3">Name</th>
+                    <th class="text-left px-5 py-3">Short Code</th>
+                    <th class="text-right px-5 py-3">Capacity</th>
+                    <th class="text-right px-5 py-3">Base Price</th>
+                    <th class="text-left px-5 py-3">Default Setup</th>
+                    <th class="text-right px-5 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (hall of halls(); track hall.id) {
+                    <tr class="border-t border-[#e4dfd5] text-[#34203a]">
+                      <td class="px-5 py-3 font-medium">{{ hall.name }}</td>
+                      <td class="px-5 py-3 text-[#55514a]">{{ hall.shortCode || '—' }}</td>
+                      <td class="px-5 py-3 text-right">{{ hall.capacity ?? '—' }}</td>
+                      <td class="px-5 py-3 text-right">{{ formatPrice(hall.basePrice) }}</td>
+                      <td class="px-5 py-3 text-[#55514a]">{{ hall.defaultSetup || '—' }}</td>
+                      <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-2">
+                          <button type="button" (click)="openEditHall(hall)"
+                            class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Edit
+                          </button>
+                          <button type="button" (click)="archiveHall(hall)"
+                            class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Archive
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          }
+          @case ('packages') {
+            @if (packages().length === 0) {
+              <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
+                No active packages. Click <span class="font-semibold text-[#34203a]">Add Package</span> to create one.
+              </div>
+            } @else {
+              <table class="w-full text-[13px]">
+                <thead class="bg-[#efebf3]">
+                  <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
+                    <th class="text-left px-5 py-3">Name</th>
+                    <th class="text-left px-5 py-3">Description</th>
+                    <th class="text-right px-5 py-3">Price</th>
+                    <th class="text-center px-5 py-3">Taxable</th>
+                    <th class="text-right px-5 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (pkg of packages(); track pkg.id) {
+                    <tr class="border-t border-[#e4dfd5] text-[#34203a]">
+                      <td class="px-5 py-3 font-medium">{{ pkg.name }}</td>
+                      <td class="px-5 py-3 text-[#55514a] max-w-[420px] truncate">{{ pkg.description || '—' }}</td>
+                      <td class="px-5 py-3 text-right">{{ formatPrice(pkg.price) }}</td>
+                      <td class="px-5 py-3 text-center">
+                        @if (pkg.isTaxable) {
+                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">Yes</span>
+                        } @else {
+                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">No</span>
+                        }
+                      </td>
+                      <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-2">
+                          <button type="button" (click)="openEditPackage(pkg)"
+                            class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Edit
+                          </button>
+                          <button type="button" (click)="archivePackage(pkg)"
+                            class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Archive
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          }
+          @case ('addons') {
+            @if (addons().length === 0) {
+              <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
+                No active add-ons. Click <span class="font-semibold text-[#34203a]">Add Add-on</span> to create one.
+              </div>
+            } @else {
+              <table class="w-full text-[13px]">
+                <thead class="bg-[#efebf3]">
+                  <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
+                    <th class="text-left px-5 py-3">Name</th>
+                    <th class="text-right px-5 py-3">Price</th>
+                    <th class="text-center px-5 py-3">Taxable</th>
+                    <th class="text-right px-5 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (addon of addons(); track addon.id) {
+                    <tr class="border-t border-[#e4dfd5] text-[#34203a]">
+                      <td class="px-5 py-3 font-medium">{{ addon.name }}</td>
+                      <td class="px-5 py-3 text-right">{{ formatPrice(addon.price) }}</td>
+                      <td class="px-5 py-3 text-center">
+                        @if (addon.isTaxable) {
+                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">Yes</span>
+                        } @else {
+                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">No</span>
+                        }
+                      </td>
+                      <td class="px-5 py-3">
+                        <div class="flex items-center justify-end gap-2">
+                          <button type="button" (click)="openEditAddon(addon)"
+                            class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Edit
+                          </button>
+                          <button type="button" (click)="archiveAddon(addon)"
+                            class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
+                            Archive
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          }
+        }
+      }
+    </div>
+  </main>
+
+  <!-- Modal -->
+  @if (modalOpen()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
+      <div class="relative bg-white rounded-[12px] shadow-lg w-full max-w-[520px] border border-[#e4dfd5]">
+        <div class="flex items-center justify-between border-b border-[#e4dfd5] px-5 py-4">
+          <h2 class="text-[#34203a] text-[16px] font-bold">{{ modalTitle() }}</h2>
+          <button type="button" (click)="closeModal()"
+            class="text-[#55514a] hover:text-[#34203a] text-[18px] leading-none w-8 h-8 rounded-full hover:bg-[#efebf3] flex items-center justify-center">
+            &times;
+          </button>
+        </div>
+
+        <div class="p-5">
+          @if (modalTab() === 'halls') {
+            <form [formGroup]="hallForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[#34203a] text-[12px] font-medium" for="hall-name">Name</label>
+                <input id="hall-name" type="text" formControlName="name"
+                  placeholder="Grand Ballroom"
+                  class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
+                  [class.border-red-500]="hallForm.controls.name.invalid && hallForm.controls.name.touched" />
+                @if (hallForm.controls.name.invalid && hallForm.controls.name.touched) {
+                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-capacity">Capacity</label>
+                  <input id="hall-capacity" type="number" formControlName="capacity" min="0" placeholder="300"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-price">Base Price (SAR)</label>
+                  <input id="hall-price" type="number" formControlName="basePrice" min="0" step="0.01" placeholder="12000.00"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-setup">Default Setup</label>
+                  <input id="hall-setup" type="text" formControlName="defaultSetup" placeholder="Theater"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-code">Short Code</label>
+                  <input id="hall-code" type="text" formControlName="shortCode" placeholder="BR-01"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+              </div>
+            </form>
+          } @else if (modalTab() === 'packages') {
+            <form [formGroup]="packageForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-name">Name</label>
+                <input id="pkg-name" type="text" formControlName="name" placeholder="Standard Wedding Package"
+                  class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
+                  [class.border-red-500]="packageForm.controls.name.invalid && packageForm.controls.name.touched" />
+                @if (packageForm.controls.name.invalid && packageForm.controls.name.touched) {
+                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                }
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-description">Description</label>
+                <textarea id="pkg-description" formControlName="description" rows="3" placeholder="What's included in the package"
+                  class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="pkg-price">Price (SAR)</label>
+                  <input id="pkg-price" type="number" formControlName="price" min="0" step="0.01" placeholder="25000.00"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+                <div class="flex items-end">
+                  <label class="flex items-center gap-2 text-[#34203a] text-[13px] font-medium">
+                    <input type="checkbox" formControlName="isTaxable"
+                      class="w-4 h-4 rounded border-[#e4dfd5] text-[#34203a] focus:ring-[#34203a]" />
+                    Taxable
+                  </label>
+                </div>
+              </div>
+            </form>
+          } @else {
+            <form [formGroup]="addonForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[#34203a] text-[12px] font-medium" for="addon-name">Name</label>
+                <input id="addon-name" type="text" formControlName="name" placeholder="Extra Sound System"
+                  class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
+                  [class.border-red-500]="addonForm.controls.name.invalid && addonForm.controls.name.touched" />
+                @if (addonForm.controls.name.invalid && addonForm.controls.name.touched) {
+                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                }
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-[#34203a] text-[12px] font-medium" for="addon-price">Price (SAR)</label>
+                  <input id="addon-price" type="number" formControlName="price" min="0" step="0.01" placeholder="1500.00"
+                    class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                </div>
+                <div class="flex items-end">
+                  <label class="flex items-center gap-2 text-[#34203a] text-[13px] font-medium">
+                    <input type="checkbox" formControlName="isTaxable"
+                      class="w-4 h-4 rounded border-[#e4dfd5] text-[#34203a] focus:ring-[#34203a]" />
+                    Taxable
+                  </label>
+                </div>
+              </div>
+            </form>
+          }
+        </div>
+
+        <div class="flex items-center justify-end gap-2 border-t border-[#e4dfd5] px-5 py-4">
+          <button type="button" (click)="closeModal()" [disabled]="saving()"
+            class="border border-[#e4dfd5] text-[#34203a] hover:bg-[#efebf3] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-60">
+            Cancel
+          </button>
+          <button type="button" (click)="submit()" [disabled]="saving()"
+            class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-4 py-2.5 text-white text-[13px] font-semibold transition-colors">
+            {{ saving() ? 'Saving...' : (modalMode() === 'create' ? 'Create' : 'Save Changes') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

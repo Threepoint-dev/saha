@@ -1,0 +1,31 @@
+@if (!hidden()) {
+<aside class="bg-[#34203a] w-[240px] shrink-0 min-h-screen sticky top-0 flex flex-col gap-6 px-4 py-6 self-start">
+  <!-- Brand -->
+  <div class="flex items-center gap-3 px-2">
+    <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+      <span class="text-white font-bold text-sm">S</span>
+    </div>
+    <div class="flex flex-col gap-px leading-none">
+      <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+      <p class="text-[#f6ddae] text-[11px]">Setup</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex flex-col gap-1">
+    <p class="text-[#f6ddae]/60 text-[10px] font-semibold tracking-[0.22px] px-3 pb-1">WORKSPACE SETUP</p>
+    @for (link of links; track link.path) {
+      <a
+        [routerLink]="link.path"
+        routerLinkActive="bg-[#f6ddae] !text-[#34203a] font-semibold"
+        [routerLinkActiveOptions]="{ exact: link.exact }"
+        class="flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 text-[#f6ddae] hover:bg-[#46294f] transition-colors">
+        <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
+        @if (link.hint) {
+          <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
+        }
+      </a>
+    }
+  </nav>
+</aside>
+}

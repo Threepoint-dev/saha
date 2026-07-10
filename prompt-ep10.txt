@@ -1,0 +1,78 @@
+Build EP-10: Data Export and Quality for SAHA. Work completely autonomously without asking questions or stopping.
+
+Figma file key J6SnHXasKmdDTHPXQidrgP
+Search for Export and Data Quality screens. Fetch design before writing HTML. If quota-blocked, use SAHA house style.
+
+No new tables needed. Reads existing data only.
+
+BACKEND under com.saha.export:
+
+ExportController — /api/tenants/{tenantId}/export:
+
+GET /inquiries → export all inquiries as CSV
+Columns: inquiry_number, client_name, client_phone, client_email, event_date, guest_count, status, estimated_value, source_channel, hall, created_at, first_response_at
+
+GET /quotes → export all quotes as CSV
+Columns: quote_number, inquiry_client_name, status, subtotal, vat_amount, total, issued_date, valid_until, created_at
+
+GET /halls → export halls as CSV
+Columns: name, short_code, capacity, base_price, default_setup, status
+
+GET /packages → export packages as CSV
+Columns: name, description, price, is_taxable, status
+
+GET /addons → export addons as CSV
+Columns: name, price, is_taxable, status
+
+All CSV exports:
+- Content-Type: text/csv
+- Content-Disposition: attachment; filename="saha-{type}-{date}.csv"
+- UTF-8 BOM for Excel compatibility
+- Filter all by tenant_id
+
+DataQualityController — /api/tenants/{tenantId}/data-quality:
+
+GET / → returns quality report:
+{
+  score: number (0-100),
+  issues: [
+    { entity: string, field: string, issue: string, count: number }
+  ],
+  summary: {
+    hotelsComplete: boolean,
+    hallsCount: number,
+    packagesCount: number,
+    addonsCount: number,
+    sourceChannelsCount: number,
+    quoteSettingsConfigured: boolean
+  }
+}
+
+Quality checks:
+- hotel has name + phone + address → if missing: issue
+- at least 1 active hall → if missing: issue
+- at least 1 active package → if missing: issue
+- at least 1 active source channel → if missing: issue
+- quote settings configured → if missing: issue
+- score = (checks passed / total checks) * 100
+
+FRONTEND under src/app/features/export/:
+
+Single page (/export):
+- Section 1: Data Export
+  - Export buttons: Inquiries CSV, Quotes CSV, Halls CSV, Packages CSV, Add-ons CSV
+  - Each button triggers download immediately
+  - Show last export date if available (store in localStorage)
+
+- Section 2: Data Quality
+  - Quality score as a progress bar (color: green >80, yellow 50-80, red <50)
+  - Summary cards: Hotels, Halls, Packages, Add-ons, Source Channels, Quote Settings
+  - Issues list: entity, field, issue description, count
+  - Refresh button to re-check quality
+
+Add "Export & Quality" link to sidebar.
+Route: /export
+
+All labels in English. Tailwind only. Match SAHA house style. Use environment.ts tenantId.
+Do not touch DB schema, auth, or other epic files.
+Write each file and move to the next without stopping.

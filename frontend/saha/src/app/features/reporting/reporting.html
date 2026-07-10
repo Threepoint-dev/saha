@@ -1,0 +1,123 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Measurement &amp; Reporting</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
+        <p class="text-[#f6ddae] text-[10px] font-semibold">SAHA ADMIN</p>
+      </div>
+      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
+      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
+        <p class="text-white text-[12px] font-semibold">SA</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1200px] mx-auto">
+    <!-- Title + date range filter -->
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-[#34203a] font-bold text-[24px] leading-none">Reporting Dashboard</h1>
+        <p class="text-[#55514a] text-[13px] leading-none">Inquiry, conversion &amp; quote performance for your venue.</p>
+      </div>
+
+      <div class="flex items-end gap-3 bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3">
+        <label class="flex flex-col gap-1">
+          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">From</span>
+          <input type="date" [ngModel]="from()" (ngModelChange)="from.set($event)"
+            class="border border-[#e4dfd5] rounded-[8px] px-2.5 py-1.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+        </label>
+        <label class="flex flex-col gap-1">
+          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">To</span>
+          <input type="date" [ngModel]="to()" (ngModelChange)="to.set($event)"
+            class="border border-[#e4dfd5] rounded-[8px] px-2.5 py-1.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+        </label>
+        <button type="button" (click)="apply()"
+          class="bg-[#34203a] hover:bg-[#46294f] text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-5 py-2 transition-colors disabled:opacity-60"
+          [disabled]="loading()">
+          {{ loading() ? 'Loading…' : 'Apply' }}
+        </button>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <!-- KPI cards -->
+    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+      @for (kpi of kpis(); track kpi.label) {
+        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-4 py-3.5 flex flex-col gap-1.5">
+          <p class="text-[#55514a] text-[11px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ kpi.label }}</p>
+          <p class="text-[#34203a] font-bold text-[22px] leading-none">{{ kpi.value }}</p>
+          @if (kpi.hint) {
+            <p class="text-[#8a8079] text-[11px] leading-none">{{ kpi.hint }}</p>
+          }
+        </div>
+      }
+      @if (kpis().length === 0) {
+        <div class="col-span-full bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-6 text-[#55514a] text-[13px]">
+          {{ loading() ? 'Loading metrics…' : 'No data for the selected range.' }}
+        </div>
+      }
+    </div>
+
+    <!-- Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Inquiries by Month -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+        <div class="flex flex-col gap-0.5">
+          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Month</h2>
+          <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+        </div>
+        <div class="h-[240px] relative">
+          <canvas id="chart-inquiries-month"></canvas>
+        </div>
+      </div>
+
+      <!-- Quote Value by Month -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+        <div class="flex flex-col gap-0.5">
+          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Quote Value by Month</h2>
+          <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+        </div>
+        <div class="h-[240px] relative">
+          <canvas id="chart-quote-month"></canvas>
+        </div>
+      </div>
+
+      <!-- Inquiries by Status -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+        <div class="flex flex-col gap-0.5">
+          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Status</h2>
+          <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+        </div>
+        <div class="h-[240px] relative">
+          <canvas id="chart-status"></canvas>
+        </div>
+      </div>
+
+      <!-- Inquiries by Source Channel -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+        <div class="flex flex-col gap-0.5">
+          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Source Channel</h2>
+          <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+        </div>
+        <div class="h-[240px] relative">
+          <canvas id="chart-source"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

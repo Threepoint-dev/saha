@@ -1,0 +1,151 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Export &amp; Data Quality</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
+        <p class="text-[#f6ddae] text-[10px] font-semibold">SAHA ADMIN</p>
+      </div>
+      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
+      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
+        <p class="text-white text-[12px] font-semibold">SA</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1200px] mx-auto">
+    <div class="flex flex-col gap-1">
+      <h1 class="text-[#34203a] font-bold text-[24px] leading-none">Data Export &amp; Quality</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">Download your data as CSV and review setup completeness.</p>
+    </div>
+
+    <!-- Section 1: Data Export -->
+    <section class="flex flex-col gap-4 bg-white border border-[#e4dfd5] rounded-[14px] px-6 py-5">
+      <div class="flex flex-col gap-1">
+        <h2 class="text-[#34203a] font-bold text-[16px] leading-none">Data Export</h2>
+        <p class="text-[#55514a] text-[12px]">Each file downloads immediately as UTF-8 CSV (Excel-ready).</p>
+      </div>
+
+      @if (exportError()) {
+        <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+          {{ exportError() }}
+        </div>
+      }
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+        @for (item of exportItems; track item.type) {
+          <div class="flex flex-col gap-3 border border-[#e4dfd5] rounded-[12px] px-4 py-4 bg-[#faf7f2]">
+            <div class="flex flex-col gap-1">
+              <p class="text-[#34203a] font-semibold text-[14px] leading-tight">{{ item.label }}</p>
+              <p class="text-[#55514a] text-[11px] leading-tight">{{ item.description }}</p>
+            </div>
+            <button type="button" (click)="download(item.type)"
+              [disabled]="downloading() === item.type"
+              class="bg-[#34203a] hover:bg-[#46294f] text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-4 py-2 transition-colors disabled:opacity-60">
+              {{ downloading() === item.type ? 'Preparing…' : 'Download CSV' }}
+            </button>
+            @if (lastExportOf(item.type)) {
+              <p class="text-[#55514a] text-[10px] leading-tight">
+                Last exported {{ formatDateTime(lastExportOf(item.type)!) }}
+              </p>
+            } @else {
+              <p class="text-[#55514a]/60 text-[10px] leading-tight">Not exported yet</p>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Section 2: Data Quality -->
+    <section class="flex flex-col gap-4 bg-white border border-[#e4dfd5] rounded-[14px] px-6 py-5">
+      <div class="flex items-start justify-between gap-4">
+        <div class="flex flex-col gap-1">
+          <h2 class="text-[#34203a] font-bold text-[16px] leading-none">Data Quality</h2>
+          <p class="text-[#55514a] text-[12px]">Setup completeness across your pilot configuration.</p>
+        </div>
+        <button type="button" (click)="loadQuality()"
+          [disabled]="qualityLoading()"
+          class="bg-white border border-[#34203a] text-[#34203a] hover:bg-[#34203a] hover:text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-4 py-2 transition-colors disabled:opacity-60">
+          {{ qualityLoading() ? 'Checking…' : 'Refresh' }}
+        </button>
+      </div>
+
+      @if (qualityError()) {
+        <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">
+          {{ qualityError() }}
+        </div>
+      }
+
+      @if (report(); as r) {
+        <!-- Score -->
+        <div class="flex flex-col gap-2">
+          <div class="flex items-end justify-between">
+            <span class="text-[#55514a] text-[12px] font-semibold uppercase tracking-[0.2px]">Quality Score</span>
+            <span class="text-[#34203a] font-bold text-[22px] leading-none">{{ score() }}%</span>
+          </div>
+          <div class="w-full h-[12px] rounded-full bg-[#efe9e0] overflow-hidden">
+            <div class="h-full rounded-full transition-all"
+              [style.width.%]="score()" [style.background-color]="scoreColor()"></div>
+          </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
+          @for (card of summaryCards(); track card.label) {
+            <div class="flex flex-col gap-1 border border-[#e4dfd5] rounded-[12px] px-3 py-3 bg-[#faf7f2]">
+              <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ card.label }}</span>
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full" [style.background-color]="card.ok ? '#2e7d5b' : '#d14343'"></span>
+                <span class="text-[#34203a] font-bold text-[15px] leading-none">{{ card.value }}</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Issues -->
+        <div class="flex flex-col gap-2">
+          <h3 class="text-[#34203a] font-semibold text-[13px]">Issues</h3>
+          @if (r.issues.length === 0) {
+            <div class="bg-[#eef7f1] border border-[#bfe0cd] rounded-[10px] px-4 py-3 text-[#2e7d5b] text-[13px] font-medium">
+              No issues found — your setup is complete. 🎉
+            </div>
+          } @else {
+            <div class="overflow-x-auto border border-[#e4dfd5] rounded-[12px]">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-[#faf7f2] text-[#55514a] text-[11px] uppercase tracking-[0.2px]">
+                    <th class="px-4 py-2.5 font-semibold">Entity</th>
+                    <th class="px-4 py-2.5 font-semibold">Field</th>
+                    <th class="px-4 py-2.5 font-semibold">Issue</th>
+                    <th class="px-4 py-2.5 font-semibold text-right">Count</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (issue of r.issues; track $index) {
+                    <tr class="border-t border-[#efe9e0] text-[13px] text-[#34203a]">
+                      <td class="px-4 py-2.5 font-medium">{{ issue.entity }}</td>
+                      <td class="px-4 py-2.5 text-[#55514a]">{{ issue.field }}</td>
+                      <td class="px-4 py-2.5 text-[#55514a]">{{ issue.issue }}</td>
+                      <td class="px-4 py-2.5 text-right tabular-nums">{{ issue.count }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      } @else if (!qualityError()) {
+        <p class="text-[#55514a] text-[13px]">Loading data quality report…</p>
+      }
+    </section>
+  </main>
+</div>
