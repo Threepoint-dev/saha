@@ -1,6 +1,8 @@
 package com.saha.event;
 
-import com.saha.setup.Addon;
+import com.saha.model.Addon;
+import com.saha.model.EventAddon;
+import com.saha.model.EventSetup;
 import com.saha.setup.AddonRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

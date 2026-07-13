@@ -1,6 +1,7 @@
 package com.saha.event;
 
-import com.saha.setup.Addon;
+import com.saha.model.Addon;
+import com.saha.model.EventAddon;
 
 import java.math.BigDecimal;
 import java.util.UUID;

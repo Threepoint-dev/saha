@@ -1,7 +1,8 @@
 package com.saha.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
@@ -9,31 +10,27 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "inquiry")
 public class Inquiry {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id", nullable = false)
-    private HotelTenant tenant;
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner_id")
-    private HotelUser owner;
+    @Column(name = "owner_id")
+    private UUID ownerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "source_channel_id")
-    private SourceChannel sourceChannel;
+    @Column(name = "source_channel_id")
+    private UUID sourceChannelId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hall_id")
-    private Hall hall;
+    @Column(name = "hall_id")
+    private UUID hallId;
 
     @Column(name = "inquiry_number")
     private String inquiryNumber;

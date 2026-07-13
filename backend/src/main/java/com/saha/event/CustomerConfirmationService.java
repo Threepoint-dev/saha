@@ -1,13 +1,14 @@
 package com.saha.event;
 
-import com.saha.quote.Quote;
+import com.saha.model.EventSetup;
+import com.saha.model.Quote;
 import com.saha.quote.QuoteRepository;
-import com.saha.setup.Addon;
+import com.saha.model.Addon;
 import com.saha.setup.AddonRepository;
-import com.saha.setup.Hall;
+import com.saha.model.Hall;
 import com.saha.setup.HallRepository;
-import com.saha.tenant.HotelTenant;
-import com.saha.tenant.HotelTenantRepository;
+import com.saha.model.HotelTenant;
+import com.saha.tenant.HotelProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class CustomerConfirmationService {
     private final EventAddonRepository addonLineRepository;
     private final AddonRepository addonRepository;
     private final HallRepository hallRepository;
-    private final HotelTenantRepository tenantRepository;
+    private final HotelProfileRepository tenantRepository;
     private final QuoteRepository quoteRepository;
 
     public CustomerConfirmationService(EventInquiryRepository inquiryRepository,
@@ -39,7 +40,7 @@ public class CustomerConfirmationService {
                                        EventAddonRepository addonLineRepository,
                                        AddonRepository addonRepository,
                                        HallRepository hallRepository,
-                                       HotelTenantRepository tenantRepository,
+                                       HotelProfileRepository tenantRepository,
                                        QuoteRepository quoteRepository) {
         this.inquiryRepository = inquiryRepository;
         this.setupRepository = setupRepository;

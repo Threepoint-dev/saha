@@ -1,27 +1,30 @@
 package com.saha.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "event_addon")
 public class EventAddon {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "event_setup_id", nullable = false)
-    private EventSetup eventSetup;
+    @Column(name = "event_setup_id", nullable = false, updatable = false)
+    private UUID eventSetupId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "addon_id", nullable = false)
-    private Addon addon;
+    @Column(name = "addon_id", nullable = false)
+    private UUID addonId;
 
     @Column(name = "quantity")
-    private Integer quantity = 1;
+    private Integer quantity;
 }

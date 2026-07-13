@@ -1,5 +1,7 @@
 package com.saha.quote;
 
+import com.saha.model.QuoteLineItem;
+
 import java.math.BigDecimal;
 import java.util.UUID;
 

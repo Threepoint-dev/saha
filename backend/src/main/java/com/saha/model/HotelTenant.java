@@ -1,34 +1,38 @@
 package com.saha.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "hotel_tenant")
 public class HotelTenant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @UuidGenerator
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "city")
     private String city;
 
     @Column(name = "district")
     private String district;
-
-    @Column(name = "address", columnDefinition = "TEXT")
-    private String address;
 
     @Column(name = "phone")
     private String phone;
@@ -45,29 +49,29 @@ public class HotelTenant {
     @Column(name = "logo_url")
     private String logoUrl;
 
+    @Column(name = "quote_footer_text")
+    private String quoteFooterText;
+
+    @Column(name = "terms_notes")
+    private String termsNotes;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+    @Column(name = "readiness_status")
+    private String readinessStatus;
+
+    @Column(name = "pilot_status")
+    private String pilotStatus;
+
     @Column(name = "pilot_start_date")
     private LocalDate pilotStartDate;
 
     @Column(name = "baseline_duration")
     private Integer baselineDuration;
 
-    @Column(name = "pilot_status")
-    private String pilotStatus;
-
-    @Column(name = "readiness_status")
-    private String readinessStatus;
-
     @Column(name = "data_quality_score")
-    private Integer dataQualityScore = 0;
-
-    @Column(name = "quote_footer_text", columnDefinition = "TEXT")
-    private String quoteFooterText;
-
-    @Column(name = "terms_notes", columnDefinition = "TEXT")
-    private String termsNotes;
-
-    @Column(name = "is_active")
-    private Boolean isActive = true;
+    private Integer dataQualityScore;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

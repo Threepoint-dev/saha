@@ -8,11 +8,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.UUID;
 
 @Service
-public class InquiryService {
+public class QuoteInquiryService {
 
-    private final InquiryRepository repository;
+    private final QuoteInquiryRepository repository;
 
-    public InquiryService(InquiryRepository repository) {
+    public QuoteInquiryService(QuoteInquiryRepository repository) {
         this.repository = repository;
     }
 

@@ -58,9 +58,9 @@ public class InquiryService {
         existing.setEstimatedValue(updated.getEstimatedValue());
         existing.setPriority(updated.getPriority());
         existing.setNotes(updated.getNotes());
-        existing.setOwner(updated.getOwner());
-        existing.setSourceChannel(updated.getSourceChannel());
-        existing.setHall(updated.getHall());
+        existing.setOwnerId(updated.getOwnerId());
+        existing.setSourceChannelId(updated.getSourceChannelId());
+        existing.setHallId(updated.getHallId());
 
         return inquiryRepository.save(existing);
     }
@@ -71,7 +71,6 @@ public class InquiryService {
 
         String oldStatus = inquiry.getStatus();
 
-        // Auto-capture first response time
         if ("NEW".equals(oldStatus) && !newStatus.equals("NEW")
                 && inquiry.getFirstResponseAt() == null) {
             inquiry.setFirstResponseAt(OffsetDateTime.now());
@@ -80,9 +79,9 @@ public class InquiryService {
         inquiry.setStatus(newStatus);
         inquiryRepository.save(inquiry);
 
-        // Log the status change
         InquiryStatusLog log = new InquiryStatusLog();
-        log.setInquiry(inquiry);
+        log.setInquiryId(inquiry.getId());
+        log.setChangedById(changedById);
         log.setFromStatus(oldStatus);
         log.setToStatus(newStatus);
         inquiryStatusLogRepository.save(log);

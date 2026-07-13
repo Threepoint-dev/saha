@@ -1,7 +1,9 @@
 package com.saha.quote;
 
-import com.saha.tenant.HotelTenant;
-import com.saha.tenant.HotelTenantRepository;
+import com.saha.model.Inquiry;
+import com.saha.model.Quote;
+import com.saha.model.HotelTenant;
+import com.saha.tenant.HotelProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +18,13 @@ public class QuoteShareService {
 
     private final QuoteRepository quoteRepository;
     private final QuoteLineItemRepository lineItemRepository;
-    private final HotelTenantRepository tenantRepository;
-    private final InquiryRepository inquiryRepository;
+    private final HotelProfileRepository tenantRepository;
+    private final QuoteInquiryRepository inquiryRepository;
 
     public QuoteShareService(QuoteRepository quoteRepository,
                              QuoteLineItemRepository lineItemRepository,
-                             HotelTenantRepository tenantRepository,
-                             InquiryRepository inquiryRepository) {
+                             HotelProfileRepository tenantRepository,
+                             QuoteInquiryRepository inquiryRepository) {
         this.quoteRepository = quoteRepository;
         this.lineItemRepository = lineItemRepository;
         this.tenantRepository = tenantRepository;

@@ -1,5 +1,7 @@
 package com.saha.setup;
 
+import com.saha.model.SourceChannel;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

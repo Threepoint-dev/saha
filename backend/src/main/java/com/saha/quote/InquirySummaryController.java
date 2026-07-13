@@ -9,11 +9,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tenants/{tenantId}/inquiries/{inquiryId}")
-public class InquiryController {
+public class InquirySummaryController {
 
-    private final InquiryService service;
+    private final QuoteInquiryService service;
 
-    public InquiryController(InquiryService service) {
+    public InquirySummaryController(QuoteInquiryService service) {
         this.service = service;
     }
 

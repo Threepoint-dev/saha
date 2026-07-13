@@ -1,5 +1,6 @@
 package com.saha.tenant;
 
+import com.saha.model.HotelTenant;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -9,11 +10,11 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Service
-public class HotelTenantService {
+public class HotelProfileService {
 
-    private final HotelTenantRepository repository;
+    private final HotelProfileRepository repository;
 
-    public HotelTenantService(HotelTenantRepository repository) {
+    public HotelProfileService(HotelProfileRepository repository) {
         this.repository = repository;
     }
 

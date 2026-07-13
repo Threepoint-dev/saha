@@ -1,4 +1,4 @@
-package com.saha.setup;
+package com.saha.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,8 +14,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "addon")
-public class Addon {
+@Table(name = "package")
+public class EventPackage {
 
     @Id
     @Column(name = "id", nullable = false, updatable = false)
@@ -26,6 +26,9 @@ public class Addon {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "price")
     private BigDecimal price;

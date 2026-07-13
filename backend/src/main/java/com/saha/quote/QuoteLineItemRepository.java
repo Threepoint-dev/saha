@@ -1,5 +1,6 @@
 package com.saha.quote;
 
+import com.saha.model.QuoteLineItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

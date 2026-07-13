@@ -1,5 +1,7 @@
 package com.saha.tenant;
 
+import com.saha.model.HotelTenant;
+
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;

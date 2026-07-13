@@ -1,5 +1,7 @@
 package com.saha.event;
 
+import com.saha.model.EventSetup;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;

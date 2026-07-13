@@ -12,11 +12,11 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/tenants/{tenantId}")
-public class HotelTenantController {
+public class HotelProfileController {
 
-    private final HotelTenantService service;
+    private final HotelProfileService service;
 
-    public HotelTenantController(HotelTenantService service) {
+    public HotelProfileController(HotelProfileService service) {
         this.service = service;
     }
 

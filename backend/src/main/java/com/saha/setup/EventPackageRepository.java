@@ -1,5 +1,6 @@
 package com.saha.setup;
 
+import com.saha.model.EventPackage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

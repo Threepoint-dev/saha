@@ -1,5 +1,7 @@
 package com.saha.quote;
 
+import com.saha.model.Quote;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

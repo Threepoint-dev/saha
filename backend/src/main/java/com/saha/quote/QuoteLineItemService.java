@@ -1,5 +1,7 @@
 package com.saha.quote;
 
+import com.saha.model.Quote;
+import com.saha.model.QuoteLineItem;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

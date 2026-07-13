@@ -1,7 +1,7 @@
 package com.saha.setup;
 
-import com.saha.tenant.HotelTenant;
-import com.saha.tenant.HotelTenantRepository;
+import com.saha.model.HotelTenant;
+import com.saha.tenant.HotelProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +29,13 @@ public class ReadinessService {
 
     private static final String STATUS_ACTIVE = "active";
 
-    private final HotelTenantRepository tenantRepository;
+    private final HotelProfileRepository tenantRepository;
     private final HallRepository hallRepository;
     private final EventPackageRepository packageRepository;
     private final SourceChannelRepository sourceChannelRepository;
     private final QuoteSettingsRepository quoteSettingsRepository;
 
-    public ReadinessService(HotelTenantRepository tenantRepository,
+    public ReadinessService(HotelProfileRepository tenantRepository,
                             HallRepository hallRepository,
                             EventPackageRepository packageRepository,
                             SourceChannelRepository sourceChannelRepository,

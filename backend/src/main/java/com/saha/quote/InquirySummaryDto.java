@@ -1,5 +1,7 @@
 package com.saha.quote;
 
+import com.saha.model.Inquiry;
+
 import java.time.LocalDate;
 import java.util.UUID;
 

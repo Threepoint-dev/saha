@@ -1,5 +1,6 @@
 package com.saha.setup;
 
+import com.saha.model.Addon;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

@@ -1,6 +1,8 @@
 package com.saha.quote;
 
-import com.saha.setup.QuoteSettings;
+import com.saha.model.Quote;
+import com.saha.model.QuoteLineItem;
+import com.saha.model.QuoteSettings;
 import com.saha.setup.QuoteSettingsRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

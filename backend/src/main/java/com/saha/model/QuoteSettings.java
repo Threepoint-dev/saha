@@ -1,48 +1,50 @@
 package com.saha.model;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "quote_settings")
 public class QuoteSettings {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", updatable = false, nullable = false)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id", nullable = false, unique = true)
-    private HotelTenant tenant;
+    @Column(name = "tenant_id", nullable = false, unique = true)
+    private UUID tenantId;
 
-    @Column(name = "vat_rate", precision = 5, scale = 2)
-    private BigDecimal vatRate = BigDecimal.valueOf(15);
-
-    @Column(name = "quote_prefix")
-    private String quotePrefix = "QT-";
+    @Column(name = "vat_rate")
+    private BigDecimal vatRate;
 
     @Column(name = "validity_days")
-    private Integer validityDays = 14;
+    private Integer validityDays;
 
-    @Column(name = "default_terms", columnDefinition = "TEXT")
+    @Column(name = "quote_prefix")
+    private String quotePrefix;
+
+    @Column(name = "default_terms")
     private String defaultTerms;
 
-    @Column(name = "footer_text", columnDefinition = "TEXT")
+    @Column(name = "footer_text")
     private String footerText;
 
     @Column(name = "enable_pdf_branding")
-    private Boolean enablePdfBranding = true;
+    private Boolean enablePdfBranding;
 
     @Column(name = "allow_manual_discount")
-    private Boolean allowManualDiscount = false;
+    private Boolean allowManualDiscount;
 
-    @UpdateTimestamp
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
 }
