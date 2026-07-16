@@ -1,31 +1,71 @@
 @if (!hidden()) {
-<aside class="bg-[#34203a] w-[240px] shrink-0 min-h-screen sticky top-0 flex flex-col gap-6 px-4 py-6 self-start">
-  <!-- Brand -->
-  <div class="flex items-center gap-3 px-2">
-    <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
-      <span class="text-white font-bold text-sm">S</span>
-    </div>
-    <div class="flex flex-col gap-px leading-none">
-      <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-      <p class="text-[#f6ddae] text-[11px]">Setup</p>
-    </div>
-  </div>
+  <aside class="bg-[#34203a] w-[240px] shrink-0 min-h-screen sticky top-0 flex flex-col gap-6 px-4 py-6 self-start">
 
-  <!-- Navigation -->
-  <nav class="flex flex-col gap-1">
-    <p class="text-[#f6ddae]/60 text-[10px] font-semibold tracking-[0.22px] px-3 pb-1">WORKSPACE SETUP</p>
-    @for (link of links; track link.path) {
-      <a
-        [routerLink]="link.path"
-        routerLinkActive="bg-[#f6ddae] !text-[#34203a] font-semibold"
-        [routerLinkActiveOptions]="{ exact: link.exact }"
-        class="flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 text-[#f6ddae] hover:bg-[#46294f] transition-colors">
-        <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
-        @if (link.hint) {
-          <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
-        }
-      </a>
-    }
-  </nav>
-</aside>
+    <!-- Brand -->
+    <div class="flex items-center gap-3 px-2">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">saha</p>
+        <p class="text-[#f6ddae] text-[11px]">Events &amp; Sales Workspace</p>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex flex-col gap-4 flex-1">
+      @for (section of getSections(); track section) {
+        <div class="flex flex-col gap-1">
+          <p class="text-[#f6ddae]/60 text-[10px] font-semibold tracking-[0.22px] px-3 pb-1">{{ section }}</p>
+          @for (link of getLinksBySection(section); track link.path) {
+            @if (link.path === '/inquiries') {
+              <a [routerLink]="link.path"
+                 [class]="'flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 transition-colors ' +
+                 (isInquiriesActive() ? 'bg-[#f6ddae] text-[#34203a] font-semibold' : 'text-[#f6ddae] hover:bg-[#46294f]')">
+                <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
+                @if (link.hint) {
+                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
+                }
+              </a>
+            } @else {
+              <a [routerLink]="link.path"
+                 routerLinkActive="bg-[#f6ddae] !text-[#34203a] font-semibold"
+                 [routerLinkActiveOptions]="{ exact: link.exact }"
+                 class="flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 text-[#f6ddae] hover:bg-[#46294f] transition-colors">
+                <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
+                @if (link.hint) {
+                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
+                }
+              </a>
+            }
+          }
+        </div>
+      }
+    </nav>
+
+    <!-- User Account -->
+    <div class="border-t border-white/10 pt-4 px-2">
+      <div class="flex items-center gap-3 py-2">
+        <div class="w-8 h-8 rounded-full bg-[#E8A33D] flex items-center justify-center shrink-0">
+          <span class="text-white text-xs font-bold">
+            {{ getInitials(authService.currentUser()?.fullName || '') }}
+          </span>
+        </div>
+        <div class="flex flex-col gap-px leading-none overflow-hidden flex-1">
+          <p class="text-white text-[12px] font-medium truncate">
+            {{ authService.currentUser()?.fullName || 'User' }}
+          </p>
+          <p class="text-[#f6ddae]/60 text-[10px] truncate">
+            {{ authService.currentUser()?.role || '' }}
+          </p>
+        </div>
+        <button
+          (click)="signOut()"
+          class="text-[#f6ddae]/40 text-[10px] hover:text-red-400 transition-colors whitespace-nowrap">
+          Sign out
+        </button>
+      </div>
+    </div>
+
+  </aside>
 }

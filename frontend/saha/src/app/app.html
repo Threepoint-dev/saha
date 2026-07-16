@@ -1,6 +1,8 @@
-<div class="app-shell">
-  <app-sidebar />
-  <main class="app-content">
+<div class="flex">
+  @if (showSidebar) {
+    <app-sidebar />
+  }
+  <main [class]="showSidebar ? 'flex-1' : 'w-full'">
     <router-outlet />
   </main>
 </div>

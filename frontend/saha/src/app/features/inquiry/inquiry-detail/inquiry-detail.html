@@ -1,0 +1,197 @@
+<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+
+  <!-- Header -->
+  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+    <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">← Back to inquiries</a>
+    <div class="flex items-center gap-2">
+      <input type="text" placeholder="Search..."
+        class="border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none w-48"/>
+      <a routerLink="/inquiries/new"
+        class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        + New Inquiry
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="flex items-center justify-center h-64">
+      <p class="text-[#7A736B]">Loading...</p>
+    </div>
+  }
+
+  @if (!isLoading && inquiry) {
+    <div class="px-8 py-6">
+
+      <!-- Inquiry Title -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-[#34203A] flex items-center justify-center">
+            <span class="text-white text-sm font-medium">{{ getInitials(inquiry.clientName) }}</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-[#1B1A17] text-xl font-semibold">{{ inquiry.clientName }}</h1>
+              <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium ' + statusBadge[inquiry.status || 'NEW']">
+                {{ inquiry.status }}
+              </span>
+            </div>
+            <p class="text-[#7A736B] text-sm">Inquiry #{{ inquiry.inquiryNumber }} · {{ inquiry.eventType }} · {{ inquiry.guestCount }} guests</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          @if (inquiry.status === 'NEW') {
+            <button (click)="moveToContacted()"
+              class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
+              Move to Contacted →
+            </button>
+          }
+          @if (inquiry.status !== 'WON' && inquiry.status !== 'LOST') {
+            <button (click)="markWon()"
+              class="bg-[#2E7D5B] text-white px-4 py-2 rounded-lg text-sm font-medium">
+              Mark Won
+            </button>
+            <button (click)="showMarkLost = true"
+              class="border border-[#D14343] text-[#D14343] px-4 py-2 rounded-lg text-sm font-medium">
+              Mark Lost
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+
+        <!-- Left Column -->
+        <div class="col-span-2 flex flex-col gap-4">
+
+          <!-- Client Details -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+            <h2 class="text-[#1B1A17] font-semibold mb-4">Client details</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Name</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientName }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Phone</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientPhone || '—' }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Email</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientEmail || '—' }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Source channel</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.sourceChannelId || '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Details -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+            <h2 class="text-[#1B1A17] font-semibold mb-4">Event details</h2>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Event type</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.eventType || '—' }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Event date</p>
+                <p class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.eventDate || '') }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Guest count</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.guestCount || '—' }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Estimated value</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          @if (inquiry.notes) {
+            <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+              <h2 class="text-[#1B1A17] font-semibold mb-3">Notes</h2>
+              <p class="text-[#7A736B] text-sm">{{ inquiry.notes }}</p>
+            </div>
+          }
+        </div>
+
+        <!-- Right Column -->
+        <div class="flex flex-col gap-4">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+            <h2 class="text-[#1B1A17] font-semibold mb-4">Owner &amp; status</h2>
+            <div class="flex flex-col gap-3">
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Status</p>
+                <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium ' + statusBadge[inquiry.status || 'NEW']">
+                  {{ inquiry.status }}
+                </span>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Priority</p>
+                <p class="text-[#1B1A17] text-sm">{{ inquiry.priority || '—' }}</p>
+              </div>
+              <div>
+                <p class="text-[#7A736B] text-xs mb-1">Created</p>
+                <p class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.createdAt || '') }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Mark Lost Modal -->
+  @if (showMarkLost) {
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-6 w-[500px] shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-[#1B1A17] font-semibold">Mark inquiry as Lost</h2>
+            <p class="text-[#7A736B] text-sm">{{ inquiry?.clientName }} · {{ inquiry?.eventType }}</p>
+          </div>
+          <button (click)="showMarkLost = false" class="text-[#7A736B] hover:text-[#1B1A17]">✕</button>
+        </div>
+
+        <p class="text-[#7A736B] text-xs font-semibold tracking-wider mb-3">
+          REASON FOR LOSS <span class="text-[#D14343]">REQUIRED</span>
+        </p>
+
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          @for (reason of lossReasons; track reason) {
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" [value]="reason" [(ngModel)]="lossReason"
+                class="accent-[#34203A]" />
+              <span class="text-[#1B1A17] text-sm">{{ reason }}</span>
+            </label>
+          }
+        </div>
+
+        @if (!lossReason) {
+          <p class="text-[#D14343] text-xs mb-3">You must select a reason before marking as Lost.</p>
+        }
+
+        <div class="mb-4">
+          <p class="text-[#7A736B] text-xs mb-1">NOTE (OPTIONAL)</p>
+          <textarea [(ngModel)]="lossNote" rows="2" placeholder="Add context..."
+            class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none resize-none">
+          </textarea>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button (click)="showMarkLost = false"
+            class="px-4 py-2 text-sm text-[#7A736B]">Cancel</button>
+          <button (click)="confirmMarkLost()" [disabled]="!lossReason || isSubmittingLost"
+            class="bg-[#D14343] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50">
+            {{ isSubmittingLost ? 'Saving...' : 'Confirm Lost' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

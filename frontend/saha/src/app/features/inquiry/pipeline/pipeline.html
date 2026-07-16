@@ -1,0 +1,114 @@
+<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+
+  <!-- Header -->
+  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-[#1B1A17] text-xl font-semibold">Inquiries</h1>
+      <p class="text-[#7A736B] text-sm">Inquiry pipeline by stage</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search inquiries..."
+        class="border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none w-48"/>
+      <a routerLink="/inquiries/new"
+        class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        + New Inquiry
+      </a>
+    </div>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="px-8 py-3 border-b border-[#E8E0D8] bg-white flex items-center gap-2">
+    <button (click)="viewMode = 'board'"
+      [class]="'px-3 py-1.5 text-sm rounded-lg ' + (viewMode === 'board' ? 'bg-[#34203A] text-white' : 'text-[#7A736B] hover:bg-[#F5F0EB]')">
+      Board
+    </button>
+    <button (click)="viewMode = 'list'"
+      [class]="'px-3 py-1.5 text-sm rounded-lg ' + (viewMode === 'list' ? 'bg-[#34203A] text-white' : 'text-[#7A736B] hover:bg-[#F5F0EB]')">
+      List
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (isLoading) {
+    <div class="flex items-center justify-center h-64">
+      <p class="text-[#7A736B]">Loading...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading && inquiries.length === 0) {
+    <div class="flex flex-col items-center justify-center h-64 gap-4">
+      <p class="text-[#1B1A17] font-medium">No inquiries in the pipeline</p>
+      <p class="text-[#7A736B] text-sm">Create your first inquiry and it'll appear here.</p>
+      <a routerLink="/inquiries/new"
+        class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        + New Inquiry
+      </a>
+    </div>
+  }
+
+  <!-- Board View -->
+  @if (!isLoading && inquiries.length > 0 && viewMode === 'board') {
+    <div class="p-6 flex gap-4 overflow-x-auto">
+      @for (status of statuses; track status) {
+        <div class="min-w-[220px] flex-1">
+          <div class="flex items-center gap-2 mb-3">
+            <span [class]="'w-2 h-2 rounded-full ' + statusColors[status]"></span>
+            <span class="text-[#1B1A17] text-sm font-semibold">{{ status }}</span>
+            <span class="text-[#7A736B] text-xs ml-auto">{{ getByStatus(status).length }}</span>
+          </div>
+          <div class="flex flex-col gap-2">
+            @for (inquiry of getByStatus(status); track inquiry.id) {
+              <a [routerLink]="['/inquiries', inquiry.id]"
+                class="bg-white rounded-xl border border-[#E8E0D8] p-4 hover:shadow-md transition-shadow block">
+                <p class="text-[#1B1A17] text-sm font-medium mb-1">{{ inquiry.clientName }}</p>
+                <p class="text-[#7A736B] text-xs mb-3">{{ inquiry.eventType }}</p>
+                <div class="flex items-center justify-between">
+                  <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center">
+                    <span class="text-white text-[10px]">{{ getInitials(inquiry.clientName) }}</span>
+                  </div>
+                  @if (inquiry.estimatedValue) {
+                    <span class="text-[#7A736B] text-xs">{{ inquiry.estimatedValue | number }} SAR</span>
+                  }
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- List View -->
+  @if (!isLoading && inquiries.length > 0 && viewMode === 'list') {
+    <div class="p-6">
+      <div class="bg-white rounded-xl border border-[#E8E0D8]">
+        <div class="grid grid-cols-5 px-6 py-3 border-b border-[#E8E0D8] text-[#7A736B] text-xs font-semibold uppercase tracking-wider">
+          <span>Client</span>
+          <span>Event</span>
+          <span>Date</span>
+          <span>Value</span>
+          <span>Status</span>
+        </div>
+        @for (inquiry of filtered; track inquiry.id) {
+          <a [routerLink]="['/inquiries', inquiry.id]"
+            class="grid grid-cols-5 px-6 py-4 border-b border-[#E8E0D8] hover:bg-[#FAF7F2] transition-colors items-center">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded-full bg-[#34203A] flex items-center justify-center">
+                <span class="text-white text-[10px]">{{ getInitials(inquiry.clientName) }}</span>
+              </div>
+              <span class="text-[#1B1A17] text-sm">{{ inquiry.clientName }}</span>
+            </div>
+            <span class="text-[#7A736B] text-sm">{{ inquiry.eventType }}</span>
+            <span class="text-[#7A736B] text-sm">{{ inquiry.eventDate || '—' }}</span>
+            <span class="text-[#7A736B] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
+            <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium w-fit ' + statusBadge[inquiry.status || 'NEW']">
+              {{ inquiry.status }}
+            </span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+
+</div>

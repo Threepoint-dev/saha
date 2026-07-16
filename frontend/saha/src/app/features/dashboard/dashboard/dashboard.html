@@ -1,0 +1,98 @@
+<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+
+  <!-- Header -->
+  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-[#1B1A17] text-xl font-semibold">Dashboard</h1>
+      <p class="text-[#7A736B] text-sm">Event inquiries overview</p>
+    </div>
+    <a routerLink="/inquiries/new"
+       class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#d4922e] transition-colors">
+      + New Inquiry
+    </a>
+  </div>
+
+  <div class="px-8 py-6">
+
+    <!-- Loading -->
+    @if (isLoading) {
+      <div class="flex items-center justify-center h-64">
+        <p class="text-[#7A736B]">Loading...</p>
+      </div>
+    }
+
+    <!-- Empty state -->
+    @if (!isLoading && inquiries.length === 0) {
+      <div class="flex flex-col items-center justify-center h-64 gap-4">
+        <div class="w-12 h-12 bg-[#E8E0D8] rounded-full flex items-center justify-center">
+          <span class="text-[#7A736B] text-xl">◇</span>
+        </div>
+        <p class="text-[#1B1A17] font-medium">No inquiries yet</p>
+        <p class="text-[#7A736B] text-sm">Log your first event inquiry and your metrics will appear here.</p>
+        <a routerLink="/inquiries/new"
+           class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
+          + Log new inquiry
+        </a>
+      </div>
+    }
+
+    <!-- Stats -->
+    @if (!isLoading && inquiries.length > 0) {
+      <div class="grid grid-cols-5 gap-4 mb-6">
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-xs mb-1">TOTAL</p>
+          <p class="text-[#1B1A17] text-2xl font-bold">{{ total }}</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-xs mb-1">NEW</p>
+          <p class="text-[#1B1A17] text-2xl font-bold">{{ newCount }}</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-xs mb-1">CONTACTED</p>
+          <p class="text-[#1B1A17] text-2xl font-bold">{{ contacted }}</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-xs mb-1">QUOTED</p>
+          <p class="text-[#1B1A17] text-2xl font-bold">{{ quoted }}</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-xs mb-1">WON</p>
+          <p class="text-[#1B1A17] text-2xl font-bold">{{ won }}</p>
+        </div>
+      </div>
+
+      <!-- Recent Inquiries -->
+      <div class="bg-white rounded-xl border border-[#E8E0D8]">
+        <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+          <h2 class="text-[#1B1A17] font-semibold">Recent inquiries</h2>
+          <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">View all →</a>
+        </div>
+        <div class="divide-y divide-[#E8E0D8]">
+          @for (inquiry of inquiries.slice(0, 5); track inquiry.id) {
+            <a [routerLink]="['/inquiries', inquiry.id]"
+               class="flex items-center justify-between px-6 py-4 hover:bg-[#FAF7F2] transition-colors">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center">
+                  <span class="text-white text-xs font-medium">
+                    {{ inquiry.clientName.charAt(0) }}
+                  </span>
+                </div>
+                <div>
+                  <p class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</p>
+                  <p class="text-[#7A736B] text-xs">{{ inquiry.eventType }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-[#7A736B] text-xs">{{ formatDate(inquiry.createdAt) }}</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ getStatusClass(inquiry.status) }}">
+                  {{ inquiry.status }}
+                </span>
+              </div>
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

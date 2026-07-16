@@ -3,6 +3,36 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/login/login').then(m => m.LoginComponent)
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)
+  },
+  {
+    path: 'inquiries/new',
+    loadComponent: () =>
+      import('./features/inquiry/new-inquiry/new-inquiry').then(m => m.NewInquiryComponent)
+  },
+  {
+    path: 'inquiries/:id',
+    loadComponent: () =>
+      import('./features/inquiry/inquiry-detail/inquiry-detail').then(m => m.InquiryDetailComponent)
+  },
+  {
+    path: 'inquiries',
+    loadComponent: () =>
+      import('./features/inquiry/pipeline/pipeline').then(m => m.PipelineComponent)
+  },
+  {
+    path: 'hotel-profile',
     loadComponent: () => import('./hotel-profile/hotel-profile').then((m) => m.HotelProfile)
   },
   {
@@ -59,6 +89,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'login'
   }
 ];
