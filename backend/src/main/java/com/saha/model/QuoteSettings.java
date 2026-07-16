@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class QuoteSettings {
 
     @Id
+    @UuidGenerator
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 

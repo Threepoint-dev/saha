@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.UuidGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class EventAddon {
 
     @Id
+    @UuidGenerator
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 

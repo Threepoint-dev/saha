@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class Inquiry {
 
     @Id
+    @UuidGenerator
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 

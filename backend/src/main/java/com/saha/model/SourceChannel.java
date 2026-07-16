@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class SourceChannel {
 
     @Id
+    @UuidGenerator
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
