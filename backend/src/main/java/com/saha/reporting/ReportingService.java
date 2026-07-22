@@ -31,7 +31,8 @@ public class ReportingService {
     }
 
     @Transactional(readOnly = true)
-    public ReportingSummaryDto summary(UUID tenantId, LocalDate from, LocalDate to) {
+    public ReportingSummaryDto summary(UUID tenantId, LocalDate from, LocalDate to,
+                                       UUID channelId, UUID ownerId, String eventType, String status) {
         // Default to the last 30 days when the caller supplies no range.
         LocalDate fromDate = from != null ? from : LocalDate.now().minusDays(30);
         LocalDate toDate = to != null ? to : LocalDate.now();
@@ -47,12 +48,12 @@ public class ReportingService {
         long newCount = 0;
         long wonCount = 0;
         long lostCount = 0;
-        for (Object[] row : repository.countByStatus(tenantId, fromDate, toExclusive)) {
-            String status = row[0] != null ? row[0].toString() : "unknown";
+        for (Object[] row : repository.countByStatus(tenantId, fromDate, toExclusive, channelId, ownerId, eventType, status)) {
+            String rowStatus = row[0] != null ? row[0].toString() : "unknown";
             long count = toLong(row[1]);
-            byStatus.add(new ReportingSummaryDto.StatusCount(status, count));
+            byStatus.add(new ReportingSummaryDto.StatusCount(rowStatus, count));
             total += count;
-            switch (status.toLowerCase()) {
+            switch (rowStatus.toLowerCase()) {
                 case "new" -> newCount += count;
                 case "won" -> wonCount += count;
                 case "lost" -> lostCount += count;
@@ -62,27 +63,27 @@ public class ReportingService {
         double conversionRate = total > 0 ? round1((wonCount * 100.0) / total) : 0.0;
 
         // --- Quote value + response time ---
-        BigDecimal totalQuoteValue = repository.totalCurrentQuoteValue(tenantId, fromDate, toExclusive);
+        BigDecimal totalQuoteValue = repository.totalCurrentQuoteValue(tenantId, fromDate, toExclusive, channelId, ownerId, eventType, status);
         if (totalQuoteValue == null) {
             totalQuoteValue = BigDecimal.ZERO;
         }
         totalQuoteValue = totalQuoteValue.setScale(2, RoundingMode.HALF_UP);
 
-        Double avgResponse = repository.avgResponseHours(tenantId, fromDate, toExclusive);
+        Double avgResponse = repository.avgResponseHours(tenantId, fromDate, toExclusive, channelId, ownerId, eventType, status);
         double avgResponseTimeHours = avgResponse != null ? round1(avgResponse) : 0.0;
 
         // --- Source breakdown ---
         List<ReportingSummaryDto.SourceCount> bySource = new ArrayList<>();
-        for (Object[] row : repository.countBySource(tenantId, fromDate, toExclusive)) {
+        for (Object[] row : repository.countBySource(tenantId, fromDate, toExclusive, channelId, ownerId, eventType, status)) {
             String name = row[0] != null ? row[0].toString() : "Unassigned";
             bySource.add(new ReportingSummaryDto.SourceCount(name, toLong(row[1])));
         }
 
         // --- Trends (6 months, gaps filled with zero) ---
         List<ReportingSummaryDto.MonthCount> inquiriesByMonth =
-                fillMonthCounts(repository.inquiriesByMonth(tenantId, monthsStart), currentMonth);
+                fillMonthCounts(repository.inquiriesByMonth(tenantId, monthsStart, channelId, ownerId, eventType, status), currentMonth);
         List<ReportingSummaryDto.MonthValue> quoteValueByMonth =
-                fillMonthValues(repository.quoteValueByMonth(tenantId, monthsStart), currentMonth);
+                fillMonthValues(repository.quoteValueByMonth(tenantId, monthsStart, channelId, ownerId, eventType, status), currentMonth);
 
         return new ReportingSummaryDto(
                 total,

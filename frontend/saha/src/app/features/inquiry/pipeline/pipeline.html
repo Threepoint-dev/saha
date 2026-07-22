@@ -3,29 +3,68 @@
   <!-- Header -->
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
     <div>
-      <h1 class="text-[#1B1A17] text-xl font-semibold">Inquiries</h1>
+      <h1 class="text-[#1B1A17] text-xl font-bold">Inquiries</h1>
       <p class="text-[#7A736B] text-sm">Inquiry pipeline by stage</p>
     </div>
     <div class="flex items-center gap-2">
-      <input type="text" [(ngModel)]="searchQuery" placeholder="Search inquiries..."
-        class="border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none w-48"/>
+      <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-lg px-3 py-2 bg-white">
+        <svg class="w-4 h-4 text-[#9C9690]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="text-sm focus:outline-none w-40 bg-transparent"/>
+      </div>
       <a routerLink="/inquiries/new"
-        class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
         + New Inquiry
       </a>
     </div>
   </div>
 
-  <!-- View Toggle -->
-  <div class="px-8 py-3 border-b border-[#E8E0D8] bg-white flex items-center gap-2">
-    <button (click)="viewMode = 'board'"
-      [class]="'px-3 py-1.5 text-sm rounded-lg ' + (viewMode === 'board' ? 'bg-[#34203A] text-white' : 'text-[#7A736B] hover:bg-[#F5F0EB]')">
-      Board
-    </button>
-    <button (click)="viewMode = 'list'"
-      [class]="'px-3 py-1.5 text-sm rounded-lg ' + (viewMode === 'list' ? 'bg-[#34203A] text-white' : 'text-[#7A736B] hover:bg-[#F5F0EB]')">
-      List
-    </button>
+  <!-- Toolbar: View Toggle + Filters + Inline Search -->
+  <div class="px-8 py-3 flex items-center gap-3">
+    <!-- Board/List toggle -->
+    <div class="flex items-center border border-[#D9D0C4] rounded-xl overflow-hidden bg-white">
+      <button (click)="viewMode = 'board'"
+        [class]="viewMode === 'board'
+          ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17] border-r border-[#D9D0C4]'
+          : 'px-4 py-2 text-sm text-[#7A736B] border-r border-[#D9D0C4] hover:bg-[#FAF7F2]'">
+        Board
+      </button>
+      <button (click)="viewMode = 'list'"
+        [class]="viewMode === 'list'
+          ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17]'
+          : 'px-4 py-2 text-sm text-[#7A736B] hover:bg-[#FAF7F2]'">
+        List
+      </button>
+    </div>
+
+    <!-- Filter button -->
+    <select [(ngModel)]="filterStatus" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
+      <option value="">All statuses</option>
+      @for (status of statuses; track status) {
+        <option [value]="status">{{ status | titlecase }}</option>
+      }
+    </select>
+
+    <!-- All sources dropdown -->
+    <select [(ngModel)]="filterSource" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
+      <option value="">All sources</option>
+      @for (channel of sourceChannels; track channel.id) {
+        <option [value]="channel.id">{{ channel.name }}</option>
+      }
+    </select>
+
+    <!-- Spacer -->
+    <div class="flex-1"></div>
+
+    <!-- Inline search -->
+    <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-xl px-3 py-2 bg-white w-52">
+      <svg class="w-4 h-4 text-[#9C9690] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+      </svg>
+      <input type="text" [(ngModel)]="searchQuery" placeholder="Search inquiries..."
+        class="text-sm focus:outline-none flex-1 bg-transparent text-[#1B1A17] placeholder-[#B0A99F]"/>
+    </div>
   </div>
 
   <!-- Loading -->
@@ -38,40 +77,83 @@
   <!-- Empty State -->
   @if (!isLoading && inquiries.length === 0) {
     <div class="flex flex-col items-center justify-center h-64 gap-4">
-      <p class="text-[#1B1A17] font-medium">No inquiries in the pipeline</p>
-      <p class="text-[#7A736B] text-sm">Create your first inquiry and it'll appear here.</p>
+      <p class="text-[#1B1A17] font-semibold">No inquiries yet</p>
+      <p class="text-[#7A736B] text-sm">Log your first event inquiry to get started.</p>
       <a routerLink="/inquiries/new"
-        class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
         + New Inquiry
       </a>
     </div>
   }
 
   <!-- Board View -->
-  @if (!isLoading && inquiries.length > 0 && viewMode === 'board') {
-    <div class="p-6 flex gap-4 overflow-x-auto">
+  @if (!isLoading && viewMode === 'board') {
+    <div class="px-8 py-4 flex gap-4 overflow-x-auto pb-8">
       @for (status of statuses; track status) {
-        <div class="min-w-[220px] flex-1">
-          <div class="flex items-center gap-2 mb-3">
-            <span [class]="'w-2 h-2 rounded-full ' + statusColors[status]"></span>
-            <span class="text-[#1B1A17] text-sm font-semibold">{{ status }}</span>
-            <span class="text-[#7A736B] text-xs ml-auto">{{ getByStatus(status).length }}</span>
+        <div class="min-w-[240px] flex-1 max-w-[300px]"
+             (dragover)="onDragOver($event)"
+             (drop)="onDrop($event, status)">
+          <!-- Column header -->
+          <div class="flex items-center gap-2 mb-3 px-1">
+            <span [class]="'w-2.5 h-2.5 rounded-full ' + statusDotColors[status]"></span>
+            <span class="text-[#1B1A17] text-sm font-semibold">{{ status | titlecase }}</span>
+            <span class="text-[#9C9690] text-xs ml-auto font-medium">{{ getByStatus(status).length }}</span>
           </div>
+          <!-- Cards -->
           <div class="flex flex-col gap-2">
             @for (inquiry of getByStatus(status); track inquiry.id) {
               <a [routerLink]="['/inquiries', inquiry.id]"
-                class="bg-white rounded-xl border border-[#E8E0D8] p-4 hover:shadow-md transition-shadow block">
-                <p class="text-[#1B1A17] text-sm font-medium mb-1">{{ inquiry.clientName }}</p>
-                <p class="text-[#7A736B] text-xs mb-3">{{ inquiry.eventType }}</p>
-                <div class="flex items-center justify-between">
-                  <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center">
-                    <span class="text-white text-[10px]">{{ getInitials(inquiry.clientName) }}</span>
-                  </div>
+                draggable="true" 
+                (dragstart)="onDragStart($event, inquiry)"
+                class="bg-white rounded-xl border border-[#E8E0D8] p-4 hover:shadow-sm hover:border-[#C9C0B6] transition-all block cursor-grab active:cursor-grabbing">
+                <!-- Client name + event type -->
+                <p class="text-[#1B1A17] text-sm font-semibold mb-0.5">{{ inquiry.clientName }}</p>
+                <p class="text-[#9C9690] text-xs mb-3">{{ inquiry.eventType }} · {{ formatDate(inquiry.eventDate || '') }}</p>
+                <!-- Stats row -->
+                <div class="flex items-center gap-3 mb-3">
+                  <!-- Guests -->
+                  <span class="flex items-center gap-1 text-[#55514A] text-xs">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    {{ inquiry.guestCount }}
+                  </span>
+                  <!-- Value -->
                   @if (inquiry.estimatedValue) {
-                    <span class="text-[#7A736B] text-xs">{{ inquiry.estimatedValue | number }} SAR</span>
+                    <span class="flex items-center gap-1 text-[#55514A] text-xs">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      {{ inquiry.estimatedValue | number }}
+                    </span>
                   }
                 </div>
+                <!-- Footer: avatar + source + time -->
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
+                      <span class="text-white text-[9px] font-semibold">{{ getInitials(inquiry.clientName) }}</span>
+                    </div>
+                    @if (inquiry.sourceChannelId) {
+                      <span class="inline-flex items-center border border-[#D9D0C4] rounded-full px-2.5 py-0.5 text-[10px] text-[#55514A]">
+                        {{ getChannelName(inquiry.sourceChannelId) }}
+                      </span>
+                    }
+                  </div>
+                  <span class="flex items-center gap-1 text-[#B0A99F] text-[10px]">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    {{ formatRelativeTime(inquiry.createdAt || '') }}
+                  </span>
+                </div>
               </a>
+            }
+            <!-- Add placeholder -->
+            @if (getByStatus(status).length === 0) {
+              <div class="border-2 border-dashed border-[#D9D0C4] rounded-xl p-4 text-center">
+                <span class="text-[#B0A99F] text-xs">+ Add</span>
+              </div>
             }
           </div>
         </div>
@@ -80,32 +162,42 @@
   }
 
   <!-- List View -->
-  @if (!isLoading && inquiries.length > 0 && viewMode === 'list') {
-    <div class="p-6">
-      <div class="bg-white rounded-xl border border-[#E8E0D8]">
-        <div class="grid grid-cols-5 px-6 py-3 border-b border-[#E8E0D8] text-[#7A736B] text-xs font-semibold uppercase tracking-wider">
-          <span>Client</span>
+  @if (!isLoading && viewMode === 'list') {
+    <div class="px-8 py-4">
+      <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+        <!-- Table Header -->
+        <div class="grid grid-cols-6 px-6 py-3 border-b border-[#E8E0D8] text-[#9C9690] text-xs font-semibold uppercase tracking-wider">
+          <span class="col-span-2">Client</span>
           <span>Event</span>
           <span>Date</span>
           <span>Value</span>
           <span>Status</span>
         </div>
+        <!-- Table Rows -->
         @for (inquiry of filtered; track inquiry.id) {
           <a [routerLink]="['/inquiries', inquiry.id]"
-            class="grid grid-cols-5 px-6 py-4 border-b border-[#E8E0D8] hover:bg-[#FAF7F2] transition-colors items-center">
-            <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded-full bg-[#34203A] flex items-center justify-center">
-                <span class="text-white text-[10px]">{{ getInitials(inquiry.clientName) }}</span>
+            class="grid grid-cols-6 px-6 py-4 border-b border-[#E8E0D8] last:border-b-0 hover:bg-[#FAF7F2] transition-colors items-center">
+            <div class="col-span-2 flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
+                <span class="text-white text-[11px] font-semibold">{{ getInitials(inquiry.clientName) }}</span>
               </div>
-              <span class="text-[#1B1A17] text-sm">{{ inquiry.clientName }}</span>
+              <div>
+                <p class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</p>
+                @if (inquiry.sourceChannelId) {
+                  <p class="text-[#9C9690] text-xs">{{ getChannelName(inquiry.sourceChannelId) }}</p>
+                }
+              </div>
             </div>
-            <span class="text-[#7A736B] text-sm">{{ inquiry.eventType }}</span>
-            <span class="text-[#7A736B] text-sm">{{ inquiry.eventDate || '—' }}</span>
-            <span class="text-[#7A736B] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
-            <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium w-fit ' + statusBadge[inquiry.status || 'NEW']">
-              {{ inquiry.status }}
+            <span class="text-[#55514A] text-sm">{{ inquiry.eventType }}</span>
+            <span class="text-[#55514A] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
+            <span class="text-[#55514A] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
+            <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold w-fit ' + statusBadge[inquiry.status || 'NEW']">
+              {{ inquiry.status | titlecase }}
             </span>
           </a>
+        }
+        @if (filtered.length === 0 && !isLoading) {
+          <div class="px-6 py-8 text-center text-[#9C9690] text-sm">No inquiries match your search.</div>
         }
       </div>
     </div>

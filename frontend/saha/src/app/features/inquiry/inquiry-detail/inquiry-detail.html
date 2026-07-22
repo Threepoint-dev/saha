@@ -2,12 +2,14 @@
 
   <!-- Header -->
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
-    <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">← Back to inquiries</a>
+    <div>
+      <h1 class="text-[#1B1A17] text-xl font-bold">Inquiry detail</h1>
+      <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">← Back to inquiries</a>
+    </div>
     <div class="flex items-center gap-2">
-      <input type="text" placeholder="Search..."
-        class="border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none w-48"/>
+
       <a routerLink="/inquiries/new"
-        class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium">
+        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
         + New Inquiry
       </a>
     </div>
@@ -23,123 +25,217 @@
   @if (!isLoading && inquiry) {
     <div class="px-8 py-6">
 
-      <!-- Inquiry Title -->
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-[#34203A] flex items-center justify-center">
-            <span class="text-white text-sm font-medium">{{ getInitials(inquiry.clientName) }}</span>
+      <!-- Inquiry Hero Row -->
+      <div class="flex items-start justify-between mb-6">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
+            <span class="text-white text-sm font-semibold">{{ getInitials(inquiry.clientName) }}</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-[#1B1A17] text-xl font-semibold">{{ inquiry.clientName }}</h1>
-              <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium ' + statusBadge[inquiry.status || 'NEW']">
-                {{ inquiry.status }}
+              <h2 class="text-[#1B1A17] text-2xl font-bold">{{ inquiry.clientName }}</h2>
+              <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold ' + statusBadge[inquiry.status || 'NEW']">
+                {{ inquiry.status | titlecase }}
               </span>
             </div>
-            <p class="text-[#7A736B] text-sm">Inquiry #{{ inquiry.inquiryNumber }} · {{ inquiry.eventType }} · {{ inquiry.guestCount }} guests</p>
+            <p class="text-[#7A736B] text-sm">
+              Inquiry #{{ inquiry.inquiryNumber }} · {{ inquiry.eventType }} · {{ inquiry.guestCount }} guests
+            </p>
           </div>
         </div>
         <div class="flex items-center gap-2">
           @if (inquiry.status === 'NEW') {
             <button (click)="moveToContacted()"
-              class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
+              class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
               Move to Contacted →
             </button>
+            <button disabled
+              class="border border-[#D9D0C4] text-[#9C9690] px-5 py-2.5 rounded-full text-sm font-semibold cursor-not-allowed opacity-60">
+              Create Quote B2
+            </button>
           }
-          @if (inquiry.status !== 'WON' && inquiry.status !== 'LOST') {
-            <button (click)="markWon()"
-              class="bg-[#2E7D5B] text-white px-4 py-2 rounded-lg text-sm font-medium">
-              Mark Won
-            </button>
-            <button (click)="showMarkLost = true"
-              class="border border-[#D14343] text-[#D14343] px-4 py-2 rounded-lg text-sm font-medium">
-              Mark Lost
-            </button>
+          @if (inquiry.status !== 'NEW') {
+            <a [routerLink]="['/events', inquiry.id]"
+              class="border-2 border-[#34203A] text-[#34203A] px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#FAF7F2] transition-colors">
+              Event Setup
+            </a>
+            <a [routerLink]="['/quotes', inquiry.id]"
+              class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+              Create Quote
+            </a>
           }
         </div>
       </div>
 
       <div class="grid grid-cols-3 gap-6">
 
-        <!-- Left Column -->
+        <!-- Left Column (2/3) -->
         <div class="col-span-2 flex flex-col gap-4">
 
-          <!-- Client Details -->
+          <!-- Client details -->
           <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-            <h2 class="text-[#1B1A17] font-semibold mb-4">Client details</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Name</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientName }}</p>
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Client details</h3>
+            <div class="flex flex-col divide-y divide-[#F0EBE3]">
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Name</span>
+                <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Phone</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientPhone || '—' }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Phone</span>
+                <span class="text-[#1B1A17] text-sm">{{ inquiry.clientPhone || '—' }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Email</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.clientEmail || '—' }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Email</span>
+                <span class="text-[#1B1A17] text-sm">{{ inquiry.clientEmail || '—' }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Source channel</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.sourceChannelId || '—' }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Source channel</span>
+                <span class="inline-flex items-center rounded-full border border-[#D9D0C4] bg-[#FAF7F2] px-3 py-0.5 text-xs text-[#1B1A17]">
+                  {{ getChannelName(inquiry.sourceChannelId) || '—' }}
+                </span>
               </div>
             </div>
           </div>
 
-          <!-- Event Details -->
+          <!-- Event details -->
           <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-            <h2 class="text-[#1B1A17] font-semibold mb-4">Event details</h2>
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Event type</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.eventType || '—' }}</p>
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Event details</h3>
+            <div class="flex flex-col divide-y divide-[#F0EBE3]">
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Event type</span>
+                <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.eventType || '—' }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Event date</p>
-                <p class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.eventDate || '') }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Event date</span>
+                <span class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Guest count</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.guestCount || '—' }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Guest count</span>
+                <span class="text-[#1B1A17] text-sm">{{ inquiry.guestCount || '—' }}</span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Estimated value</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</p>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Hall</span>
+                <span class="text-[#1B1A17] text-sm">{{ inquiry.hallId || '—' }}</span>
+              </div>
+              <div class="flex items-center justify-between py-3">
+                <span class="text-[#7A736B] text-sm">Estimated value</span>
+                <span class="text-[#1B1A17] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
               </div>
             </div>
           </div>
 
           <!-- Notes -->
-          @if (inquiry.notes) {
-            <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-              <h2 class="text-[#1B1A17] font-semibold mb-3">Notes</h2>
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-3">Notes</h3>
+            @if (inquiry.notes) {
               <p class="text-[#7A736B] text-sm">{{ inquiry.notes }}</p>
-            </div>
-          }
+            } @else {
+              <p class="text-[#B0A99F] text-sm italic">No notes added.</p>
+            }
+          </div>
+
         </div>
 
-        <!-- Right Column -->
+        <!-- Right Column (1/3) -->
         <div class="flex flex-col gap-4">
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-            <h2 class="text-[#1B1A17] font-semibold mb-4">Owner &amp; status</h2>
+
+          <!-- First Response -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+            <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">First Response</p>
+            @if (inquiry.status === 'NEW') {
+              <span class="inline-flex items-center gap-1.5 bg-[#FDF4E7] text-[#CE8A28] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#F6DEB0]">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+                Awaiting first response
+              </span>
+              <p class="text-[#9C9690] text-xs mt-2">Timer starts automatically when you first respond.</p>
+            } @else {
+              <span class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-green-200">
+                ✓ Responded
+              </span>
+            }
+            <div class="mt-3 flex items-center justify-between text-xs text-[#9C9690]">
+              <span>Inquiry created</span>
+              <span class="text-[#55514A] font-medium">{{ formatDateShort(inquiry.createdAt || '') }}</span>
+            </div>
+          </div>
+
+          <!-- Owner & Status -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Owner & status</h3>
             <div class="flex flex-col gap-3">
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Status</p>
-                <span [class]="'px-2 py-0.5 rounded-full text-xs font-medium ' + statusBadge[inquiry.status || 'NEW']">
-                  {{ inquiry.status }}
+              <div class="flex items-center justify-between">
+                <span class="text-[#7A736B] text-sm">Owner</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center">
+                    <span class="text-white text-xs font-medium">{{ getInitials(inquiry.clientName).substring(0,1) }}</span>
+                  </div>
+                  <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.ownerId || 'Unassigned' }}</span>
+                  <button (click)="reassign()" class="text-[#CE8A28] text-xs font-semibold hover:underline ml-1">Reassign</button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[#7A736B] text-sm">Status</span>
+                <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold ' + statusBadge[inquiry.status || 'NEW']">
+                  {{ inquiry.status | titlecase }}
                 </span>
               </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Priority</p>
-                <p class="text-[#1B1A17] text-sm">{{ inquiry.priority || '—' }}</p>
-              </div>
-              <div>
-                <p class="text-[#7A736B] text-xs mb-1">Created</p>
-                <p class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.createdAt || '') }}</p>
+              <div class="flex items-center justify-between">
+                <span class="text-[#7A736B] text-sm">Priority</span>
+                @if (inquiry.priority === 'HIGH' || inquiry.priority === 'High') {
+                  <span class="text-[#D14343] text-sm font-semibold">High</span>
+                } @else {
+                  <span class="text-[#1B1A17] text-sm">{{ inquiry.priority || '—' }}</span>
+                }
               </div>
             </div>
           </div>
+
+          <!-- Status History -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Status history</h3>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-start gap-2">
+                <div class="w-2 h-2 rounded-full bg-blue-400 mt-1.5 shrink-0"></div>
+                <div>
+                  <p class="text-[#1B1A17] text-sm font-medium">Inquiry created</p>
+                  <p class="text-[#9C9690] text-xs">{{ formatDateShort(inquiry.createdAt || '') }}</p>
+                </div>
+              </div>
+              @if (inquiry.status !== 'NEW') {
+                <div class="flex items-start gap-2">
+                  <div class="w-2 h-2 rounded-full bg-yellow-400 mt-1.5 shrink-0"></div>
+                  <div>
+                    <p class="text-[#1B1A17] text-sm font-medium">Moved to {{ inquiry.status | titlecase }}</p>
+                    <p class="text-[#9C9690] text-xs">{{ formatDateShort(inquiry.updatedAt || '') }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+            <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">Actions</p>
+            <div class="flex flex-col gap-2">
+              @if (inquiry.status !== 'WON' && inquiry.status !== 'LOST') {
+                <button (click)="markWon()"
+                  class="w-full bg-[#34203A] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+                  Mark Won
+                </button>
+                <button (click)="showMarkLost = true"
+                  class="w-full border-2 border-[#D14343] text-[#D14343] py-2.5 rounded-full text-sm font-semibold hover:bg-red-50 transition-colors">
+                  Mark Lost
+                </button>
+              }
+              <button
+                class="w-full border border-[#D9D0C4] text-[#1B1A17] py-2.5 rounded-full text-sm font-medium hover:bg-[#FAF7F2] transition-colors">
+                Reassign
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -147,46 +243,69 @@
 
   <!-- Mark Lost Modal -->
   @if (showMarkLost) {
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-2xl p-6 w-[500px] shadow-xl">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <h2 class="text-[#1B1A17] font-semibold">Mark inquiry as Lost</h2>
-            <p class="text-[#7A736B] text-sm">{{ inquiry?.clientName }} · {{ inquiry?.eventType }}</p>
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="showMarkLost = false">
+      <div class="bg-white rounded-2xl shadow-xl w-[520px] overflow-hidden" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="px-6 pt-6 pb-5">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-[#D14343]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-[#1B1A17] font-semibold text-lg">Mark inquiry as Lost</h2>
+              <p class="text-[#7A736B] text-sm">{{ inquiry?.clientName }} · {{ inquiry?.eventType }} · {{ inquiry?.guestCount }} guests</p>
+            </div>
           </div>
-          <button (click)="showMarkLost = false" class="text-[#7A736B] hover:text-[#1B1A17]">✕</button>
         </div>
 
-        <p class="text-[#7A736B] text-xs font-semibold tracking-wider mb-3">
-          REASON FOR LOSS <span class="text-[#D14343]">REQUIRED</span>
-        </p>
+        <div class="px-6 pb-5">
+          <!-- Reason for loss -->
+          <div class="flex items-center justify-between mb-3">
+            <p class="text-[#1B1A17] text-sm font-semibold">Reason for loss</p>
+            <span class="text-[#D14343] text-xs font-semibold tracking-wide">REQUIRED ★</span>
+          </div>
 
-        <div class="grid grid-cols-2 gap-2 mb-4">
-          @for (reason of lossReasons; track reason) {
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" [value]="reason" [(ngModel)]="lossReason"
-                class="accent-[#34203A]" />
-              <span class="text-[#1B1A17] text-sm">{{ reason }}</span>
-            </label>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            @for (reason of lossReasons; track reason) {
+              <button type="button" (click)="lossReason = reason"
+                [class]="lossReason === reason
+                  ? 'flex items-center gap-2 border-2 border-[#D14343] bg-red-50 rounded-xl px-4 py-3 text-sm text-[#D14343] font-medium text-left w-full'
+                  : 'flex items-center gap-2 border border-[#D9D0C4] rounded-xl px-4 py-3 text-sm text-[#1B1A17] text-left w-full hover:bg-[#FAF7F2]'">
+                <div [class]="lossReason === reason
+                  ? 'w-4 h-4 rounded-full border-2 border-[#D14343] flex items-center justify-center shrink-0'
+                  : 'w-4 h-4 rounded-full border-2 border-[#D9D0C4] flex items-center justify-center shrink-0'">
+                  @if (lossReason === reason) {
+                    <div class="w-2 h-2 rounded-full bg-[#D14343]"></div>
+                  }
+                </div>
+                {{ reason }}
+              </button>
+            }
+          </div>
+
+          @if (showLostError && !lossReason) {
+            <p class="text-[#D14343] text-xs mb-3">You must select a reason before marking as Lost.</p>
           }
+
+          <!-- Note -->
+          <div class="mb-5">
+            <p class="text-[#9C9690] text-xs font-semibold tracking-wider mb-2">NOTE (OPTIONAL)</p>
+            <textarea [(ngModel)]="lossNote" rows="3" placeholder="Add context about why this was lost..."
+              class="w-full border border-[#D9D0C4] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#34203A] resize-none text-[#1B1A17] placeholder-[#B0A99F]">
+            </textarea>
+          </div>
         </div>
 
-        @if (!lossReason) {
-          <p class="text-[#D14343] text-xs mb-3">You must select a reason before marking as Lost.</p>
-        }
-
-        <div class="mb-4">
-          <p class="text-[#7A736B] text-xs mb-1">NOTE (OPTIONAL)</p>
-          <textarea [(ngModel)]="lossNote" rows="2" placeholder="Add context..."
-            class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm focus:outline-none resize-none">
-          </textarea>
-        </div>
-
-        <div class="flex justify-end gap-2">
-          <button (click)="showMarkLost = false"
-            class="px-4 py-2 text-sm text-[#7A736B]">Cancel</button>
-          <button (click)="confirmMarkLost()" [disabled]="!lossReason || isSubmittingLost"
-            class="bg-[#D14343] text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50">
+        <!-- Footer -->
+        <div class="border-t border-[#F0EBE3] bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3">
+          <button (click)="showMarkLost = false; showLostError = false"
+            class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-white transition-colors">
+            Cancel
+          </button>
+          <button (click)="confirmMarkLost()" [disabled]="isSubmittingLost"
+            class="px-5 py-2.5 bg-[#D14343] text-white rounded-full text-sm font-semibold hover:bg-red-600 disabled:opacity-50 transition-colors">
             {{ isSubmittingLost ? 'Saving...' : 'Confirm Lost' }}
           </button>
         </div>

@@ -36,14 +36,13 @@ public class QuoteLineItemService {
         Quote quote = quoteService.requireOwned(tenantId, quoteId);
 
         QuoteLineItem item = new QuoteLineItem();
-        item.setId(UUID.randomUUID());
         item.setQuoteId(quoteId);
         applyRequest(item, request);
         if (item.getSortOrder() == null) {
             item.setSortOrder(nextSortOrder(quoteId));
         }
         item.setTotal(QuoteService.lineTotal(item));
-        repository.save(item);
+        item = repository.save(item);
 
         quoteService.recalculateTotals(quote);
         return QuoteLineItemDto.from(item);
@@ -55,7 +54,7 @@ public class QuoteLineItemService {
         QuoteLineItem item = requireOwned(quoteId, itemId);
         applyRequest(item, request);
         item.setTotal(QuoteService.lineTotal(item));
-        repository.save(item);
+        item = repository.save(item);
 
         quoteService.recalculateTotals(quote);
         return QuoteLineItemDto.from(item);
@@ -78,7 +77,7 @@ public class QuoteLineItemService {
                 QuoteLineItem item = repository.findByIdAndQuoteId(id, quoteId).orElse(null);
                 if (item != null) {
                     item.setSortOrder(order++);
-                    repository.save(item);
+                    item = repository.save(item);
                 }
             }
         }

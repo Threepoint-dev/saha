@@ -48,14 +48,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/setup/quote-settings').then((m) => m.QuoteSettingsPage)
   },
   {
-    path: 'setup/readiness',
-    loadComponent: () => import('./features/setup/readiness').then((m) => m.PilotReadiness)
-  },
-  {
-    path: 'quotes',
-    loadComponent: () => import('./features/quotes/quotes-placeholder').then((m) => m.QuotesPlaceholder)
-  },
-  {
     path: 'quotes/preview/:shareToken',
     loadComponent: () => import('./features/quotes/quote-preview').then((m) => m.QuotePreview)
   },
@@ -66,10 +58,6 @@ export const routes: Routes = [
   {
     path: 'quotes/:inquiryId/:quoteId',
     loadComponent: () => import('./features/quotes/quote-builder').then((m) => m.QuoteBuilder)
-  },
-  {
-    path: 'events',
-    loadComponent: () => import('./features/events/events-placeholder').then((m) => m.EventsPlaceholder)
   },
   {
     path: 'events/summary/:inquiryId',

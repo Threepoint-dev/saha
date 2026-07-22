@@ -31,7 +31,11 @@ public class ReportingController {
             @RequestParam(name = "from", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(name = "to", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return service.summary(tenantId, from, to);
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(name = "channelId", required = false) UUID channelId,
+            @RequestParam(name = "ownerId", required = false) UUID ownerId,
+            @RequestParam(name = "eventType", required = false) String eventType,
+            @RequestParam(name = "status", required = false) String status) {
+        return service.summary(tenantId, from, to, channelId, ownerId, eventType, status);
     }
 }

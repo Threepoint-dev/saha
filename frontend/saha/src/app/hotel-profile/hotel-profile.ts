@@ -20,6 +20,8 @@ export class HotelProfile implements OnInit {
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
+  readonly logoPreviewUrl = signal<string | null>(null);
+  selectedLogoFile: File | null = null;
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
@@ -64,6 +66,16 @@ export class HotelProfile implements OnInit {
       termsNotes: profile.termsNotes ?? '',
       isActive: profile.isActive ?? true
     });
+  }
+
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.selectedLogoFile = file;
+    const prev = this.logoPreviewUrl();
+    if (prev) URL.revokeObjectURL(prev);
+    this.logoPreviewUrl.set(URL.createObjectURL(file));
   }
 
   toggleActive(): void {

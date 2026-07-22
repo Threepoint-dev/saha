@@ -56,7 +56,6 @@ public class CustomerConfirmationService {
         EventInquiry inquiry = inquiryRepository.findByIdAndTenantId(inquiryId, tenantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inquiry not found"));
         inquiry.setCustomerConfirmedAt(OffsetDateTime.now());
-        inquiry.setStatus(STATUS_CONFIRMED);
         inquiryRepository.save(inquiry);
         return buildSummary(inquiry);
     }

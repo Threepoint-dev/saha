@@ -104,8 +104,8 @@
 
         <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-4 flex items-center gap-4 w-fit">
           <div class="bg-[#efebf3] border border-[#e4dfd5] rounded-[10px] w-20 h-20 flex items-center justify-center overflow-hidden">
-            @if (form.controls.logoUrl.value) {
-              <img [src]="form.controls.logoUrl.value" alt="Hotel logo" class="w-full h-full object-contain" />
+            @if (logoPreviewUrl() || form.controls.logoUrl.value) {
+              <img [src]="logoPreviewUrl() || form.controls.logoUrl.value" alt="Hotel logo" class="w-full h-full object-contain" />
             } @else {
               <span class="text-[#c9c3b8] text-[11px] font-medium">Logo</span>
             }
@@ -114,10 +114,11 @@
             <p class="text-[#34203a] text-[13px] font-semibold">Hotel Logo</p>
             <p class="text-[#55514a] text-[11px]">PNG or SVG · Used on quotes and confirmations</p>
             <input
-              type="text"
-              formControlName="logoUrl"
-              placeholder="Logo URL"
-              class="bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-[14px] py-2 text-[12px] text-[#55514a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors w-[280px]" />
+              type="file"
+              accept="image/png,image/svg+xml"
+              (change)="onLogoSelected($event)"
+              class="bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[12px] text-[#55514a] focus:outline-none focus:border-[#34203a] transition-colors w-[280px] cursor-pointer
+                file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-[#34203a] file:text-white" />
           </div>
         </div>
 

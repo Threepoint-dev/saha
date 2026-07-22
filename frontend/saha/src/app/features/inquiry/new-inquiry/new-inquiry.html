@@ -1,9 +1,23 @@
 <div class="flex-1 bg-[#FAF7F2] min-h-screen">
 
   <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4">
-    <h1 class="text-[#1B1A17] text-xl font-semibold">New Inquiry</h1>
-    <p class="text-[#7A736B] text-sm">Manually log an event inquiry</p>
+  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+    <div>
+      <h1 class="text-[#1B1A17] text-xl font-bold">New Inquiry</h1>
+      <p class="text-[#7A736B] text-sm">Manually log an event inquiry</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-lg px-3 py-2 bg-white">
+        <svg class="w-4 h-4 text-[#9C9690]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input type="text" placeholder="Search..." class="text-sm focus:outline-none w-40 bg-transparent"/>
+      </div>
+      <a routerLink="/inquiries/new"
+        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
+        + New Inquiry
+      </a>
+    </div>
   </div>
 
   <div class="px-8 py-6 max-w-4xl">
@@ -148,11 +162,11 @@
       <!-- Actions -->
       <div class="flex justify-end gap-3">
         <button (click)="cancel()"
-          class="px-6 py-2.5 text-sm text-[#7A736B] hover:text-[#1B1A17] transition-colors">
+          class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-[#FAF7F2] transition-colors">
           Cancel
         </button>
         <button (click)="submit()" [disabled]="isLoading"
-          class="bg-[#34203A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#2a1830] transition-colors disabled:opacity-60">
+          class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors disabled:opacity-60">
           {{ isLoading ? 'Saving...' : 'Save inquiry' }}
         </button>
       </div>

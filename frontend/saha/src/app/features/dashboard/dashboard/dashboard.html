@@ -3,13 +3,21 @@
   <!-- Header -->
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
     <div>
-      <h1 class="text-[#1B1A17] text-xl font-semibold">Dashboard</h1>
-      <p class="text-[#7A736B] text-sm">Event inquiries overview</p>
+      <h1 class="text-[#1B1A17] text-[20px] font-semibold">Dashboard</h1>
+      <p class="text-[#7A736B] text-[13px]">Event inquiries overview · {{ currentMonth }}</p>
     </div>
-    <a routerLink="/inquiries/new"
-       class="bg-[#E8A33D] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#d4922e] transition-colors">
-      + New Inquiry
-    </a>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center border border-[#D9D0C4] rounded-xl px-3 py-2 gap-2 bg-white w-56">
+        <svg class="w-4 h-4 text-[#7A736B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="outline-none text-sm text-[#1B1A17] bg-transparent w-full" />
+      </div>
+      <a routerLink="/inquiries/new"
+         class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors flex items-center gap-1">
+        + Log Inquiry
+      </a>
+    </div>
   </div>
 
   <div class="px-8 py-6">
@@ -17,74 +25,168 @@
     <!-- Loading -->
     @if (isLoading) {
       <div class="flex items-center justify-center h-64">
-        <p class="text-[#7A736B]">Loading...</p>
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-8 h-8 border-2 border-[#34203A] border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-[#7A736B] text-sm">Loading dashboard...</p>
+        </div>
       </div>
     }
 
-    <!-- Empty state -->
+    <!-- Empty State -->
     @if (!isLoading && inquiries.length === 0) {
-      <div class="flex flex-col items-center justify-center h-64 gap-4">
-        <div class="w-12 h-12 bg-[#E8E0D8] rounded-full flex items-center justify-center">
-          <span class="text-[#7A736B] text-xl">◇</span>
+      <div class="flex flex-col items-center justify-center py-24 gap-4">
+        <div class="w-14 h-14 bg-[#ECE6F1] rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-[#34203A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
         </div>
-        <p class="text-[#1B1A17] font-medium">No inquiries yet</p>
-        <p class="text-[#7A736B] text-sm">Log your first event inquiry and your metrics will appear here.</p>
+        <div class="text-center">
+          <p class="text-[#1B1A17] font-semibold text-base mb-1">No inquiries yet</p>
+          <p class="text-[#7A736B] text-sm max-w-sm">Log your first event inquiry and it'll appear here as soon as there's data.</p>
+        </div>
         <a routerLink="/inquiries/new"
-           class="bg-[#34203A] text-white px-4 py-2 rounded-lg text-sm font-medium">
-          + Log new inquiry
+           class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+          + Log Inquiry
         </a>
       </div>
     }
 
-    <!-- Stats -->
+    <!-- Stats + Charts -->
     @if (!isLoading && inquiries.length > 0) {
-      <div class="grid grid-cols-5 gap-4 mb-6">
+
+      <!-- Stats Row -->
+      <div class="grid grid-cols-6 gap-3 mb-6">
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-xs mb-1">TOTAL</p>
-          <p class="text-[#1B1A17] text-2xl font-bold">{{ total }}</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">TOTAL</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ total }}</p>
+          <p class="text-[#2E7D5B] text-xs font-medium">▲ {{ newCount }} new</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-xs mb-1">NEW</p>
-          <p class="text-[#1B1A17] text-2xl font-bold">{{ newCount }}</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">WON</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ won }}</p>
+          <p class="text-[#2E7D5B] text-xs font-medium">{{ winRate }}% rate</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-xs mb-1">CONTACTED</p>
-          <p class="text-[#1B1A17] text-2xl font-bold">{{ contacted }}</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">NEW</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ newCount }}</p>
+          <p class="text-[#7A736B] text-xs">Awaiting contact</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-xs mb-1">QUOTED</p>
-          <p class="text-[#1B1A17] text-2xl font-bold">{{ quoted }}</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">CONTACTED</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ contacted }}</p>
+          <p class="text-[#7A736B] text-xs">In progress</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-xs mb-1">WON</p>
-          <p class="text-[#1B1A17] text-2xl font-bold">{{ won }}</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">QUOTED</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ quoted }}</p>
+          <p class="text-[#7A736B] text-xs">Awaiting decision</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">LOST</p>
+          <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ lost }}</p>
+          @if (lost > 0) {
+            <p class="text-[#D14343] text-xs font-medium">▼ {{ lossRate }}% loss</p>
+          } @else {
+            <p class="text-[#7A736B] text-xs">None lost</p>
+          }
+        </div>
+      </div>
+
+      <!-- Mid Row: First Response + Conversion + Source + Recent + Why Lost -->
+      <div class="grid grid-cols-3 gap-5 mb-6">
+
+        <!-- First Response + Conversion Rate -->
+        <div class="flex flex-col gap-3">
+          <!-- First Response Dark Card -->
+          <div class="bg-[#2D1B35] rounded-xl p-5 text-white">
+            <p class="text-[#F6DDAE]/60 text-[10px] font-semibold tracking-wider uppercase mb-3">MEDIAN FIRST RESPONSE</p>
+            <p class="text-white text-[36px] font-bold leading-none mb-1">{{ firstResponseDisplay }}</p>
+            @if (firstResponseMinutes > 0) {
+              <p class="text-[#F6DDAE]/70 text-xs">{{ firstResponseMinutes < 60 ? firstResponseMinutes + 'm faster than baseline' : 'Average response time' }}</p>
+            } @else {
+              <p class="text-[#F6DDAE]/70 text-xs">No responses recorded yet</p>
+            }
+          </div>
+
+          <!-- Conversion Rate Card -->
+          <div class="bg-white rounded-xl p-5 border border-[#E8E0D8]">
+            <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-3">CONVERSION RATE (WIN)</p>
+            <p class="text-[#1B1A17] text-[32px] font-bold leading-none mb-1">{{ winRate }}%</p>
+            <p class="text-[#7A736B] text-xs">{{ won }} won of {{ total }} total</p>
+          </div>
+        </div>
+
+        <!-- Inquiries by Source -->
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-[#1B1A17] text-sm font-semibold">Inquiries by source</h2>
+          </div>
+          <div class="flex flex-col gap-2.5">
+            @for (src of sourceSummary; track src.name) {
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-[#1B1A17] text-xs font-medium">{{ src.name }}</span>
+                  <span class="text-[#7A736B] text-xs">{{ src.pct }}%</span>
+                </div>
+                <div class="h-1.5 bg-[#F0EBE3] rounded-full overflow-hidden">
+                  <div [style.width.%]="src.pct" [class]="src.color + ' h-full rounded-full transition-all duration-700'"></div>
+                </div>
+              </div>
+            }
+          </div>
+          @if (sourceSummary.length === 0) {
+            <p class="text-[#7A736B] text-xs mt-4">No source data yet</p>
+          }
+        </div>
+
+        <!-- Why We Lose Inquiries -->
+        <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <h2 class="text-[#1B1A17] text-sm font-semibold mb-4">Why we lose inquiries</h2>
+          <div class="flex flex-col gap-2.5">
+            @for (reason of lossReasonSummary; track reason.label) {
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 flex-1">
+                  <div class="h-2 bg-[#D14343] rounded-full" [style.width.%]="reason.pct * 0.8" style="min-width: 4px; max-width: 140px"></div>
+                  <span class="text-[#1B1A17] text-xs">{{ reason.label }}</span>
+                </div>
+                <span class="text-[#7A736B] text-xs font-semibold ml-2">{{ reason.count }}</span>
+              </div>
+            }
+            @if (lossReasonSummary.length === 0) {
+              <p class="text-[#7A736B] text-xs">No lost inquiries yet</p>
+            }
+          </div>
         </div>
       </div>
 
       <!-- Recent Inquiries -->
       <div class="bg-white rounded-xl border border-[#E8E0D8]">
         <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
-          <h2 class="text-[#1B1A17] font-semibold">Recent inquiries</h2>
-          <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">View all →</a>
+          <h2 class="text-[#1B1A17] font-semibold">Recent Inquiries</h2>
+          <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17] transition-colors">View all →</a>
         </div>
         <div class="divide-y divide-[#E8E0D8]">
-          @for (inquiry of inquiries.slice(0, 5); track inquiry.id) {
+          @for (inquiry of filteredInquiries; track inquiry.id) {
             <a [routerLink]="['/inquiries', inquiry.id]"
-               class="flex items-center justify-between px-6 py-4 hover:bg-[#FAF7F2] transition-colors">
+               class="flex items-center justify-between px-6 py-3.5 hover:bg-[#FAF7F2] transition-colors group">
               <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center">
-                  <span class="text-white text-xs font-medium">
-                    {{ inquiry.clientName.charAt(0) }}
-                  </span>
+                <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
+                  <span class="text-white text-xs font-semibold">{{ inquiry.clientName.charAt(0) }}</span>
                 </div>
                 <div>
-                  <p class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</p>
+                  <p class="text-[#1B1A17] text-sm font-medium group-hover:text-[#34203A] transition-colors">{{ inquiry.clientName }}</p>
                   <p class="text-[#7A736B] text-xs">{{ inquiry.eventType }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-4">
-                <span class="text-[#7A736B] text-xs">{{ formatDate(inquiry.createdAt) }}</span>
-                <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ getStatusClass(inquiry.status) }}">
+                <!-- Source badge -->
+                @if (inquiry.sourceChannelId) {
+                  <span [class]="'px-2 py-0.5 rounded text-[10px] font-semibold ' + getSourceClass(inquiry.sourceChannelId)">
+                    {{ getChannelName(inquiry.sourceChannelId) }}
+                  </span>
+                }
+                <span class="text-[#7A736B] text-xs">{{ timeAgo(inquiry.createdAt || '') }}</span>
+                <span [class]="'px-2.5 py-1 rounded-full text-[11px] font-medium ' + statusBadge[inquiry.status || 'NEW']">
                   {{ inquiry.status }}
                 </span>
               </div>
@@ -92,7 +194,7 @@
           }
         </div>
       </div>
-    }
 
+    }
   </div>
 </div>

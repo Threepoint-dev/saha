@@ -32,8 +32,12 @@ export interface ReportingSummary {
   quoteValueByMonth: MonthValue[];
 }
 
-/** Inclusive date range (YYYY-MM-DD) sent to the reporting endpoint. */
-export interface DateRange {
-  from: string;
-  to: string;
+/** Filter parameters sent to the reporting endpoint. */
+export interface ReportingFilter {
+  from?: string;
+  to?: string;
+  channelId?: string;
+  ownerId?: string;
+  eventType?: string;
+  status?: string;
 }

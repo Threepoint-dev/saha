@@ -39,7 +39,6 @@ public class EventSetupService {
 
         OffsetDateTime now = OffsetDateTime.now();
         EventSetup setup = new EventSetup();
-        setup.setId(UUID.randomUUID());
         setup.setInquiryId(inquiryId);
         applyRequest(setup, request);
         if (setup.getPreparationStatus() == null || setup.getPreparationStatus().isBlank()) {

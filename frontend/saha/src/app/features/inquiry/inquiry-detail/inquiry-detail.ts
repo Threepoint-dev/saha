@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InquiryService, Inquiry } from '../../../core/services/inquiry.service';
+import { SourceChannelsService } from '../../setup/source-channels.service';
+import { SourceChannel } from '../../setup/source-channels.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-inquiry-detail',
@@ -13,11 +16,13 @@ import { InquiryService, Inquiry } from '../../../core/services/inquiry.service'
 })
 export class InquiryDetailComponent implements OnInit {
   inquiry: Inquiry | null = null;
+  sourceChannels: SourceChannel[] = [];
   isLoading = true;
   showMarkLost = false;
   lossReason = '';
   lossNote = '';
   isSubmittingLost = false;
+  showLostError = false;
 
   lossReasons = [
     'Price too high',
@@ -41,24 +46,46 @@ export class InquiryDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private inquiryService: InquiryService,
+    private sourceChannelsService: SourceChannelsService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
+    const tenantId = environment.tenantId;
+
     if (id) {
-      this.inquiryService.getById(id).subscribe({
-        next: (data) => {
-          this.inquiry = data;
-          this.isLoading = false;
-          this.cdr.detectChanges();
+      this.sourceChannelsService.list(tenantId).subscribe({
+        next: (channels) => {
+          this.sourceChannels = channels;
+          this.loadInquiry(id);
         },
-        error: () => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
+        error: (err) => {
+          console.error('Failed to load source channels', err);
+          this.loadInquiry(id);
         }
       });
     }
+  }
+
+  private loadInquiry(id: string) {
+    this.inquiryService.getById(id).subscribe({
+      next: (data) => {
+        this.inquiry = data;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getChannelName(sourceChannelId: string | undefined): string {
+    if (!sourceChannelId) return '';
+    const channel = this.sourceChannels.find(c => c.id === sourceChannelId);
+    return channel ? channel.name : sourceChannelId;
   }
 
   moveToContacted() {
@@ -82,8 +109,10 @@ export class InquiryDetailComponent implements OnInit {
   }
 
   confirmMarkLost() {
-    if (!this.lossReason || !this.inquiry?.id) return;
+    if (!this.lossReason) { this.showLostError = true; return; }
+    if (!this.inquiry?.id) return;
     this.isSubmittingLost = true;
+    this.showLostError = false;
     this.inquiryService.markLost(this.inquiry.id, this.lossReason, this.lossNote).subscribe({
       next: (data) => {
         this.inquiry = data;
@@ -107,5 +136,16 @@ export class InquiryDetailComponent implements OnInit {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short', day: 'numeric', year: 'numeric'
     });
+  }
+
+  formatDateShort(date: string): string {
+    if (!date) return '—';
+    const d = new Date(date);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
+      d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  }
+
+  reassign(): void {
+    alert('Reassign feature coming soon!');
   }
 }

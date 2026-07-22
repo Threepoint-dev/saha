@@ -62,14 +62,13 @@ public class QuoteService {
         String prefix = settings != null && settings.getQuotePrefix() != null && !settings.getQuotePrefix().isBlank()
                 ? settings.getQuotePrefix() : DEFAULT_PREFIX;
 
-        // Any previous quotes for this inquiry are no longer the current version.
+        // Flush any previous current quotes for this inquiry before creating the new one.
         clearCurrentFlag(tenantId, inquiryId);
 
         LocalDate today = LocalDate.now();
         OffsetDateTime now = OffsetDateTime.now();
 
         Quote quote = new Quote();
-        quote.setId(UUID.randomUUID());
         quote.setTenantId(tenantId);
         quote.setInquiryId(inquiryId);
         quote.setQuoteNumber(nextQuoteNumber(tenantId, prefix));
@@ -84,8 +83,8 @@ public class QuoteService {
         quote.setIsCurrent(Boolean.TRUE);
         quote.setCreatedAt(now);
         quote.setUpdatedAt(now);
-        quoteRepository.save(quote);
-        return QuoteDto.from(quote, List.of());
+        Quote saved = quoteRepository.save(quote);
+        return QuoteDto.from(saved, List.of());
     }
 
     @Transactional
@@ -126,7 +125,6 @@ public class QuoteService {
         OffsetDateTime now = OffsetDateTime.now();
 
         Quote copy = new Quote();
-        copy.setId(UUID.randomUUID());
         copy.setTenantId(tenantId);
         copy.setInquiryId(source.getInquiryId());
         copy.setQuoteNumber(nextQuoteNumber(tenantId, prefix));
@@ -141,7 +139,7 @@ public class QuoteService {
         copy.setIsCurrent(Boolean.TRUE);
         copy.setCreatedAt(now);
         copy.setUpdatedAt(now);
-        quoteRepository.save(copy);
+        copy = quoteRepository.save(copy);
 
         for (QuoteLineItem item : lineItemRepository.findAllByQuoteIdOrderBySortOrderAsc(source.getId())) {
             QuoteLineItem clone = new QuoteLineItem();
@@ -203,14 +201,7 @@ public class QuoteService {
     }
 
     private void clearCurrentFlag(UUID tenantId, UUID inquiryId) {
-        List<Quote> existing = quoteRepository.findAllByTenantIdAndInquiryId(tenantId, inquiryId);
-        for (Quote q : existing) {
-            if (Boolean.TRUE.equals(q.getIsCurrent())) {
-                q.setIsCurrent(Boolean.FALSE);
-                q.setUpdatedAt(OffsetDateTime.now());
-                quoteRepository.save(q);
-            }
-        }
+        quoteRepository.clearCurrentFlagForInquiry(tenantId, inquiryId, OffsetDateTime.now());
     }
 
     private String nextQuoteNumber(UUID tenantId, String prefix) {

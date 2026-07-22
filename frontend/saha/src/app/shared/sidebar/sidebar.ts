@@ -27,13 +27,10 @@ export class Sidebar {
     { label: 'Dashboard', path: '/dashboard', exact: true, section: 'SALES' },
     { label: 'Inquiries', hint: 'Pipeline & tracking', path: '/inquiries', exact: false, section: 'SALES' },
     { label: 'New Inquiry', path: '/inquiries/new', exact: true, section: 'SALES' },
-    { label: 'Quotes', hint: 'Commercial quote builder', path: '/quotes', exact: false, section: 'SALES' },
-    { label: 'Events', hint: 'Setup & customer confirmation', path: '/events', exact: false, section: 'SALES' },
     { label: 'Hotel Profile', path: '/hotel-profile', exact: true, section: 'SETUP' },
     { label: 'Reference Data', hint: 'Halls / Packages / Add-ons', path: '/setup/reference-data', exact: false, section: 'SETUP' },
     { label: 'Source Channels', path: '/setup/source-channels', exact: false, section: 'SETUP' },
     { label: 'Quote & VAT Settings', path: '/setup/quote-settings', exact: false, section: 'SETUP' },
-    { label: 'Pilot Readiness', path: '/setup/readiness', exact: false, section: 'SETUP' },
     { label: 'Reporting', hint: 'Measurement & analytics', path: '/reporting', exact: false, section: 'REPORTING' },
     { label: 'Export & Quality', hint: 'CSV export & data quality', path: '/export', exact: false, section: 'REPORTING' },
   ];

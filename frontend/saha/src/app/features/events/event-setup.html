@@ -22,7 +22,7 @@
   </header>
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1240px] mx-auto">
+  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1320px] mx-auto">
     <!-- Title row -->
     <div class="flex items-end justify-between gap-4">
       <div class="flex flex-col gap-1">
@@ -56,14 +56,14 @@
     @if (loading()) {
       <div class="rounded-[12px] bg-white border border-[#e4dfd5] px-5 py-4 text-[#55514a] text-[13px]">Loading event setup...</div>
     } @else {
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5 items-start">
-        <!-- LEFT: form -->
-        <div class="flex flex-col gap-4">
-          <!-- Event Details -->
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">EVENT DETAILS</p>
-          </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+        <!-- ════════════════════════════════════════ -->
+        <!-- LEFT COLUMN: 9 Numbered Section Cards   -->
+        <!-- ════════════════════════════════════════ -->
+        <div class="flex flex-col gap-5">
+
+          <!-- Hall selector (kept outside numbered sections) -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
             <div class="flex flex-col gap-1">
               <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Hall</label>
               <select [(ngModel)]="form.hallId"
@@ -72,153 +72,291 @@
                 @for (h of halls(); track h.id) { <option [ngValue]="h.id">{{ h.name }}</option> }
               </select>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Event Date</label>
-              <input type="date" [(ngModel)]="form.eventDate"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Setup Type</label>
-              <select [(ngModel)]="form.setupType"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
-                <option [ngValue]="null">— Select —</option>
-                @for (t of setupTypes; track t) { <option [ngValue]="t">{{ t }}</option> }
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Guest Count</label>
-              <input type="number" min="0" [(ngModel)]="form.guestCount"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Banquet Headcount</label>
-              <input type="number" min="0" [(ngModel)]="form.banquetHeadcount"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Preparation Status</label>
-              <select [(ngModel)]="form.preparationStatus"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
-                <option [ngValue]="null">— Select —</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="ready">Ready</option>
-              </select>
-            </div>
           </div>
 
-          <!-- Schedule -->
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">SCHEDULE</p>
-          </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Start Time</label>
-              <input type="time" [(ngModel)]="form.startTime" (ngModelChange)="recomputeDuration()"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+          <!-- ─── SECTION 1: Booking Date & Time ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">1</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Booking Date &amp; Time</p>
+                <p class="text-[#55514a] text-[12px]">Select event date, duration, and preferred time slot</p>
+              </div>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">End Time</label>
-              <input type="time" [(ngModel)]="form.endTime" (ngModelChange)="recomputeDuration()"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Duration (hrs)</label>
-              <input type="number" min="0" [(ngModel)]="form.durationHours"
-                class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-          </div>
-
-          <!-- Catering -->
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">CATERING</p>
-          </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Catering Style</label>
-              <select [(ngModel)]="form.cateringStyle"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
-                <option [ngValue]="null">— Select —</option>
-                @for (c of cateringStyles; track c) { <option [ngValue]="c">{{ c }}</option> }
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Main Meal</label>
-              <input type="text" [(ngModel)]="form.mainMeal" placeholder="e.g. Mixed grill, Kabsa"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
-            </div>
-          </div>
-
-          <!-- Styling & Layout -->
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">STYLING &amp; LAYOUT</p>
-          </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 flex flex-col gap-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex flex-col gap-1">
-                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Chair Color</label>
-                <input type="text" [(ngModel)]="form.chairColor" placeholder="e.g. Gold"
-                  class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Event Date</label>
+                <input type="date" [(ngModel)]="form.eventDate"
+                  class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
               </div>
               <div class="flex flex-col gap-1">
-                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Table Color</label>
-                <input type="text" [(ngModel)]="form.tableColor" placeholder="e.g. Ivory"
-                  class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Duration (hours)</label>
+                <input type="number" min="1" [(ngModel)]="form.durationHours"
+                  class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
               </div>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Layout Notes</label>
-              <textarea [(ngModel)]="form.layoutNotes" rows="2" placeholder="Stage, dance floor, head table position..."
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Select Time Slot</label>
+              <div class="flex flex-wrap gap-2">
+                @for (slot of timeSlots; track slot) {
+                  <button type="button" (click)="selectTimeSlot(slot)"
+                    [class]="form.startTime === slot
+                      ? 'bg-[#34203a] text-white border border-[#34203a] rounded-[8px] px-4 py-2 text-[13px] font-semibold transition-all'
+                      : 'bg-[#faf7f2] text-[#34203a] border border-[#e4dfd5] rounded-[8px] px-4 py-2 text-[13px] font-medium hover:border-[#34203a] transition-all'">
+                    {{ formatSlotLabel(slot) }}
+                  </button>
+                }
+              </div>
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Agenda</label>
-              <textarea [(ngModel)]="form.agenda" rows="3" placeholder="Run of show / timeline..."
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Attachment URL</label>
-              <input type="text" [(ngModel)]="form.attachmentUrl" placeholder="Link to floor plan or brief"
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+            <!-- Hidden time inputs still bound for backend compatibility -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1">
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Start Time</label>
+                <input type="time" [(ngModel)]="form.startTime" (ngModelChange)="recomputeDuration()"
+                  class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">End Time</label>
+                <input type="time" [(ngModel)]="form.endTime" (ngModelChange)="recomputeDuration()"
+                  class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+              </div>
             </div>
           </div>
 
-          <!-- Add-ons -->
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">EVENT ADD-ONS</p>
+          <!-- ─── SECTION 2: Number of Guests ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">2</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Number of Guests</p>
+                <p class="text-[#55514a] text-[12px]">Set the expected guest count for this event</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-center gap-6 py-3">
+              <button type="button" (click)="decrementGuests()"
+                class="w-[44px] h-[44px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[20px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">−</button>
+              <div class="flex flex-col items-center">
+                <input type="number" [(ngModel)]="form.guestCount" min="0"
+                  class="text-[#34203a] text-[40px] font-bold leading-none w-32 text-center bg-transparent focus:outline-none focus:border-b-2 border-transparent border-b-2 focus:border-[#34203a] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                <span class="text-[#8a8478] text-[11px] mt-1">guests</span>
+              </div>
+              <button type="button" (click)="incrementGuests()"
+                class="w-[44px] h-[44px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[20px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">+</button>
+            </div>
+            @if (selectedHallCapacity(); as cap) {
+              <p class="text-center text-[#ce8a28] text-[12px] font-medium">Max hall capacity: {{ cap }} guests</p>
+            }
           </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 flex flex-col gap-3">
-            @if (!setup()) {
-              <p class="text-[#8a8478] text-[12px]">Save the event setup first to attach add-ons.</p>
-            } @else {
-              @if (eventAddons().length === 0) {
-                <p class="text-[#8a8478] text-[12px]">No add-ons selected yet.</p>
-              } @else {
-                <div class="flex flex-col gap-2">
-                  @for (ea of eventAddons(); track ea.id) {
-                    <div class="flex items-center gap-3 border border-[#efebf3] rounded-[10px] px-3 py-2.5">
-                      <div class="flex-1">
-                        <p class="text-[#34203a] text-[13px] font-medium">{{ ea.addonName || addonName(ea.addonId) }}</p>
-                        @if (ea.unitPrice != null) {
-                          <p class="text-[#8a8478] text-[11px]">SAR {{ ea.unitPrice | number:'1.2-2' }} each</p>
-                        }
-                      </div>
-                      <div class="flex flex-col gap-1">
-                        <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Qty</label>
-                        <input type="number" min="1" [(ngModel)]="ea.quantity" (blur)="updateAddonQty(ea)"
-                          class="w-[70px] bg-white border border-[#e4dfd5] rounded-[8px] px-2.5 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
-                      </div>
-                      <div class="flex flex-col gap-1 text-right">
-                        <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Total</label>
-                        <p class="text-[#34203a] text-[13px] font-semibold h-[36px] flex items-center justify-end">SAR {{ (ea.lineTotal ?? 0) | number:'1.2-2' }}</p>
-                      </div>
-                      <button type="button" (click)="removeAddon(ea)" title="Remove"
-                        class="text-[#a02f2f] border border-[#e8c9c9] hover:bg-[#f7dede] text-[12px] font-medium px-3 h-[36px] rounded-[8px] transition-colors">Remove</button>
+
+          <!-- ─── SECTION 3: Setup Type ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">3</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Setup Type</p>
+                <p class="text-[#55514a] text-[12px]">Choose how the hall will be arranged</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              @for (card of setupTypeCards; track card.value) {
+                <button type="button" (click)="selectSetupType(card.value)"
+                  [class]="form.setupType === card.value
+                    ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[12px] p-4 flex flex-col items-center gap-2 text-center transition-all'
+                    : 'bg-white border border-[#e4dfd5] rounded-[12px] p-4 flex flex-col items-center gap-2 text-center hover:border-[#34203a] transition-all'">
+                  <span class="text-[24px]">{{ card.icon }}</span>
+                  <span class="text-[#34203a] text-[13px] font-semibold">{{ card.value }}</span>
+                  <span class="text-[#8a8478] text-[11px] leading-tight">{{ card.description }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- ─── SECTION 4: Table & Chair Colors ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">4</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Table &amp; Chair Colors</p>
+                <p class="text-[#55514a] text-[12px]">Pick the color scheme for tables and chairs</p>
+              </div>
+            </div>
+            <!-- Table Color -->
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Table Color</label>
+              <div class="flex flex-wrap gap-3">
+                @for (sw of colorSwatches; track sw.value) {
+                  <button type="button" (click)="selectTableColor(sw.value)"
+                    class="flex flex-col items-center gap-1 group">
+                    <div [class]="(form.tableColor ?? '') === sw.value
+                      ? 'w-[44px] h-[44px] rounded-[8px] border-2 border-[#34203a] flex items-center justify-center transition-all'
+                      : 'w-[44px] h-[44px] rounded-[8px] border border-[#e4dfd5] flex items-center justify-center hover:border-[#34203a] transition-all'"
+                      [style.background-color]="sw.hex === 'transparent' ? '#faf7f2' : sw.hex">
+                      @if ((form.tableColor ?? '') === sw.value) {
+                        <span class="text-white text-[14px] font-bold" [class.text-[#34203a]]="sw.hex === '#f5f5f0' || sw.hex === '#d4c5a9' || sw.hex === 'transparent'">✓</span>
+                      }
+                    </div>
+                    <span class="text-[#8a8478] text-[10px]">{{ sw.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+            <!-- Chair Color -->
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Chair Color</label>
+              <div class="flex flex-wrap gap-3">
+                @for (sw of colorSwatches; track sw.value) {
+                  <button type="button" (click)="selectChairColor(sw.value)"
+                    class="flex flex-col items-center gap-1 group">
+                    <div [class]="(form.chairColor ?? '') === sw.value
+                      ? 'w-[44px] h-[44px] rounded-[8px] border-2 border-[#34203a] flex items-center justify-center transition-all'
+                      : 'w-[44px] h-[44px] rounded-[8px] border border-[#e4dfd5] flex items-center justify-center hover:border-[#34203a] transition-all'"
+                      [style.background-color]="sw.hex === 'transparent' ? '#faf7f2' : sw.hex">
+                      @if ((form.chairColor ?? '') === sw.value) {
+                        <span class="text-white text-[14px] font-bold" [class.text-[#34203a]]="sw.hex === '#f5f5f0' || sw.hex === '#d4c5a9' || sw.hex === 'transparent'">✓</span>
+                      }
+                    </div>
+                    <span class="text-[#8a8478] text-[10px]">{{ sw.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── SECTION 5: Design the Hall (Layout) ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">5</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Design the Hall (Layout)</p>
+                <p class="text-[#55514a] text-[12px]">Drag elements onto the canvas to design your hall</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-[180px_1fr] gap-4">
+              <!-- Left: Draggable chips -->
+              <div class="flex flex-col gap-2">
+                <p class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Elements</p>
+                @for (chip of layoutChips; track chip) {
+                  <div draggable="true"
+                    (dragstart)="onChipDragStart($event, chip)"
+                    class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[12px] text-[#34203a] font-medium cursor-grab hover:border-[#34203a] hover:bg-[#ece6f1] transition-all select-none">
+                    {{ chip }}
+                  </div>
+                }
+              </div>
+              <!-- Right: Drop canvas -->
+              <div class="flex flex-col gap-2">
+                <p class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px] text-center">Front / Stage</p>
+                <div class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] relative min-h-[320px]"
+                  (dragover)="onCanvasDragOver($event)"
+                  (drop)="onCanvasDrop($event)">
+                  @for (el of layoutElements; track $index) {
+                    <div class="absolute bg-white border border-[#34203a] rounded-[6px] px-2 py-1 text-[11px] font-medium text-[#34203a] cursor-grab select-none shadow-sm flex items-center gap-1"
+                      [style.left.px]="el.x - 30"
+                      [style.top.px]="el.y - 12"
+                      draggable="true"
+                      (dragstart)="onElementDragStart($event, $index)">
+                      {{ el.type }}
+                      <button type="button" (click)="removeLayoutElement($index)"
+                        class="text-[#a02f2f] text-[10px] hover:text-red-600 ml-1">×</button>
+                    </div>
+                  }
+                  @if (layoutElements.length === 0) {
+                    <div class="absolute inset-0 flex items-center justify-center">
+                      <p class="text-[#c9c3b8] text-[12px]">Drag elements here</p>
                     </div>
                   }
                 </div>
-              }
+              </div>
+            </div>
+            <!-- Layout notes -->
+            <div class="flex flex-col gap-1">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Layout Notes</label>
+              <textarea [(ngModel)]="form.layoutNotes" rows="2" placeholder="Stage, dance floor, head table position..."
+                class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+            </div>
+            <!-- Attachment pill -->
+            <div class="flex items-center gap-2">
+              <input type="text" [(ngModel)]="form.attachmentUrl" placeholder="📎 Or attach a ready hall layout (image or PDF)"
+                class="flex-1 bg-[#faf7f2] border border-[#e4dfd5] rounded-full px-4 py-2 h-[38px] text-[12px] text-[#34203a] placeholder-[#8a8478] focus:outline-none focus:border-[#ce8a28] transition-colors" />
+            </div>
+          </div>
 
+          <!-- ─── SECTION 6: Additional Options (Add-ons) ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">6</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Additional Options</p>
+                <p class="text-[#55514a] text-[12px]">Select extra services and add-ons for the event</p>
+              </div>
+            </div>
+            @if (addons().length === 0) {
+              <p class="text-[#8a8478] text-[12px]">No add-on options available.</p>
+            } @else {
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @for (a of addons(); track a.id) {
+                  <button type="button" (click)="toggleAddonSelection(a.id)"
+                    [class]="isAddonSelected(a.id)
+                      ? 'flex items-center gap-3 bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3 text-left transition-all'
+                      : 'flex items-center gap-3 bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3 text-left hover:border-[#34203a] transition-all'">
+                    <div class="flex-1">
+                      <p class="text-[#34203a] text-[13px] font-semibold">{{ a.name }}</p>
+                      @if (a.price != null) {
+                        <p class="text-[#8a8478] text-[11px]">SAR {{ a.price | number:'1.2-2' }}</p>
+                      }
+                    </div>
+                    <div [class]="isAddonSelected(a.id)
+                      ? 'w-[24px] h-[24px] rounded-[6px] bg-[#ce8a28] border-2 border-[#ce8a28] flex items-center justify-center shrink-0'
+                      : 'w-[24px] h-[24px] rounded-[6px] bg-white border-2 border-[#e4dfd5] flex items-center justify-center shrink-0'">
+                      @if (isAddonSelected(a.id)) {
+                        <span class="text-white text-[12px] font-bold">✓</span>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+            <!-- Existing add-ons (already persisted) -->
+            @if (setup() && eventAddons().length > 0) {
+              <div class="border-t border-[#e4dfd5] pt-3 flex flex-col gap-2">
+                <p class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Saved Add-ons</p>
+                @for (ea of eventAddons(); track ea.id) {
+                  <div class="flex items-center gap-3 border border-[#efebf3] rounded-[10px] px-3 py-2.5">
+                    <div class="flex-1">
+                      <p class="text-[#34203a] text-[13px] font-medium">{{ ea.addonName || addonName(ea.addonId) }}</p>
+                      @if (ea.unitPrice != null) {
+                        <p class="text-[#8a8478] text-[11px]">SAR {{ ea.unitPrice | number:'1.2-2' }} each</p>
+                      }
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Qty</label>
+                      <input type="number" min="1" [(ngModel)]="ea.quantity" (blur)="updateAddonQty(ea)"
+                        class="w-[70px] bg-white border border-[#e4dfd5] rounded-[8px] px-2.5 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                    </div>
+                    <div class="flex flex-col gap-1 text-right">
+                      <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Total</label>
+                      <p class="text-[#34203a] text-[13px] font-semibold h-[36px] flex items-center justify-end">SAR {{ (ea.lineTotal ?? 0) | number:'1.2-2' }}</p>
+                    </div>
+                    <button type="button" (click)="removeAddon(ea)" title="Remove"
+                      class="text-[#a02f2f] border border-[#e8c9c9] hover:bg-[#f7dede] text-[12px] font-medium px-3 h-[36px] rounded-[8px] transition-colors">Remove</button>
+                  </div>
+                }
+              </div>
+            }
+            <!-- Quick-add add-on (same as before but restyled) -->
+            @if (setup()) {
               <div class="flex flex-wrap items-end gap-3 border-t border-[#efebf3] pt-3">
                 <div class="flex flex-col gap-1 flex-1 min-w-[180px]">
                   <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Add-on</label>
@@ -241,58 +379,266 @@
             }
           </div>
 
-          <!-- Internal notes -->
-          <div class="bg-[#efebf3] border border-[#d8d2c6] rounded-[8px] px-[14px] py-2 flex items-center gap-2">
-            <p class="text-[#55514a] text-[11px] font-semibold tracking-[0.22px]">INTERNAL — NOT SHOWN TO CUSTOMER</p>
-          </div>
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Internal Notes</label>
-              <textarea [(ngModel)]="form.internalNotes" rows="3" placeholder="Sales / coordination notes..."
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+          <!-- ─── SECTION 7: Catering Style ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">7</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Catering Style</p>
+                <p class="text-[#55514a] text-[12px]">Choose the serving style and main meal option</p>
+              </div>
             </div>
+            <!-- Serving Style -->
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Serving Style</label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                @for (cs of cateringStyleCards; track cs.value) {
+                  <button type="button" (click)="selectCateringStyle(cs.value)"
+                    [class]="form.cateringStyle === cs.value
+                      ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[12px] px-4 py-3 text-center transition-all'
+                      : 'bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3 text-center hover:border-[#34203a] transition-all'">
+                    <p class="text-[#34203a] text-[13px] font-semibold">{{ cs.value }}</p>
+                    <p class="text-[#8a8478] text-[11px]">{{ cs.priceLabel }}</p>
+                  </button>
+                }
+              </div>
+            </div>
+            <!-- Main Meal -->
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Main Meal</label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                @for (meal of mealCards; track meal.value) {
+                  <button type="button" (click)="selectMainMeal(meal.value)"
+                    [class]="(form.mainMeal ?? '') === meal.value
+                      ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[10px] px-3 py-2 text-center transition-all'
+                      : 'bg-white border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-center hover:border-[#34203a] transition-all'">
+                    <p class="text-[#34203a] text-[13px] font-semibold">{{ meal.label }}</p>
+                    <p class="text-[#8a8478] text-[10px]">{{ meal.priceLabel }}</p>
+                  </button>
+                }
+              </div>
+            </div>
+            <!-- Banquet headcount stepper -->
+            <div class="flex flex-col gap-2">
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Banquet Headcount</label>
+              <div class="flex items-center gap-4">
+                <button type="button" (click)="decrementBanquetHeadcount()"
+                  class="w-[36px] h-[36px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[18px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">−</button>
+                <input type="number" [(ngModel)]="form.banquetHeadcount" min="0"
+                  class="text-[#34203a] text-[24px] font-bold min-w-[60px] w-20 text-center bg-transparent focus:outline-none focus:border-b-2 border-transparent border-b-2 focus:border-[#34203a] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                <button type="button" (click)="incrementBanquetHeadcount()"
+                  class="w-[36px] h-[36px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[18px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">+</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── SECTION 8: Event Agenda ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">8</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Event Agenda</p>
+                <p class="text-[#55514a] text-[12px]">Build the timeline of your event</p>
+              </div>
+            </div>
+            <!-- Segment list -->
+            @if (agendaSegments.length > 0) {
+              <div class="flex flex-col gap-2">
+                @for (seg of agendaSegments; track $index) {
+                  <div class="flex items-center gap-3 bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-4 py-3">
+                    <div class="w-[28px] h-[28px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                      <span class="text-white font-bold text-[11px]">{{ $index + 1 }}</span>
+                    </div>
+                    <div class="flex-1 flex flex-wrap items-center gap-2">
+                      <span class="text-[#34203a] text-[13px] font-medium">{{ seg.time }}</span>
+                      <span class="text-[#34203a] text-[13px] font-semibold">{{ seg.title }}</span>
+                      <span class="bg-[#efebf3] text-[#55514a] text-[11px] font-medium px-2 py-0.5 rounded-full">{{ seg.durationMinutes }} min</span>
+                      @if (segmentEndTime(seg)) {
+                        <span class="text-[#ce8a28] text-[11px] font-medium">till {{ segmentEndTime(seg) }}</span>
+                      }
+                    </div>
+                    <button type="button" (click)="removeAgendaSegment($index)"
+                      class="text-[#a02f2f] text-[14px] hover:text-red-600 w-[24px] h-[24px] flex items-center justify-center">×</button>
+                  </div>
+                }
+              </div>
+            }
+            <!-- Add segment form -->
+            @if (showAddSegment) {
+              <div class="bg-[#faf7f2] border border-dashed border-[#ce8a28] rounded-[10px] px-4 py-3 flex flex-wrap items-end gap-3">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Time</label>
+                  <input type="time" [(ngModel)]="newSegment.time"
+                    class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+                </div>
+                <div class="flex flex-col gap-1 flex-1 min-w-[120px]">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Title</label>
+                  <input type="text" [(ngModel)]="newSegment.title" placeholder="e.g. Guest Arrival"
+                    class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a]" />
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Duration (min)</label>
+                  <input type="number" min="5" step="5" [(ngModel)]="newSegment.durationMinutes"
+                    class="w-[80px] bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+                </div>
+                <button type="button" (click)="addAgendaSegment()"
+                  class="bg-[#34203a] hover:bg-[#46294f] rounded-[8px] px-4 h-[36px] text-white text-[12px] font-semibold transition-colors">Add</button>
+                <button type="button" (click)="showAddSegment = false"
+                  class="text-[#8a8478] hover:text-[#34203a] text-[12px] font-medium h-[36px] transition-colors">Cancel</button>
+              </div>
+            } @else {
+              <button type="button" (click)="showAddSegment = true"
+                class="bg-white border border-[#ce8a28] text-[#ce8a28] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold hover:bg-[#fef8ee] transition-colors border-dashed">
+                + Add segment
+              </button>
+            }
+            <!-- Total agenda duration -->
+            @if (agendaSegments.length > 0) {
+              <div class="flex items-center justify-between border-t border-[#e4dfd5] pt-3">
+                <span class="text-[#8a8478] text-[12px] font-medium">Total agenda duration</span>
+                <span class="text-[#34203a] text-[13px] font-bold">{{ totalAgendaDuration() }} min</span>
+              </div>
+            }
+          </div>
+
+          <!-- ─── SECTION 9: Internal Notes & Attachments ─── -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5 flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-[32px] h-[32px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                <span class="text-white font-bold text-[13px]">9</span>
+              </div>
+              <div>
+                <p class="text-[#34203a] text-[15px] font-semibold leading-tight">Internal Notes &amp; Attachments</p>
+                <p class="text-[#55514a] text-[12px]">Visible to hotel team only · not on customer confirmation</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1">
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Internal Notes</label>
+                <textarea [(ngModel)]="form.internalNotes" rows="3" placeholder="Sales / coordination notes..."
+                  class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 h-20 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Ops Notes</label>
+                <textarea [(ngModel)]="form.opsNotes" rows="3" placeholder="Operations / kitchen / AV notes..."
+                  class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 h-20 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" [(ngModel)]="form.attachmentUrl" placeholder="📎 Attach floor plan, brief, or any supporting document"
+                class="flex-1 bg-[#faf7f2] border border-[#ce8a28] rounded-full px-4 py-2 h-[38px] text-[12px] text-[#34203a] placeholder-[#ce8a28] focus:outline-none focus:border-[#34203a] transition-colors" />
+            </div>
+            <!-- Preparation Status (kept for backend) -->
             <div class="flex flex-col gap-1">
-              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Ops Notes</label>
-              <textarea [(ngModel)]="form.opsNotes" rows="3" placeholder="Operations / kitchen / AV notes..."
-                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+              <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">Preparation Status</label>
+              <select [(ngModel)]="form.preparationStatus"
+                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
+                <option [ngValue]="null">— Select —</option>
+                <option value="pending">Pending</option>
+                <option value="in_progress">In Progress</option>
+                <option value="ready">Ready</option>
+              </select>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT: actions -->
-        <div class="flex flex-col gap-4 lg:sticky lg:top-6">
-          <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2">
-            <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">ACTIONS</p>
+        <!-- ════════════════════════════════════════ -->
+        <!-- RIGHT COLUMN: Quote Package Summary     -->
+        <!-- ════════════════════════════════════════ -->
+        <div class="flex flex-col gap-0 lg:sticky lg:top-6">
+          <!-- Header block -->
+          <div class="bg-[#46294f] rounded-t-[16px] px-5 py-4">
+            <p class="text-[#f6ddae] text-[10px] font-semibold uppercase tracking-[0.12px]">Quote Package Summary</p>
+            <p class="text-white text-[16px] font-bold mt-1">{{ selectedHallName() !== '—' ? selectedHallName() : 'Hall not selected' }}</p>
+            <p class="text-[#f6ddae] text-[12px]">{{ inquiry()?.clientName || 'Client' }}</p>
           </div>
 
-          <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-4 flex flex-col gap-3">
+          <!-- Body: summary rows -->
+          <div class="bg-[#34203a] px-5 py-4 flex flex-col gap-2.5">
             <div class="flex items-center justify-between">
-              <span class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.12px]">Client</span>
-              <span class="text-[#34203a] text-[13px] font-semibold">{{ inquiry()?.clientName || '—' }}</span>
+              <span class="text-[#f6ddae] text-[11px] font-medium">Date</span>
+              <span class="text-white text-[13px] font-bold">{{ form.eventDate ? (form.eventDate | date:'mediumDate') : '—' }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.12px]">Status</span>
-              <span class="text-[#34203a] text-[13px] font-semibold capitalize">{{ inquiry()?.status || '—' }}</span>
+              <span class="text-[#f6ddae] text-[11px] font-medium">Time</span>
+              <span class="text-white text-[13px] font-bold">{{ form.startTime || '—' }} — {{ form.endTime || '—' }}</span>
             </div>
             <div class="flex items-center justify-between">
-              <span class="text-[#8a8478] text-[11px] font-medium uppercase tracking-[0.12px]">Add-ons</span>
-              <span class="text-[#34203a] text-[13px] font-semibold">{{ eventAddons().length }}</span>
+              <span class="text-[#f6ddae] text-[11px] font-medium">Guests</span>
+              <span class="text-white text-[13px] font-bold">{{ form.guestCount ?? '—' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#f6ddae] text-[11px] font-medium">Setup Type</span>
+              <span class="text-white text-[13px] font-bold">{{ form.setupType || '—' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#f6ddae] text-[11px] font-medium">Colors</span>
+              <span class="text-white text-[13px] font-bold">{{ (form.tableColor || '—') + ' / ' + (form.chairColor || '—') }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#f6ddae] text-[11px] font-medium">Extras</span>
+              <span class="text-white text-[13px] font-bold">{{ selectedExtrasLabel() }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#f6ddae] text-[11px] font-medium">Catering</span>
+              <span class="text-white text-[13px] font-bold">{{ form.cateringStyle || '—' }}</span>
+            </div>
+            <div class="flex items-center justify-between border-t border-white/10 pt-2">
+              <span class="text-[#f6ddae] text-[11px] font-medium">Quote Value</span>
+              <span class="text-white text-[15px] font-bold">—</span>
             </div>
           </div>
 
-          <div class="flex flex-col gap-2.5">
+          <!-- Status tracker section -->
+          <div class="bg-[#46294f] px-5 py-4 flex flex-col gap-3">
+            <p class="text-[#f6ddae] text-[10px] font-semibold uppercase tracking-[0.12px]">Status</p>
+            <!-- Customer Confirmation -->
+            <div class="flex items-center gap-2">
+              <span class="w-[8px] h-[8px] rounded-full bg-[#c9c3b8]"></span>
+              <span class="text-[#f6ddae] text-[12px] flex-1">Customer Confirmation</span>
+              <span class="text-[#c9c3b8] text-[11px] font-medium">Not sent yet</span>
+            </div>
+            <!-- Internal BEO -->
+            <div class="flex items-center gap-2">
+              <span class="w-[8px] h-[8px] rounded-full bg-[#c9c3b8]"></span>
+              <span class="text-[#f6ddae] text-[12px] flex-1">Internal BEO</span>
+              <span class="text-[#c9c3b8] text-[11px] font-medium">Not shared yet</span>
+            </div>
+            <!-- Hall Availability -->
+            <div class="flex items-center gap-2">
+              <span class="w-[8px] h-[8px] rounded-full bg-[#e0922f]"></span>
+              <span class="text-[#f6ddae] text-[12px] flex-1">Hall Availability</span>
+              <span class="text-[#e0922f] text-[11px] font-medium">Tentative Hold</span>
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="bg-[#34203a] rounded-b-[16px] px-5 py-4 flex flex-col gap-2.5">
             <button type="button" (click)="save()" [disabled]="saving()"
-              class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[12px] px-6 py-3 text-white text-[14px] font-semibold transition-colors">
-              {{ saving() ? 'Saving...' : 'Save' }}
+              class="bg-[#46294f] hover:bg-[#5a3566] disabled:opacity-60 rounded-[10px] px-5 py-3 text-white text-[13px] font-semibold transition-colors w-full">
+              {{ saving() ? 'Saving...' : 'Save Quote Package' }}
+            </button>
+            <button type="button" (click)="save()" [disabled]="saving()"
+              class="bg-[#ce8a28] hover:bg-[#b87922] disabled:opacity-60 rounded-[10px] px-5 py-3 text-[#34203a] text-[13px] font-semibold transition-colors w-full">
+              Generate Event Confirmation
+            </button>
+            <button type="button" (click)="save()" [disabled]="saving()"
+              class="bg-[#ce8a28] hover:bg-[#b87922] disabled:opacity-60 rounded-[10px] px-5 py-3 text-[#34203a] text-[13px] font-semibold transition-colors w-full">
+              Send Quote Package
             </button>
             <button type="button" (click)="sendConfirmation()" [disabled]="confirming()"
-              class="bg-white border border-[#34203a] text-[#34203a] hover:bg-[#efebf3] disabled:opacity-60 rounded-[12px] px-6 py-3 text-[14px] font-semibold transition-colors">
-              {{ confirming() ? 'Sending...' : 'Send Confirmation to Customer' }}
+              class="bg-[#46294f] hover:bg-[#5a3566] disabled:opacity-60 rounded-[10px] px-5 py-3 text-white text-[13px] font-semibold transition-colors w-full">
+              {{ confirming() ? 'Sending...' : 'Mark Customer Confirmed' }}
             </button>
           </div>
 
+          <!-- Customer Summary Link -->
           @if (summaryUrl()) {
-            <div class="bg-[#efebf3] border border-[#e4dfd5] rounded-[12px] px-4 py-3 flex flex-col gap-2">
+            <div class="bg-[#efebf3] border border-[#e4dfd5] rounded-[12px] px-4 py-3 flex flex-col gap-2 mt-3">
               <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px]">Customer Summary Link</p>
               <div class="flex items-center gap-2">
                 <input type="text" [value]="summaryUrl()" readonly

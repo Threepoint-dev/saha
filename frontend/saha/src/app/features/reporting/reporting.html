@@ -11,40 +11,91 @@
       </div>
     </div>
     <div class="flex items-center gap-3">
-      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
-        <p class="text-[#f6ddae] text-[10px] font-semibold">SAHA ADMIN</p>
+      <div class="flex items-center gap-2 border border-[#e4dfd5] bg-white text-[#34203a] text-[12px] font-semibold rounded-md px-3 py-1.5 shadow-sm">
+        <svg class="w-3.5 h-3.5 text-[#8a6fa8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        Hotel: Al Faisaliah Ballrooms
       </div>
-      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
-      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
-        <p class="text-white text-[12px] font-semibold">SA</p>
+      <div class="bg-[#ce8a28] text-white text-[12px] font-semibold rounded-md px-3 py-1.5">
+        Events Team
       </div>
     </div>
   </header>
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1200px] mx-auto">
-    <!-- Title + date range filter -->
-    <div class="flex flex-wrap items-end justify-between gap-4">
+  <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1400px] mx-auto">
+
+    <!-- Title + sample badge -->
+    <div class="flex items-start justify-between">
       <div class="flex flex-col gap-1">
-        <h1 class="text-[#34203a] font-bold text-[24px] leading-none">Reporting Dashboard</h1>
-        <p class="text-[#55514a] text-[13px] leading-none">Inquiry, conversion &amp; quote performance for your venue.</p>
+        <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Hotel Measurement Dashboard</h1>
+        <p class="text-[#55514a] text-[13px] leading-none">Event sales performance · inquiries, conversion &amp; response time</p>
+      </div>
+      @if (!loading() && summary()) {
+        <span class="inline-flex items-center gap-1.5 bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[11px] font-semibold px-3 py-1.5 rounded-full">
+          ● Sample data
+        </span>
+      }
+    </div>
+
+    <!-- Filters Row -->
+    <div class="flex items-center gap-2 flex-wrap bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3">
+      <span class="text-[#55514a] text-[12px] font-semibold mr-1">Filters</span>
+
+      <div class="flex items-center gap-1 border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] cursor-pointer hover:bg-[#efebf3] transition-colors">
+        <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-wide">Date Range</span>
+        <span class="text-[#34203a] text-[12px] font-semibold mx-1">
+          {{ from() | date:'MMM d' }} – {{ to() | date:'MMM d' }}
+        </span>
+        <span class="text-[#55514a] text-[10px]">▾</span>
       </div>
 
-      <div class="flex items-end gap-3 bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3">
-        <label class="flex flex-col gap-1">
+      <select [ngModel]="filterChannelId()" (ngModelChange)="filterChannelId.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
+        <option value="">All channels</option>
+        @for (channel of sourceChannels(); track channel.id) {
+          <option [value]="channel.id">{{ channel.name }}</option>
+        }
+      </select>
+
+      <select [ngModel]="filterOwnerId()" (ngModelChange)="filterOwnerId.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
+        <option value="">All owners</option>
+      </select>
+
+      <select [ngModel]="filterEventType()" (ngModelChange)="filterEventType.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
+        <option value="">All types</option>
+        <option value="Wedding">Wedding</option>
+        <option value="Corporate">Corporate</option>
+        <option value="Social">Social</option>
+        <option value="Other">Other</option>
+      </select>
+
+      <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
+        <option value="">All statuses</option>
+        <option value="NEW">New</option>
+        <option value="CONTACTED">Contacted</option>
+        <option value="QUOTED">Quoted</option>
+        <option value="WON">Won</option>
+        <option value="LOST">Lost</option>
+      </select>
+
+      <div class="flex items-center gap-2 ml-auto">
+        <label class="flex flex-col gap-0.5">
           <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">From</span>
           <input type="date" [ngModel]="from()" (ngModelChange)="from.set($event)"
-            class="border border-[#e4dfd5] rounded-[8px] px-2.5 py-1.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+            class="border border-[#e4dfd5] rounded-[8px] px-2 py-1 text-[12px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
         </label>
-        <label class="flex flex-col gap-1">
+        <label class="flex flex-col gap-0.5">
           <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">To</span>
           <input type="date" [ngModel]="to()" (ngModelChange)="to.set($event)"
-            class="border border-[#e4dfd5] rounded-[8px] px-2.5 py-1.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+            class="border border-[#e4dfd5] rounded-[8px] px-2 py-1 text-[12px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
         </label>
-        <button type="button" (click)="apply()"
-          class="bg-[#34203a] hover:bg-[#46294f] text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-5 py-2 transition-colors disabled:opacity-60"
-          [disabled]="loading()">
+        <button type="button" (click)="apply()" [disabled]="loading()"
+          class="self-end bg-[#34203a] hover:bg-[#46294f] text-white text-[12px] font-semibold rounded-[8px] px-4 py-1.5 transition-colors disabled:opacity-60">
           {{ loading() ? 'Loading…' : 'Apply' }}
+        </button>
+        <button type="button" class="self-end text-[#ce8a28] text-[12px] font-semibold hover:underline">
+          Clear all
         </button>
       </div>
     </div>
@@ -55,69 +106,175 @@
       </div>
     }
 
-    <!-- KPI cards -->
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-      @for (kpi of kpis(); track kpi.label) {
-        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-4 py-3.5 flex flex-col gap-1.5">
-          <p class="text-[#55514a] text-[11px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ kpi.label }}</p>
-          <p class="text-[#34203a] font-bold text-[22px] leading-none">{{ kpi.value }}</p>
-          @if (kpi.hint) {
-            <p class="text-[#8a8079] text-[11px] leading-none">{{ kpi.hint }}</p>
+    <!-- Key Metrics Section -->
+    <div class="flex flex-col gap-3">
+      <h2 class="text-[#34203a] font-bold text-[16px]">Key metrics</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
+        @for (kpi of kpis(); track kpi.label) {
+          <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-4 py-4 flex flex-col gap-2">
+            <div class="w-full h-0.5 rounded-full" [class]="kpi.barColor || 'bg-[#34203a]'"></div>
+            <p class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ kpi.label }}</p>
+            <p class="text-[#34203a] font-bold text-[24px] leading-none">{{ kpi.value }}</p>
+            @if (kpi.hint) {
+              <p class="text-[#8a8079] text-[11px] leading-none">{{ kpi.hint }}</p>
+            }
+          </div>
+        }
+        @if (kpis().length === 0) {
+          <div class="col-span-full bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-6 text-[#55514a] text-[13px]">
+            {{ loading() ? 'Loading metrics…' : 'No data for the selected range.' }}
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Insights Section -->
+    @if (summary()) {
+      <div class="flex flex-col gap-3">
+        <h2 class="text-[#34203a] font-bold text-[16px]">Insights</h2>
+
+        <!-- Conversion Funnel -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-5 flex flex-col gap-4">
+          <div class="flex flex-col gap-0.5">
+            <h3 class="text-[#34203a] font-semibold text-[14px]">Conversion funnel</h3>
+            <p class="text-[#8a8079] text-[11px]">New → Contacted → Quoted → Won / Lost</p>
+          </div>
+          <div class="flex items-end gap-2">
+            @for (bar of funnelBars(); track bar.label) {
+              <div class="flex-1 flex flex-col items-center gap-1.5">
+                <span class="text-[#34203a] font-bold text-[14px]">{{ bar.count }}</span>
+                <div [style.height.px]="bar.height" [class]="'w-full rounded-[6px] ' + bar.color" style="min-height: 24px;"></div>
+                <span class="text-[#55514a] text-[11px] font-medium">{{ bar.label }}</span>
+              </div>
+            }
+          </div>
+          @if (summary()) {
+            <p class="text-[#8a8079] text-[11px]">
+              Won {{ summary()!.wonInquiries }} of {{ summary()!.totalInquiries }} · {{ summary()!.conversionRate | number:'1.0-0' }}% conversion.
+              {{ (summary()!.totalInquiries - summary()!.wonInquiries - summary()!.lostInquiries) }} inquiries still open across New / Contacted / Quoted.
+            </p>
           }
         </div>
-      }
-      @if (kpis().length === 0) {
-        <div class="col-span-full bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-6 text-[#55514a] text-[13px]">
-          {{ loading() ? 'Loading metrics…' : 'No data for the selected range.' }}
-        </div>
-      }
-    </div>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <!-- Inquiries by Month -->
-      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-        <div class="flex flex-col gap-0.5">
-          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Month</h2>
-          <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+        <!-- Two-column charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- Inquiries by source channel -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <h3 class="text-[#34203a] font-semibold text-[14px]">Inquiries by source channel</h3>
+              <p class="text-[#8a8079] text-[11px]">Where inquiries come from</p>
+            </div>
+            @if (summary()?.inquiriesBySource?.length) {
+              <div class="flex flex-col gap-2">
+                @for (src of summary()!.inquiriesBySource; track src.sourceName) {
+                  <div class="flex items-center gap-3">
+                    <span class="text-[#34203a] text-[12px] font-medium w-20 shrink-0">{{ src.sourceName }}</span>
+                    <div class="flex-1 bg-[#f0ebf3] rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-[#34203a] h-full rounded-full"
+                        [style.width.%]="summary()!.totalInquiries > 0 ? (src.count / summary()!.totalInquiries * 100) : 0">
+                      </div>
+                    </div>
+                    <span class="text-[#55514a] text-[11px] w-16 text-right">
+                      {{ src.count }} · {{ summary()!.totalInquiries > 0 ? (src.count / summary()!.totalInquiries * 100 | number:'1.0-0') : 0 }}%
+                    </span>
+                  </div>
+                }
+              </div>
+            } @else {
+              <p class="text-[#8a8079] text-[12px]">No source data.</p>
+            }
+          </div>
+
+          <!-- Lost reason breakdown -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <h3 class="text-[#34203a] font-semibold text-[14px]">Lost reason breakdown</h3>
+              <p class="text-[#8a8079] text-[11px]">Why inquiries don't convert</p>
+            </div>
+            <p class="text-[#8a8079] text-[12px]">No lost reason data in current range.</p>
+          </div>
         </div>
-        <div class="h-[240px] relative">
-          <canvas id="chart-inquiries-month"></canvas>
+
+        <!-- Two-column: First-response + Recent trend -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <!-- First-response time -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <h3 class="text-[#34203a] font-semibold text-[14px]">First-response time</h3>
+              <p class="text-[#8a8079] text-[11px]">Distribution of time to first contact</p>
+            </div>
+            @if (summary()?.avgResponseTimeHours !== undefined) {
+              <div class="flex items-center gap-2">
+                <span class="text-[#34203a] font-bold text-[24px]">{{ formatHours(summary()!.avgResponseTimeHours) }}</span>
+                <span class="bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[10px] font-semibold px-2 py-0.5 rounded-full">median</span>
+              </div>
+            }
+          </div>
+
+          <!-- Recent performance trend -->
+          <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+            <div class="flex flex-col gap-0.5">
+              <h3 class="text-[#34203a] font-semibold text-[14px]">Recent performance trend</h3>
+              <p class="text-[#8a8079] text-[11px]">Inquiries vs. won — last 6 weeks</p>
+            </div>
+            <div class="h-[160px] relative">
+              <canvas id="chart-inquiries-month"></canvas>
+            </div>
+          </div>
         </div>
       </div>
+    }
 
-      <!-- Quote Value by Month -->
-      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-        <div class="flex flex-col gap-0.5">
-          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Quote Value by Month</h2>
-          <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+    <!-- Charts - additional  -->
+    @if (summary()) {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Quote Value by Month -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Quote Value by Month</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+          </div>
+          <div class="h-[240px] relative">
+            <canvas id="chart-quote-month"></canvas>
+          </div>
         </div>
-        <div class="h-[240px] relative">
-          <canvas id="chart-quote-month"></canvas>
+
+        <!-- Inquiries by Status -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Status</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+          </div>
+          <div class="h-[240px] relative">
+            <canvas id="chart-status"></canvas>
+          </div>
+        </div>
+
+        <!-- Inquiries by Source Channel - chart -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
+          <div class="flex flex-col gap-0.5">
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Source Channel</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+          </div>
+          <div class="h-[240px] relative">
+            <canvas id="chart-source"></canvas>
+          </div>
         </div>
       </div>
+    }
 
-      <!-- Inquiries by Status -->
-      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-        <div class="flex flex-col gap-0.5">
-          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Status</h2>
-          <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+    <!-- Screen States (empty / error) -->
+    @if (!summary() && !loading()) {
+      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-6 py-10 flex flex-col items-center gap-3 text-center">
+        <div class="w-10 h-10 bg-[#efebf3] rounded-full flex items-center justify-center">
+          <svg class="w-5 h-5 text-[#55514a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
         </div>
-        <div class="h-[240px] relative">
-          <canvas id="chart-status"></canvas>
-        </div>
+        <p class="text-[#34203a] font-semibold text-[14px]">No data for this range</p>
+        <p class="text-[#8a8079] text-[12px]">Adjust filters or wait for new inquiries.</p>
       </div>
+    }
 
-      <!-- Inquiries by Source Channel -->
-      <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-        <div class="flex flex-col gap-0.5">
-          <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Source Channel</h2>
-          <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
-        </div>
-        <div class="h-[240px] relative">
-          <canvas id="chart-source"></canvas>
-        </div>
-      </div>
-    </div>
   </main>
 </div>

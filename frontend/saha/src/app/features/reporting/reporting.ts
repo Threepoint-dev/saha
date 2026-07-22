@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { ReportingSummary } from './reporting.model';
 import { ReportingService } from './reporting.service';
+import { SourceChannelsService } from '../setup/source-channels.service';
 
 /** Chart.js is loaded globally via CDN (see index.html). */
 declare const Chart: any;
@@ -13,6 +14,7 @@ interface Kpi {
   label: string;
   value: string;
   hint?: string;
+  barColor?: string;
 }
 
 // SAHA house palette.
@@ -27,15 +29,22 @@ const STATUS_COLORS = ['#34203a', '#f6ddae', '#2e7d5b', '#d14343', '#e0922f', '#
 })
 export class Reporting implements OnInit, OnDestroy {
   private service = inject(ReportingService);
+  private sourceChannelsService = inject(SourceChannelsService);
 
   readonly tenantId = environment.tenantId;
 
   readonly from = signal(this.isoDaysAgo(30));
   readonly to = signal(this.isoDaysAgo(0));
 
+  readonly filterChannelId = signal('');
+  readonly filterOwnerId = signal('');
+  readonly filterEventType = signal('');
+  readonly filterStatus = signal('');
+
   readonly summary = signal<ReportingSummary | null>(null);
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly sourceChannels = signal<any[]>([]);
 
   private charts: Record<string, any> = {};
 
@@ -43,16 +52,37 @@ export class Reporting implements OnInit, OnDestroy {
     const s = this.summary();
     if (!s) return [];
     return [
-      { label: 'Total Inquiries', value: this.num(s.totalInquiries) },
-      { label: 'Won', value: this.num(s.wonInquiries), hint: 'Confirmed events' },
-      { label: 'Lost', value: this.num(s.lostInquiries), hint: 'Declined / expired' },
-      { label: 'Conversion Rate', value: `${this.num(s.conversionRate)}%`, hint: 'Won / total' },
-      { label: 'Avg Response Time', value: `${this.num(s.avgResponseTimeHours)} h`, hint: 'First reply' },
-      { label: 'Total Quote Value', value: this.currency(s.totalQuoteValue) }
+      { label: 'Total Inquiries', value: this.num(s.totalInquiries), hint: 'All inquiries received', barColor: 'bg-[#34203a]' },
+      { label: 'New', value: this.num(s.newInquiries ?? 0), hint: 'Awaiting first contact', barColor: 'bg-[#4B9ED6]' },
+      { label: 'Won', value: this.num(s.wonInquiries), hint: 'Confirmed bookings', barColor: 'bg-[#2E7D5B]' },
+      { label: 'Lost', value: this.num(s.lostInquiries), hint: 'Closed without booking', barColor: 'bg-[#D14343]' },
+      { label: 'Conversion Rate', value: `${(s.conversionRate ?? 0).toFixed(1)}%`, hint: 'Won ÷ (Won + Lost)', barColor: 'bg-[#ce8a28]' },
+      { label: 'Median First Response', value: this.formatHours(s.avgResponseTimeHours), hint: 'median(first_response → created)', barColor: 'bg-[#E0922F]' },
+      { label: 'Total Quote Value', value: this.currency(s.totalQuoteValue), hint: 'Sum of estimated value', barColor: 'bg-[#34203a]' },
     ];
   });
 
+  readonly funnelBars = computed(() => {
+    const s = this.summary();
+    if (!s) return [];
+    const statuses = [
+      { label: 'New', count: s.newInquiries ?? 0, color: 'bg-[#4B9ED6]' },
+      { label: 'Contacted', count: Math.max(0, s.totalInquiries - (s.newInquiries ?? 0) - s.wonInquiries - s.lostInquiries), color: 'bg-[#3d8f8a]' },
+      { label: 'Quoted', count: 0, color: 'bg-[#ce8a28]' },
+      { label: 'Won', count: s.wonInquiries, color: 'bg-[#2E7D5B]' },
+      { label: 'Lost', count: s.lostInquiries, color: 'bg-[#D14343]' },
+    ];
+    const max = Math.max(...statuses.map(s => s.count), 1);
+    return statuses.map(s => ({ ...s, height: Math.max(24, Math.round((s.count / max) * 120)) }));
+  });
+
   ngOnInit(): void {
+    this.sourceChannelsService.list(this.tenantId).subscribe({
+      next: (channels) => {
+        this.sourceChannels.set(channels);
+      },
+      error: (err) => console.error('Failed to load source channels:', err)
+    });
     this.load();
   }
 
@@ -67,7 +97,14 @@ export class Reporting implements OnInit, OnDestroy {
   load(): void {
     this.loading.set(true);
     this.errorMessage.set(null);
-    this.service.getSummary(this.tenantId, { from: this.from(), to: this.to() }).subscribe({
+    this.service.getSummary(this.tenantId, { 
+      from: this.from(), 
+      to: this.to(),
+      channelId: this.filterChannelId() || undefined,
+      ownerId: this.filterOwnerId() || undefined,
+      eventType: this.filterEventType() || undefined,
+      status: this.filterStatus() || undefined
+    }).subscribe({
       next: (s) => {
         this.summary.set(s);
         this.loading.set(false);
@@ -225,5 +262,14 @@ export class Reporting implements OnInit, OnDestroy {
     const anyErr = err as { error?: { message?: string } };
     if (anyErr?.error?.message) return anyErr.error.message;
     return fallback;
+  }
+
+  formatHours(hours: number): string {
+    if (!hours && hours !== 0) return '—';
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    if (h === 0) return `${m}m`;
+    if (m === 0) return `${h}h`;
+    return `${h}h ${m}m`;
   }
 }

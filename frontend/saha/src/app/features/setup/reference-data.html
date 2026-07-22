@@ -7,7 +7,7 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Reference Data Setup</p>
+        <p class="text-[#f6ddae] text-[11px]">Halls, Packages &amp; Add-ons</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -25,31 +25,31 @@
   <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1440px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Reference Data</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">Halls, packages, and add-ons available in your workspace</p>
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Halls, Packages &amp; Add-ons Setup</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">Lightweight reference data for quote generation &middot; Not a full pricing engine</p>
     </div>
 
-    <!-- Tabs -->
-    <div class="flex items-center gap-1 border-b border-[#e4dfd5]">
+    <!-- Tabs: bordered button group like Figma -->
+    <div class="flex items-center border border-[#e4dfd5] rounded-[12px] bg-white w-fit overflow-hidden">
       <button
         type="button"
         (click)="setTab('halls')"
-        [ngClass]="activeTab() === 'halls' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
-        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        [ngClass]="activeTab() === 'halls' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
+        class="px-5 py-2.5 text-[13px] font-semibold transition-colors border-r border-[#e4dfd5]">
         Halls
       </button>
       <button
         type="button"
         (click)="setTab('packages')"
-        [ngClass]="activeTab() === 'packages' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
-        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        [ngClass]="activeTab() === 'packages' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
+        class="px-5 py-2.5 text-[13px] font-semibold transition-colors border-r border-[#e4dfd5]">
         Packages
       </button>
       <button
         type="button"
         (click)="setTab('addons')"
-        [ngClass]="activeTab() === 'addons' ? 'text-[#34203a] border-[#34203a]' : 'text-[#55514a] border-transparent hover:text-[#34203a]'"
-        class="px-5 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors">
+        [ngClass]="activeTab() === 'addons' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
+        class="px-5 py-2.5 text-[13px] font-semibold transition-colors">
         Add-ons
       </button>
     </div>
@@ -102,11 +102,12 @@
               <table class="w-full text-[13px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
-                    <th class="text-left px-5 py-3">Name</th>
-                    <th class="text-left px-5 py-3">Short Code</th>
+                    <th class="text-left px-5 py-3">Hall Name</th>
+                    <th class="text-left px-5 py-3">Short</th>
                     <th class="text-right px-5 py-3">Capacity</th>
                     <th class="text-right px-5 py-3">Base Price</th>
-                    <th class="text-left px-5 py-3">Default Setup</th>
+                    <th class="text-left px-5 py-3">Setup</th>
+                    <th class="text-left px-5 py-3">Status</th>
                     <th class="text-right px-5 py-3">Actions</th>
                   </tr>
                 </thead>
@@ -118,6 +119,9 @@
                       <td class="px-5 py-3 text-right">{{ hall.capacity ?? '—' }}</td>
                       <td class="px-5 py-3 text-right">{{ formatPrice(hall.basePrice) }}</td>
                       <td class="px-5 py-3 text-[#55514a]">{{ hall.defaultSetup || '—' }}</td>
+                      <td class="px-5 py-3">
+                        <span class="inline-flex items-center rounded-[6px] px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-100 text-emerald-700">Active</span>
+                      </td>
                       <td class="px-5 py-3">
                         <div class="flex items-center justify-end gap-2">
                           <button type="button" (click)="openEditHall(hall)"

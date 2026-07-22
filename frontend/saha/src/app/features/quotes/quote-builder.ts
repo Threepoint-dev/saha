@@ -46,13 +46,38 @@ export class QuoteBuilder implements OnInit {
 
   readonly dragIndex = signal<number | null>(null);
 
+  // Modal state
+  showAddModal = false;
+  editingItem: QuoteLineItem | null = null;
+
   notes = '';
 
   readonly addModel: AddModel = this.emptyAddModel();
 
+  // Item type tabs matching Figma
+  readonly itemTypes = [
+    { label: 'Hall rental', value: 'hall' },
+    { label: 'Catering package', value: 'package' },
+    { label: 'Coffee break', value: 'coffee_break' },
+    { label: 'AV package', value: 'av_package' },
+    { label: 'Decoration', value: 'decoration' },
+    { label: 'Service staff', value: 'service_staff' },
+    { label: 'Custom', value: 'custom' },
+  ];
+
   readonly halls = computed(() => this.catalog().filter((c) => c.type === 'hall'));
   readonly packages = computed(() => this.catalog().filter((c) => c.type === 'package'));
   readonly addons = computed(() => this.catalog().filter((c) => c.type === 'addon'));
+
+  // Catalog items filtered by the currently selected item type and name search
+  readonly filteredCatalog = computed(() => {
+    const type = this.addModel.itemType;
+    const name = (this.addModel.itemName || '').toLowerCase().trim();
+    if (!name) return [];
+    return this.catalog().filter(
+      (c) => c.name.toLowerCase().includes(name) && (type === 'custom' || c.type === type || !type)
+    ).slice(0, 6);
+  });
 
   ngOnInit(): void {
     this.inquiryId.set(this.route.snapshot.paramMap.get('inquiryId') ?? '');
@@ -84,30 +109,31 @@ export class QuoteBuilder implements OnInit {
     });
   }
 
-  /** Refresh quote + items from the server (after totals change). */
   private refresh(): void {
     this.service.getQuote(this.tenantId, this.inquiryId(), this.quoteId()).subscribe({
       next: (q) => { this.quote.set(q); this.items.set(q.lineItems ?? []); }
     });
   }
 
-  // --- Add line item ---
-  onSourceChange(): void {
-    const id = this.addModel.source;
-    if (!id || id === 'custom') {
-      this.addModel.itemType = 'custom';
-      return;
-    }
-    const item = this.catalog().find((c) => c.id === id);
-    if (item) {
-      this.addModel.itemName = item.name;
-      this.addModel.unitPrice = item.price ?? 0;
-      this.addModel.isTaxable = item.isTaxable;
-      this.addModel.itemType = item.type;
+  // --- Item type selection ---
+  setItemType(type: string): void {
+    this.addModel.itemType = type;
+    // Clear name on type change if from catalog
+    if (type !== 'custom') {
+      this.addModel.itemName = '';
+      this.addModel.unitPrice = 0;
     }
   }
 
-  addItem(): void {
+  selectCatalogItem(item: CatalogItem): void {
+    this.addModel.itemName = item.name;
+    this.addModel.unitPrice = item.price ?? 0;
+    this.addModel.isTaxable = item.isTaxable;
+    this.addModel.itemType = item.type;
+  }
+
+  // --- Add line item from modal ---
+  addItemFromModal(): void {
     this.clearMessages();
     const name = this.addModel.itemName.trim();
     if (!name) { this.errorMessage.set('Enter a name for the line item.'); return; }
@@ -123,6 +149,7 @@ export class QuoteBuilder implements OnInit {
     this.service.addLineItem(this.tenantId, this.quoteId(), body).subscribe({
       next: () => {
         this.adding.set(false);
+        this.showAddModal = false;
         Object.assign(this.addModel, this.emptyAddModel());
         this.refresh();
         this.successMessage.set('Line item added.');
@@ -131,7 +158,26 @@ export class QuoteBuilder implements OnInit {
     });
   }
 
-  // --- Edit line item (on blur / change) ---
+  // Keep old addItem method for compatibility
+  addItem(): void {
+    this.addItemFromModal();
+  }
+
+  // --- Edit line item ---
+  openEditModal(item: QuoteLineItem): void {
+    this.editingItem = { ...item };
+  }
+
+  closeEditModal(): void {
+    this.editingItem = null;
+  }
+
+  saveEditedItem(): void {
+    if (!this.editingItem) return;
+    this.saveItem(this.editingItem);
+    this.editingItem = null;
+  }
+
   saveItem(item: QuoteLineItem): void {
     this.clearMessages();
     const body: LineItemRequest = {
@@ -190,16 +236,15 @@ export class QuoteBuilder implements OnInit {
     this.clearMessages();
     this.savingNotes.set(true);
     this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null }).subscribe({
-      next: (q) => { this.savingNotes.set(false); this.quote.set(q); this.successMessage.set('Quote saved.'); },
+      next: (q) => { this.savingNotes.set(false); this.quote.set(q); this.successMessage.set('Quote saved as draft.'); },
       error: (err) => { this.savingNotes.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save quote.')); }
     });
   }
 
-  // --- Share ---
+  // --- Share / preview ---
   share(): void {
     this.clearMessages();
     this.sharing.set(true);
-    // Persist notes first so the shared quote is up to date.
     this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null }).subscribe({
       next: () => {
         this.service.share(this.tenantId, this.quoteId()).subscribe({
@@ -230,7 +275,7 @@ export class QuoteBuilder implements OnInit {
   }
 
   private emptyAddModel(): AddModel {
-    return { source: 'custom', itemName: '', itemType: 'custom', description: '', quantity: 1, unitPrice: 0, isTaxable: true };
+    return { source: 'custom', itemName: '', itemType: 'hall', description: '', quantity: 1, unitPrice: 0, isTaxable: true };
   }
 
   private clearMessages(): void {
@@ -242,5 +287,12 @@ export class QuoteBuilder implements OnInit {
     const anyErr = err as { error?: { message?: string } };
     if (anyErr?.error?.message) return anyErr.error.message;
     return fallback;
+  }
+
+  // Keep for catalog dropdown backward compat
+  onSourceChange(): void {
+    this.selectCatalogItem(
+      (this.catalog().find(c => c.id === this.addModel.source) || { id: '', name: '', type: 'custom', isTaxable: true, price: 0 }) as CatalogItem
+    );
   }
 }
