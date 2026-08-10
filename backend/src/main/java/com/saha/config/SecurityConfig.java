@@ -38,7 +38,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:4200",
-                "https://startling-cactus-0a064a.netlify.app"
+                "https://startling-cactus-0a064a.netlify.app",
+                "https://saha-ksa.com",
+                "https://www.saha-ksa.com"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
