@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DashboardService, RecentInquiry } from '../../../core/services/dashboard.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -15,6 +16,8 @@ import { environment } from '../../../../environments/environment';
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
+  private authService = inject(AuthService);
+
   inquiries: RecentInquiry[] = [];
   sourceChannels: SourceChannel[] = [];
   isLoading = true;
@@ -23,8 +26,8 @@ export class Dashboard implements OnInit {
   get filteredInquiries(): RecentInquiry[] {
     if (!this.searchQuery) return this.inquiries;
     const lowerQuery = this.searchQuery.toLowerCase();
-    return this.inquiries.filter(i => 
-      i.clientName.toLowerCase().includes(lowerQuery) || 
+    return this.inquiries.filter(i =>
+      i.clientName.toLowerCase().includes(lowerQuery) ||
       i.eventType?.toLowerCase().includes(lowerQuery)
     );
   }
@@ -50,10 +53,24 @@ export class Dashboard implements OnInit {
     return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
 
-  // First response time — placeholder calculation (minutes median)
+  // Real first response time calculation
   get firstResponseMinutes(): number {
-    // Real implementation would come from backend stats endpoint
-    return 0;
+    const responded = this.inquiries.filter(i =>
+      i.firstResponseAt && i.createdAt
+    );
+    if (responded.length === 0) return 0;
+
+    const minutes = responded.map(i => {
+      const created = new Date(i.createdAt).getTime();
+      const responded = new Date(i.firstResponseAt).getTime();
+      return Math.floor((responded - created) / 60000);
+    });
+
+    minutes.sort((a, b) => a - b);
+    const mid = Math.floor(minutes.length / 2);
+    return minutes.length % 2 === 0
+      ? Math.floor((minutes[mid - 1] + minutes[mid]) / 2)
+      : minutes[mid];
   }
 
   get firstResponseDisplay(): string {
@@ -67,12 +84,9 @@ export class Dashboard implements OnInit {
   get sourceSummary(): { name: string; count: number; pct: number; color: string }[] {
     const sourceMap: Record<string, number> = {};
     for (const inq of this.inquiries) {
-      // Map the UUID to the actual channel name
       let key = inq.sourceChannelId || 'Unknown';
       const channel = this.sourceChannels.find(c => c.id === key);
-      if (channel) {
-        key = channel.name;
-      }
+      if (channel) key = channel.name;
       sourceMap[key] = (sourceMap[key] || 0) + 1;
     }
     const colors = ['bg-[#34203A]', 'bg-[#E8A33D]', 'bg-[#2E7D5B]', 'bg-[#4A90D9]', 'bg-[#D14343]'];
@@ -87,18 +101,25 @@ export class Dashboard implements OnInit {
       }));
   }
 
+  // Real loss reasons from actual inquiry data
   get lossReasonSummary(): { label: string; count: number; pct: number }[] {
-    // Loss reasons would come from a dedicated backend endpoint; placeholder from status
-    const lostCount = this.lost;
-    if (lostCount === 0) return [];
-    // Static placeholder labels matching Figma design
-    return [
-      { label: 'Price too high', count: Math.ceil(lostCount * 0.35), pct: 35 },
-      { label: 'Date unavailable', count: Math.ceil(lostCount * 0.25), pct: 25 },
-      { label: 'Chose competitor', count: Math.ceil(lostCount * 0.20), pct: 20 },
-      { label: 'Capacity', count: Math.ceil(lostCount * 0.12), pct: 12 },
-      { label: 'No response from us', count: Math.ceil(lostCount * 0.08), pct: 8 },
-    ].filter(r => r.count > 0);
+    const lostInquiries = this.inquiries.filter(i => i.status === 'LOST' && i.lossReason);
+    if (lostInquiries.length === 0) return [];
+
+    const reasonMap: Record<string, number> = {};
+    for (const inq of lostInquiries) {
+      const reason = inq.lossReason || 'Other';
+      reasonMap[reason] = (reasonMap[reason] || 0) + 1;
+    }
+
+    const total = lostInquiries.length;
+    return Object.entries(reasonMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, count]) => ({
+        label,
+        count,
+        pct: Math.round((count / total) * 100)
+      }));
   }
 
   statusBadge: Record<string, string> = {
@@ -117,17 +138,14 @@ export class Dashboard implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    const tenantId = environment.tenantId;
+    const tenantId = this.authService.getTenantId();
 
-    // Fetch source channels first, then inquiries
     this.sourceChannelsService.list(tenantId).subscribe({
       next: (channels) => {
         this.sourceChannels = channels;
         this.loadInquiries();
       },
-      error: (err) => {
-        console.error('Failed to load source channels:', err);
-        // Continue loading inquiries even if channels fail
+      error: () => {
         this.loadInquiries();
       }
     });
@@ -155,7 +173,6 @@ export class Dashboard implements OnInit {
   getSourceClass(sourceIdOrName: string): string {
     const channel = this.sourceChannels.find(c => c.id === sourceIdOrName || c.name === sourceIdOrName);
     const s = (channel ? channel.name : sourceIdOrName || '').toLowerCase();
-    
     if (s.includes('whatsapp')) return 'bg-[#DCF8C6] text-[#128C7E]';
     if (s.includes('email')) return 'bg-blue-50 text-blue-700';
     if (s.includes('phone')) return 'bg-orange-50 text-orange-700';
@@ -185,9 +202,6 @@ export class Dashboard implements OnInit {
 
   formatDate(date: string): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
+    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 }

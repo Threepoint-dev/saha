@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import {
   Addon,
   CATERING_STYLES,
@@ -23,7 +23,10 @@ export interface AgendaSegment {
   durationMinutes: number;
 }
 
-/** Layout element dropped onto the hall canvas (local-only UI state). */
+/** Layout element dropped onto the hall canvas. x/y are percentages (0-100) of
+ *  the canvas size, not pixels, so the same layout renders correctly on any
+ *  page regardless of that page's canvas dimensions. Persisted as JSON in
+ *  the `layoutDesign` field. */
 export interface LayoutElement {
   type: string;
   x: number;
@@ -65,8 +68,11 @@ interface MealCard {
 export class EventSetupPage implements OnInit {
   private service = inject(EventsService);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
   readonly inquiryId = signal<string>('');
 
   readonly setupTypes = SETUP_TYPES;
@@ -212,8 +218,11 @@ export class EventSetupPage implements OnInit {
     const source = event.dataTransfer?.getData('source');
     if (!chipType) return;
     const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    // Stored as a percentage of the canvas, not raw pixels, so the same
+    // layout lines up correctly on other pages (e.g. Events Team Detail)
+    // whose canvas is a different size than this one.
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
     if (source === 'element' && this.draggingLayoutIndex !== null) {
       // Moving existing element
       this.layoutElements[this.draggingLayoutIndex].x = x;
@@ -328,6 +337,25 @@ export class EventSetupPage implements OnInit {
     this.form.agenda = JSON.stringify(this.agendaSegments);
   }
 
+  private syncLayoutDesignToForm(): void {
+    this.form.layoutDesign = JSON.stringify(this.layoutElements);
+  }
+
+  private parseLayoutDesignFromForm(): void {
+    if (!this.form.layoutDesign) {
+      this.layoutElements = [];
+      return;
+    }
+    try {
+      const parsed = JSON.parse(this.form.layoutDesign);
+      if (Array.isArray(parsed)) {
+        this.layoutElements = parsed;
+      }
+    } catch {
+      this.layoutElements = [];
+    }
+  }
+
   private parseAgendaFromForm(): void {
     if (!this.form.agenda) {
       this.agendaSegments = [];
@@ -392,6 +420,7 @@ export class EventSetupPage implements OnInit {
         this.setup.set(s);
         this.form = this.toForm(s);
         this.parseAgendaFromForm();
+        this.parseLayoutDesignFromForm();
         this.loading.set(false);
         this.loadEventAddons();
       },
@@ -439,6 +468,7 @@ export class EventSetupPage implements OnInit {
   save(): void {
     this.clearMessages();
     this.syncAgendaToForm();
+    this.syncLayoutDesignToForm();
     this.saving.set(true);
     const body = { ...this.form };
     const existing = this.setup();
@@ -451,6 +481,7 @@ export class EventSetupPage implements OnInit {
         this.setup.set(s);
         this.form = this.toForm(s);
         this.parseAgendaFromForm();
+        this.parseLayoutDesignFromForm();
         this.successMessage.set('Event setup saved.');
         this.loadEventAddons();
       },
@@ -506,6 +537,7 @@ export class EventSetupPage implements OnInit {
   sendConfirmation(): void {
     this.clearMessages();
     this.syncAgendaToForm();
+    this.syncLayoutDesignToForm();
     this.confirming.set(true);
     // Persist the latest form first so the customer sees current details.
     const persist$ = this.setup()
@@ -516,6 +548,7 @@ export class EventSetupPage implements OnInit {
         this.setup.set(s);
         this.form = this.toForm(s);
         this.parseAgendaFromForm();
+        this.parseLayoutDesignFromForm();
         this.service.confirm(this.tenantId, this.inquiryId()).subscribe({
           next: () => {
             this.confirming.set(false);
@@ -549,6 +582,7 @@ export class EventSetupPage implements OnInit {
       hallId: s.hallId,
       setupType: s.setupType,
       layoutNotes: s.layoutNotes,
+      layoutDesign: s.layoutDesign,
       guestCount: s.guestCount,
       banquetHeadcount: s.banquetHeadcount,
       cateringStyle: s.cateringStyle,
@@ -569,7 +603,7 @@ export class EventSetupPage implements OnInit {
 
   private emptyForm(): EventSetupRequest {
     return {
-      quoteId: null, hallId: null, setupType: null, layoutNotes: null, guestCount: null,
+      quoteId: null, hallId: null, setupType: null, layoutNotes: null, layoutDesign: null, guestCount: null,
       banquetHeadcount: null, cateringStyle: null, mainMeal: null, startTime: null, endTime: null,
       durationHours: null, eventDate: null, chairColor: null, tableColor: null, agenda: null,
       internalNotes: null, opsNotes: null, attachmentUrl: null, preparationStatus: null

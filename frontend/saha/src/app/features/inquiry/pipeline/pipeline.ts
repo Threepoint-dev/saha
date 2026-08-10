@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { InquiryService, Inquiry } from '../../../core/services/inquiry.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
-import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-pipeline',
@@ -52,6 +52,7 @@ export class PipelineComponent implements OnInit {
   constructor(
     private inquiryService: InquiryService,
     private sourceChannelsService: SourceChannelsService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -96,7 +97,7 @@ export class PipelineComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    const tenantId = environment.tenantId;
+    const tenantId = this.authService.getTenantId();
 
     this.sourceChannelsService.list(tenantId).subscribe({
       next: (channels) => {

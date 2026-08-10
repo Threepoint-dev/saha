@@ -1,6 +1,7 @@
 package com.saha.event;
 
 import com.saha.model.EventSetup;
+import com.saha.service.HallAvailabilityService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,13 @@ public class EventSetupService {
 
     private final EventSetupRepository repository;
     private final EventInquiryRepository inquiryRepository;
+    private final HallAvailabilityService hallAvailabilityService;
 
-    public EventSetupService(EventSetupRepository repository, EventInquiryRepository inquiryRepository) {
+    public EventSetupService(EventSetupRepository repository, EventInquiryRepository inquiryRepository,
+                             HallAvailabilityService hallAvailabilityService) {
         this.repository = repository;
         this.inquiryRepository = inquiryRepository;
+        this.hallAvailabilityService = hallAvailabilityService;
     }
 
     @Transactional(readOnly = true)
@@ -46,7 +50,9 @@ public class EventSetupService {
         }
         setup.setCreatedAt(now);
         setup.setUpdatedAt(now);
-        return EventSetupDto.from(repository.save(setup));
+        EventSetup saved = repository.save(setup);
+        syncTentativeHold(tenantId, inquiryId, saved);
+        return EventSetupDto.from(saved);
     }
 
     @Transactional
@@ -56,7 +62,9 @@ public class EventSetupService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event setup not found"));
         applyRequest(setup, request);
         setup.setUpdatedAt(OffsetDateTime.now());
-        return EventSetupDto.from(repository.save(setup));
+        EventSetup saved = repository.save(setup);
+        syncTentativeHold(tenantId, inquiryId, saved);
+        return EventSetupDto.from(saved);
     }
 
     @Transactional
@@ -72,6 +80,7 @@ public class EventSetupService {
         setup.setHallId(request.hallId());
         setup.setSetupType(request.setupType());
         setup.setLayoutNotes(request.layoutNotes());
+        setup.setLayoutDesign(request.layoutDesign());
         setup.setGuestCount(request.guestCount());
         setup.setBanquetHeadcount(request.banquetHeadcount());
         setup.setCateringStyle(request.cateringStyle());
@@ -94,5 +103,11 @@ public class EventSetupService {
     private void requireInquiry(UUID tenantId, UUID inquiryId) {
         inquiryRepository.findByIdAndTenantId(inquiryId, tenantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inquiry not found"));
+    }
+
+    /** Keeps the hall calendar's Tentative hold for this inquiry in sync with the saved setup (US-027). */
+    private void syncTentativeHold(UUID tenantId, UUID inquiryId, EventSetup setup) {
+        hallAvailabilityService.upsertTentativeHoldForInquiry(
+                tenantId, inquiryId, setup.getHallId(), setup.getEventDate(), setup.getStartTime(), setup.getEndTime());
     }
 }

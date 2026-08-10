@@ -48,7 +48,7 @@ export class LoginComponent implements OnDestroy {
     if (result.success) {
       this.step.set('signed-in');
     } else {
-      this.errorMessage.set('That code is incorrect or expired. Try again.');
+      this.errorMessage.set(result.error || 'That code is incorrect or expired. Try again.');
       this.otp.set('');
     }
   }

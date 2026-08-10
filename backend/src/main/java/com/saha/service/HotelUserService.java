@@ -3,7 +3,9 @@ package com.saha.service;
 import com.saha.model.HotelUser;
 import com.saha.repository.HotelUserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,6 +42,15 @@ public class HotelUserService {
     public HotelUser update(UUID id, HotelUser updated) {
         HotelUser existing = hotelUserRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // A SAHA Admin account can never be deactivated/invited-back-to — doing so
+        // risks locking the platform operator out of the whole system with no way back in.
+        boolean isSahaAdmin = "SAHA_ADMIN".equals(existing.getRole());
+        boolean losingActiveStatus = updated.getStatus() != null && !"ACTIVE".equals(updated.getStatus());
+        if (isSahaAdmin && losingActiveStatus) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "A SAHA Admin account cannot be deactivated.");
+        }
 
         existing.setFullName(updated.getFullName());
         existing.setRole(updated.getRole());

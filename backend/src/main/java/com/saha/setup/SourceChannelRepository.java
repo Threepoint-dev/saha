@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public interface SourceChannelRepository extends JpaRepository<SourceChannel, UUID> {
 
+    List<SourceChannel> findByTenantId(UUID tenantId);
+
     List<SourceChannel> findAllByTenantIdOrderBySortOrderAscCreatedAtAsc(UUID tenantId);
 
     Optional<SourceChannel> findByIdAndTenantId(UUID id, UUID tenantId);

@@ -1,0 +1,92 @@
+<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+
+  <!-- Header -->
+  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+    <div>
+      <a routerLink="/admin" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">← Back to hotels</a>
+      <h1 class="text-[#1B1A17] text-xl font-bold mt-1">Create Hotel Tenant</h1>
+    </div>
+  </div>
+
+  <div class="px-8 py-6 max-w-2xl">
+    <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+
+      <p class="text-xs text-[#7A736B] bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6">
+        Each hotel workspace is fully isolated. Hotel users cannot see data from other hotels.
+      </p>
+
+      <!-- Hotel Info -->
+      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">HOTEL INFORMATION</p>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">HOTEL NAME *</label>
+          <input type="text" [(ngModel)]="form.name" placeholder="Al Faisaliah Ballrooms"
+            [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
+            (hasError('name') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
+          @if (hasError('name')) {
+            <p class="text-[#D14343] text-xs mt-1">Hotel name is required</p>
+          }
+        </div>
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">CITY *</label>
+          <input type="text" [(ngModel)]="form.city" placeholder="Riyadh"
+            [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
+            (hasError('city') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
+          @if (hasError('city')) {
+            <p class="text-[#D14343] text-xs mt-1">City is required</p>
+          }
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">DISTRICT</label>
+          <input type="text" [(ngModel)]="form.district" placeholder="Al Olaya"
+            class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
+        </div>
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">PHONE</label>
+          <input type="text" [(ngModel)]="form.phone" placeholder="+966 11 000 0000"
+            class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">MAIN CONTACT</p>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">FULL NAME</label>
+          <input type="text" [(ngModel)]="form.mainContactName" placeholder="Sara Al-Otaibi"
+            class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
+        </div>
+        <div>
+          <label class="text-[#7A736B] text-xs mb-1 block">EMAIL *</label>
+          <input type="email" [(ngModel)]="form.mainContactEmail" placeholder="sara@hotel.com"
+            [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
+            (hasError('mainContactEmail') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
+          @if (hasError('mainContactEmail')) {
+            <p class="text-[#D14343] text-xs mt-1">Email is required</p>
+          }
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="text-[#7A736B] text-xs mb-1 block">CONTACT PHONE</label>
+        <input type="text" [(ngModel)]="form.mainContactPhone" placeholder="+966 50 000 0000"
+          class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3">
+        <a routerLink="/admin"
+          class="px-6 py-2.5 text-sm text-[#7A736B] hover:text-[#1B1A17] transition-colors">
+          Cancel
+        </a>
+        <button (click)="submit()" [disabled]="isLoading"
+          class="bg-[#34203A] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#46294f] transition-colors disabled:opacity-60">
+          {{ isLoading ? 'Creating...' : 'Create Tenant' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

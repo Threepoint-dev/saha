@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { DataQualityReport, ExportType } from './export.model';
 import { ExportService } from './export.service';
 
@@ -26,8 +26,11 @@ const LAST_EXPORT_KEY = 'saha.export.lastExport';
 })
 export class Export implements OnInit {
   private service = inject(ExportService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
 
   readonly exportItems: ExportItem[] = [
     { type: 'inquiries', label: 'Inquiries CSV', description: 'All inquiries with source & response times' },

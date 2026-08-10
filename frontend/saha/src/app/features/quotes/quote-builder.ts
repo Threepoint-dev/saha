@@ -3,7 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { CatalogItem, InquirySummary, LineItemRequest, Quote, QuoteLineItem } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
@@ -25,8 +25,11 @@ interface AddModel {
 export class QuoteBuilder implements OnInit {
   private service = inject(QuotesService);
   private route = inject(ActivatedRoute);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
   readonly inquiryId = signal<string>('');
   readonly quoteId = signal<string>('');
 

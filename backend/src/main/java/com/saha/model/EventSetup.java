@@ -39,6 +39,9 @@ public class EventSetup {
     @Column(name = "layout_notes")
     private String layoutNotes;
 
+    @Column(name = "layout_design", columnDefinition = "TEXT")
+    private String layoutDesign;
+
     @Column(name = "guest_count")
     private Integer guestCount;
 

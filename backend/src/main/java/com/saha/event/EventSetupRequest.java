@@ -13,6 +13,7 @@ public record EventSetupRequest(
         UUID hallId,
         String setupType,
         String layoutNotes,
+        String layoutDesign,
         Integer guestCount,
         Integer banquetHeadcount,
         String cateringStyle,

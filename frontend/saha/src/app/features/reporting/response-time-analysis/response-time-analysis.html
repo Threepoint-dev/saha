@@ -1,0 +1,169 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Measurement &amp; Reporting</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1400px] mx-auto">
+
+    <div class="flex flex-col gap-1">
+      <a routerLink="/reporting" class="text-[#8a8478] hover:text-[#34203a] text-[12px] font-medium transition-colors">← Back to Dashboard</a>
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Response Time Analysis</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">First-response speed, distribution, owner &amp; source breakdown — and impact on conversion</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">{{ errorMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="rounded-[12px] bg-white border border-[#e4dfd5] px-5 py-4 text-[#55514a] text-[13px]">Loading…</div>
+    } @else if (data(); as d) {
+
+      <!-- Top 4 cards -->
+      <div class="grid grid-cols-4 gap-4">
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-blue-700 bg-blue-100 inline-block px-2 py-0.5 rounded-full mb-2">Acceptable</p>
+          <p class="text-[#8a8478] text-[10px] uppercase tracking-wide mb-1">Median First Response</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ formatHours(d.medianResponseHours) }}</p>
+        </div>
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-[#B06D1A] bg-[#F7E7D6] inline-block px-2 py-0.5 rounded-full mb-2">Slow</p>
+          <p class="text-[#8a8478] text-[10px] uppercase tracking-wide mb-1">Average First Response</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ formatHours(d.avgResponseHours) }}</p>
+        </div>
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-green-700 bg-green-100 inline-block px-2 py-0.5 rounded-full mb-2">Fast</p>
+          <p class="text-[#8a8478] text-[10px] uppercase tracking-wide mb-1">Fastest Response</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ formatHours(d.fastestResponseHours) }}</p>
+        </div>
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-red-700 bg-red-100 inline-block px-2 py-0.5 rounded-full mb-2">At Risk</p>
+          <p class="text-[#8a8478] text-[10px] uppercase tracking-wide mb-1">Slowest Response</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ formatHours(d.slowestResponseHours) }}</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Response time distribution -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <h3 class="text-[#34203a] font-semibold text-[15px] mb-1">Response time distribution</h3>
+          <p class="text-[#8a8478] text-[12px] mb-4">How quickly the team responds to first contact</p>
+          <div class="flex flex-col gap-3">
+            @for (row of d.distribution; track row.label) {
+              <div>
+                <div class="flex justify-between text-[13px] mb-1">
+                  <span class="text-[#34203a] font-medium">{{ row.label }}</span>
+                  <span class="text-[#8a8478]">{{ row.count }} · {{ row.percent | number:'1.0-0' }}%</span>
+                </div>
+                <div class="h-2 bg-[#efebf3] rounded-full overflow-hidden">
+                  <div class="h-full bg-[#2c7a8c]" [style.width]="barWidth(row.count, maxBucketCount())"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Conversion by response time -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <h3 class="text-[#34203a] font-semibold text-[15px] mb-1">Conversion by response time</h3>
+          <p class="text-[#8a8478] text-[12px] mb-4">Faster response = higher win rate</p>
+          <div class="flex flex-col gap-3">
+            @for (row of d.conversionByBucket; track row.label) {
+              <div>
+                <div class="flex justify-between text-[13px] mb-1">
+                  <span class="text-[#34203a] font-medium">{{ row.label }}</span>
+                  <span class="text-[#8a8478]">{{ row.conversionRate | number:'1.0-0' }}%</span>
+                </div>
+                <div class="h-2 bg-[#efebf3] rounded-full overflow-hidden">
+                  <div class="h-full bg-[#2e7d5b]" [style.width]="barWidth(row.conversionRate, maxConversionRate())"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <!-- By owner -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden">
+          <div class="px-5 py-4 border-b border-[#efebf3]">
+            <h3 class="text-[#34203a] font-semibold text-[14px]">Response time by owner</h3>
+            <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
+          </div>
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Name</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Median</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Avg</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">SLA</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Conv%</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of d.byOwner; track row.name) {
+                <tr class="border-b border-[#efebf3]">
+                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium">{{ row.name }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.medianHours) }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.avgHours) }}</td>
+                  <td class="px-5 py-2.5 text-right">
+                    <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-semibold ' + slaClass(row.sla)">{{ row.sla }}</span>
+                  </td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ row.conversionRate | number:'1.0-0' }}%</td>
+                </tr>
+              }
+              @if (d.byOwner.length === 0) {
+                <tr><td colspan="5" class="px-5 py-4 text-[#8a8478] text-[13px]">No data in this period.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- By source -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden">
+          <div class="px-5 py-4 border-b border-[#efebf3]">
+            <h3 class="text-[#34203a] font-semibold text-[14px]">Response time by source</h3>
+            <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
+          </div>
+          <table class="w-full text-left">
+            <thead>
+              <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Source</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Median</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Avg</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">SLA</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Conv%</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of d.bySource; track row.name) {
+                <tr class="border-b border-[#efebf3]">
+                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium">{{ row.name }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.medianHours) }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.avgHours) }}</td>
+                  <td class="px-5 py-2.5 text-right">
+                    <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-semibold ' + slaClass(row.sla)">{{ row.sla }}</span>
+                  </td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ row.conversionRate | number:'1.0-0' }}%</td>
+                </tr>
+              }
+              @if (d.bySource.length === 0) {
+                <tr><td colspan="5" class="px-5 py-4 text-[#8a8478] text-[13px]">No data in this period.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </main>
+</div>

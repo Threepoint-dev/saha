@@ -261,8 +261,8 @@
                   (drop)="onCanvasDrop($event)">
                   @for (el of layoutElements; track $index) {
                     <div class="absolute bg-white border border-[#34203a] rounded-[6px] px-2 py-1 text-[11px] font-medium text-[#34203a] cursor-grab select-none shadow-sm flex items-center gap-1"
-                      [style.left.px]="el.x - 30"
-                      [style.top.px]="el.y - 12"
+                      [style.left]="'calc(' + el.x + '% - 30px)'"
+                      [style.top]="'calc(' + el.y + '% - 12px)'"
                       draggable="true"
                       (dragstart)="onElementDragStart($event, $index)">
                       {{ el.type }}

@@ -49,6 +49,6 @@ public class EventSetupController {
 
     private EventSetupRequest emptyRequest() {
         return new EventSetupRequest(null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null);
+                null, null, null, null, null, null, null, null, null, null);
     }
 }

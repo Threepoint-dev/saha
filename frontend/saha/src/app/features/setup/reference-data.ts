@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import {
   Addon,
   EventPackage,
@@ -21,8 +21,11 @@ type ModalMode = 'create' | 'edit';
 export class ReferenceData implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(ReferenceDataService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
 
   readonly activeTab = signal<TabKey>('halls');
   readonly loading = signal(false);

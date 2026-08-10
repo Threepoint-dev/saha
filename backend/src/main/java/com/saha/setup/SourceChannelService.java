@@ -37,7 +37,6 @@ public class SourceChannelService {
     @Transactional
     public SourceChannelDto create(UUID tenantId, SourceChannelUpsertRequest request) {
         SourceChannel channel = new SourceChannel();
-        channel.setId(UUID.randomUUID());
         channel.setTenantId(tenantId);
         channel.setName(request.name());
         channel.setIsActive(request.isActive() == null ? Boolean.TRUE : request.isActive());
@@ -59,12 +58,6 @@ public class SourceChannelService {
         return SourceChannelDto.from(repository.save(channel));
     }
 
-    /**
-     * Hard delete when the channel is not referenced by any inquiry; otherwise
-     * deactivate. There is no Inquiry JPA entity yet, so we rely on the database
-     * foreign-key constraint: if the row is referenced, the delete raises a
-     * DataIntegrityViolationException and we fall back to deactivating it.
-     */
     @Transactional
     public void delete(UUID tenantId, UUID id) {
         SourceChannel channel = requireOwned(tenantId, id);
@@ -97,7 +90,6 @@ public class SourceChannelService {
         int order = 0;
         for (String name : DEFAULT_CHANNELS) {
             SourceChannel channel = new SourceChannel();
-            channel.setId(UUID.randomUUID());
             channel.setTenantId(tenantId);
             channel.setName(name);
             channel.setIsActive(Boolean.TRUE);

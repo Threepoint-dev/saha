@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { SourceChannel } from './source-channels.model';
 import { SourceChannelsService } from './source-channels.service';
 
@@ -14,8 +14,11 @@ import { SourceChannelsService } from './source-channels.service';
 export class SourceChannels implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(SourceChannelsService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
 
   readonly channels = signal<SourceChannel[]>([]);
   readonly loading = signal(false);

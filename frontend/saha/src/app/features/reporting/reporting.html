@@ -187,9 +187,12 @@
 
           <!-- Lost reason breakdown -->
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-            <div class="flex flex-col gap-0.5">
-              <h3 class="text-[#34203a] font-semibold text-[14px]">Lost reason breakdown</h3>
-              <p class="text-[#8a8079] text-[11px]">Why inquiries don't convert</p>
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col gap-0.5">
+                <h3 class="text-[#34203a] font-semibold text-[14px]">Lost reason breakdown</h3>
+                <p class="text-[#8a8079] text-[11px]">Why inquiries don't convert</p>
+              </div>
+              <a routerLink="/reporting/lost-reasons" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">View full analysis →</a>
             </div>
             <p class="text-[#8a8079] text-[12px]">No lost reason data in current range.</p>
           </div>
@@ -199,9 +202,12 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <!-- First-response time -->
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
-            <div class="flex flex-col gap-0.5">
-              <h3 class="text-[#34203a] font-semibold text-[14px]">First-response time</h3>
-              <p class="text-[#8a8079] text-[11px]">Distribution of time to first contact</p>
+            <div class="flex items-center justify-between">
+              <div class="flex flex-col gap-0.5">
+                <h3 class="text-[#34203a] font-semibold text-[14px]">First-response time</h3>
+                <p class="text-[#8a8079] text-[11px]">Distribution of time to first contact</p>
+              </div>
+              <a routerLink="/reporting/response-time" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">View full analysis →</a>
             </div>
             @if (summary()?.avgResponseTimeHours !== undefined) {
               <div class="flex items-center gap-2">

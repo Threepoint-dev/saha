@@ -33,7 +33,6 @@ public class AddonService {
     @Transactional
     public AddonDto create(UUID tenantId, AddonUpsertRequest request) {
         Addon addon = new Addon();
-        addon.setId(UUID.randomUUID());
         addon.setTenantId(tenantId);
         applyRequest(addon, request);
         addon.setStatus(STATUS_ACTIVE);

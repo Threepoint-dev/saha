@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { InquirySummary, Quote } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
@@ -15,8 +15,11 @@ export class QuoteList implements OnInit {
   private service = inject(QuotesService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
   readonly inquiryId = signal<string>('');
 
   readonly inquiry = signal<InquirySummary | null>(null);

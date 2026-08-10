@@ -32,7 +32,6 @@ public class EventPackageService {
     @Transactional
     public PackageDto create(UUID tenantId, PackageUpsertRequest request) {
         EventPackage pkg = new EventPackage();
-        pkg.setId(UUID.randomUUID());
         pkg.setTenantId(tenantId);
         applyRequest(pkg, request);
         pkg.setStatus(STATUS_ACTIVE);

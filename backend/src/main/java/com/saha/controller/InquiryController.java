@@ -73,6 +73,12 @@ public class InquiryController {
         return ResponseEntity.ok(inquiryService.markLost(id, lossReason, lossNote));
     }
 
+    /** Shares the Final Internal BEO with the Events Team. Only allowed once the inquiry is Won. */
+    @PatchMapping("/{id}/share-beo")
+    public ResponseEntity<Inquiry> shareBeo(@PathVariable UUID id) {
+        return ResponseEntity.ok(inquiryService.shareBeo(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         inquiryService.delete(id);

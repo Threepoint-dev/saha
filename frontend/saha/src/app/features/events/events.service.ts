@@ -9,9 +9,13 @@ import {
   EventAddonRequest,
   EventSetup,
   EventSetupRequest,
+  EventsDirectorDashboard,
+  EventsTeamRequest,
+  EventsTeamRequestDetail,
   EventSummary,
   Hall,
-  InquirySummary
+  InquirySummary,
+  PreparationStatusUpdateRequest
 } from './events.model';
 
 @Injectable({ providedIn: 'root' })
@@ -87,5 +91,27 @@ export class EventsService {
 
   getPublicSummary(inquiryId: string): Observable<EventSummary> {
     return this.http.get<EventSummary>(`${this.api}/public/events/${inquiryId}/summary`);
+  }
+
+  // --- Events Team Request Tracker & Detail (EP-08) ---
+  private teamRequestsBase(tenantId: string): string {
+    return `${this.tenantBase(tenantId)}/events-team/requests`;
+  }
+
+  listTeamRequests(tenantId: string): Observable<EventsTeamRequest[]> {
+    return this.http.get<EventsTeamRequest[]>(this.teamRequestsBase(tenantId));
+  }
+
+  getTeamRequestDetail(tenantId: string, inquiryId: string): Observable<EventsTeamRequestDetail> {
+    return this.http.get<EventsTeamRequestDetail>(`${this.teamRequestsBase(tenantId)}/${inquiryId}`);
+  }
+
+  updatePreparationStatus(tenantId: string, inquiryId: string, body: PreparationStatusUpdateRequest): Observable<EventsTeamRequest> {
+    return this.http.patch<EventsTeamRequest>(`${this.teamRequestsBase(tenantId)}/${inquiryId}/status`, body);
+  }
+
+  // --- Events Director Dashboard (EP-08) ---
+  getDirectorDashboard(tenantId: string): Observable<EventsDirectorDashboard> {
+    return this.http.get<EventsDirectorDashboard>(`${this.tenantBase(tenantId)}/events-team/dashboard`);
   }
 }

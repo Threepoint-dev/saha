@@ -12,10 +12,11 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
- * Writable view of the existing inquiry table scoped to the fields EP-05 needs:
- * the customer confirmation timestamp and status transition. The quote module
- * keeps its own read-only Inquiry entity; this class never redefines that table's
- * schema, it only maps the columns this feature reads and writes.
+ * Writable view of the existing inquiry table scoped to the fields EP-05,
+ * EP-06, and EP-08 need: customer confirmation, status, owner, event type,
+ * and Final Internal BEO sharing. The quote module keeps its own read-only
+ * Inquiry entity; this class never redefines that table's schema, it only
+ * maps the columns this feature reads and writes.
  */
 @Getter
 @Setter
@@ -30,6 +31,9 @@ public class EventInquiry {
     @Column(name = "tenant_id")
     private UUID tenantId;
 
+    @Column(name = "owner_id")
+    private UUID ownerId;
+
     @Column(name = "client_name")
     private String clientName;
 
@@ -38,6 +42,9 @@ public class EventInquiry {
 
     @Column(name = "client_email")
     private String clientEmail;
+
+    @Column(name = "event_type")
+    private String eventType;
 
     @Column(name = "event_date")
     private LocalDate eventDate;
@@ -50,6 +57,12 @@ public class EventInquiry {
 
     @Column(name = "customer_confirmed_at")
     private OffsetDateTime customerConfirmedAt;
+
+    @Column(name = "beo_shared_at")
+    private OffsetDateTime beoSharedAt;
+
+    @Column(name = "beo_shared_with_events")
+    private Boolean beoSharedWithEvents;
 
     @Column(name = "notes")
     private String notes;

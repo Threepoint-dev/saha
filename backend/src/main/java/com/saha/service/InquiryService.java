@@ -5,7 +5,9 @@ import com.saha.model.InquiryStatusLog;
 import com.saha.repository.InquiryRepository;
 import com.saha.repository.InquiryStatusLogRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +19,7 @@ public class InquiryService {
 
     private final InquiryRepository inquiryRepository;
     private final InquiryStatusLogRepository inquiryStatusLogRepository;
+    private final HallAvailabilityService hallAvailabilityService;
 
     public List<Inquiry> getAll() {
         return inquiryRepository.findAll();
@@ -86,6 +89,11 @@ public class InquiryService {
         log.setToStatus(newStatus);
         inquiryStatusLogRepository.save(log);
 
+        // Flip any tentative hold on the hall calendar to Confirmed now that the deal is Won.
+        if ("WON".equals(newStatus)) {
+            hallAvailabilityService.confirmForInquiry(inquiry.getTenantId(), inquiry.getId());
+        }
+
         return inquiry;
     }
 
@@ -102,6 +110,25 @@ public class InquiryService {
 
     public void delete(UUID id) {
         inquiryRepository.deleteById(id);
+    }
+
+    /**
+     * Shares the Final Internal BEO with the Events Team. Only allowed once
+     * the inquiry is Won — the Events Team should never see a request that
+     * Sales hasn't intentionally shared after confirming the deal.
+     */
+    public Inquiry shareBeo(UUID id) {
+        Inquiry inquiry = inquiryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Inquiry not found"));
+
+        if (!"WON".equals(inquiry.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Inquiry must be marked Won before sharing the Internal BEO.");
+        }
+
+        inquiry.setBeoSharedAt(OffsetDateTime.now());
+        inquiry.setBeoSharedWithEvents(true);
+        return inquiryRepository.save(inquiry);
     }
 
     private String generateInquiryNumber() {

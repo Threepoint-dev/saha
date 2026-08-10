@@ -102,6 +102,7 @@ public class CustomerConfirmationService {
                 setup != null && setup.getEventDate() != null ? setup.getEventDate() : inquiry.getEventDate(),
                 hallName,
                 setup != null ? setup.getSetupType() : null,
+                setup != null ? setup.getLayoutDesign() : null,
                 setup != null && setup.getGuestCount() != null ? setup.getGuestCount() : inquiry.getGuestCount(),
                 setup != null ? setup.getCateringStyle() : null,
                 setup != null ? setup.getMainMeal() : null,

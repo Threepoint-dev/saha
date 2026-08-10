@@ -1,0 +1,137 @@
+<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
+  <!-- Top Bar -->
+  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
+    <div class="flex items-center gap-3">
+      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
+        <span class="text-white font-bold text-sm">S</span>
+      </div>
+      <div class="flex flex-col gap-px leading-none">
+        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
+        <p class="text-[#f6ddae] text-[11px]">Measurement &amp; Reporting</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1400px] mx-auto">
+
+    <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-1">
+        <a routerLink="/reporting" class="text-[#8a8478] hover:text-[#34203a] text-[12px] font-medium transition-colors">← Back to Dashboard</a>
+        <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Lost Reason Analysis</h1>
+        <p class="text-[#55514a] text-[13px] leading-none">Why inquiries are lost, and where revenue leakage happens</p>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">{{ errorMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="rounded-[12px] bg-white border border-[#e4dfd5] px-5 py-4 text-[#55514a] text-[13px]">Loading…</div>
+    } @else if (data(); as d) {
+
+      <!-- Top 3 cards -->
+      <div class="grid grid-cols-3 gap-4">
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-[#B06D1A] bg-[#F7E7D6] inline-block px-2 py-0.5 rounded-full mb-2">Top Leakage Reason</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ d.topLeakageReason || '—' }}</p>
+          <p class="text-[#8a8478] text-[12px] mt-1">Most common reason inquiries are lost</p>
+        </div>
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-[#A02F2F] bg-[#F7DEDE] inline-block px-2 py-0.5 rounded-full mb-2">Highest Lost Value</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ d.highestLostValueReason || '—' }}</p>
+          <p class="text-[#8a8478] text-[12px] mt-1">Biggest revenue leaking reason</p>
+        </div>
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-[#8a6fa8] bg-[#ece6f1] inline-block px-2 py-0.5 rounded-full mb-2">Most Urgent to Fix</p>
+          <p class="text-[#34203a] text-[22px] font-bold leading-tight">{{ d.mostUrgentReason || '—' }}</p>
+          <p class="text-[#8a8478] text-[12px] mt-1">Most preventable, within the hotel's control</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Lost reason breakdown -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <h3 class="text-[#34203a] font-semibold text-[15px] mb-1">Lost reason breakdown</h3>
+          <p class="text-[#8a8478] text-[12px] mb-4">Count · share of lost · estimated value lost</p>
+          @if (d.breakdown.length === 0) {
+            <p class="text-[#8a8478] text-[13px]">No lost inquiries in this period.</p>
+          } @else {
+            <div class="flex flex-col gap-3">
+              @for (row of d.breakdown; track row.reason) {
+                <div>
+                  <div class="flex justify-between text-[13px] mb-1">
+                    <span class="text-[#34203a] font-medium">{{ row.reason }}</span>
+                    <span class="text-[#8a8478]">{{ row.count }} · {{ row.percentOfLost | number:'1.0-0' }}% · {{ formatSar(row.estimatedValueLost) }}</span>
+                  </div>
+                  <div class="h-2 bg-[#efebf3] rounded-full overflow-hidden">
+                    <div class="h-full bg-[#a02f2f]" [style.width]="barWidth(row.count, maxCount())"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Lost trend over time -->
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
+          <h3 class="text-[#34203a] font-semibold text-[15px] mb-1">Lost trend over time</h3>
+          <p class="text-[#8a8478] text-[12px] mb-4">Total lost inquiries — last 6 weeks</p>
+          @if (d.trend.length === 0) {
+            <p class="text-[#8a8478] text-[13px]">Not enough data yet.</p>
+          } @else {
+            <div class="flex items-end gap-4 h-40">
+              @for (row of d.trend; track row.weekLabel) {
+                <div class="flex flex-col items-center gap-2 flex-1">
+                  <div class="w-full bg-[#a02f2f] rounded-t" [style.height]="barWidth(row.count, maxWeekCount())"></div>
+                  <span class="text-[#34203a] text-[12px] font-semibold">{{ row.count }}</span>
+                  <span class="text-[#8a8478] text-[10px]">{{ row.weekLabel | date:'MMM d' }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Lost reason table -->
+      <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden">
+        <div class="px-6 py-4 border-b border-[#efebf3]">
+          <h3 class="text-[#34203a] font-semibold text-[15px]">Lost reason table</h3>
+          <p class="text-[#8a8478] text-[12px]">Count · percentage of lost · estimated value lost · urgency</p>
+        </div>
+        <table class="w-full text-left">
+          <thead>
+            <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px]">Lost Reason</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Count</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">% of Lost</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Est. Value Lost</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Urgency</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of d.breakdown; track row.reason) {
+              <tr class="border-b border-[#efebf3]">
+                <td class="px-6 py-3 text-[#34203a] text-[13px] font-medium">{{ row.reason }}</td>
+                <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ row.count }}</td>
+                <td class="px-6 py-3 text-[#55514a] text-[13px] text-right">{{ row.percentOfLost | number:'1.0-0' }}%</td>
+                <td class="px-6 py-3 text-[#55514a] text-[13px] text-right">{{ formatSar(row.estimatedValueLost) }}</td>
+                <td class="px-6 py-3 text-right">
+                  <span [class]="'px-2.5 py-0.5 rounded-full text-[11px] font-semibold ' + urgencyClass(row.urgency)">{{ row.urgency }}</span>
+                </td>
+              </tr>
+            }
+            <tr class="bg-[#faf7f2] font-semibold">
+              <td class="px-6 py-3 text-[#34203a] text-[13px]">Total lost</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ d.totalLost }}</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">100%</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ formatSar(totalValueLost()) }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    }
+  </main>
+</div>

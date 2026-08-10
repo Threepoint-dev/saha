@@ -52,7 +52,6 @@ public class QuoteSettingsService {
 
     private QuoteSettings createDefault(UUID tenantId) {
         QuoteSettings settings = new QuoteSettings();
-        settings.setId(UUID.randomUUID());
         settings.setTenantId(tenantId);
         settings.setVatRate(new BigDecimal("15"));
         settings.setValidityDays(7);

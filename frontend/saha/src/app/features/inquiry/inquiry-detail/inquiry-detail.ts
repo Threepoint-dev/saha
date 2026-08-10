@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { InquiryService, Inquiry } from '../../../core/services/inquiry.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
-import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../core/services/auth.service';
+import { QuotesService } from '../../quotes/quotes.service';
+import { AvailabilityService } from '../../availability/availability.service';
 
 @Component({
   selector: 'app-inquiry-detail',
@@ -23,6 +25,15 @@ export class InquiryDetailComponent implements OnInit {
   lossNote = '';
   isSubmittingLost = false;
   showLostError = false;
+
+  // Mark as Won — confirmation check
+  showWonCheck = false;
+  wonCheckLoading = false;
+  wonCheckQuoteExists = false;
+  wonCheckCustomerConfirmed = false;
+  wonCheckHallStatus: string | null = null;
+  markingWon = false;
+  wonSuccess = false;
 
   lossReasons = [
     'Price too high',
@@ -47,12 +58,15 @@ export class InquiryDetailComponent implements OnInit {
     private router: Router,
     private inquiryService: InquiryService,
     private sourceChannelsService: SourceChannelsService,
+    private authService: AuthService,
+    private quotesService: QuotesService,
+    private availabilityService: AvailabilityService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    const tenantId = environment.tenantId;
+    const tenantId = this.authService.getTenantId();
 
     if (id) {
       this.sourceChannelsService.list(tenantId).subscribe({
@@ -98,14 +112,92 @@ export class InquiryDetailComponent implements OnInit {
     });
   }
 
-  markWon() {
+  // --- Mark as Won: confirmation check ---
+  openWonCheck(): void {
     if (!this.inquiry?.id) return;
-    this.inquiryService.updateStatus(this.inquiry.id, 'WON').subscribe({
-      next: (data) => {
-        this.inquiry = data;
+    this.showWonCheck = true;
+    this.wonSuccess = false;
+    this.wonCheckLoading = true;
+    const tenantId = this.authService.getTenantId();
+    const inquiryId = this.inquiry.id;
+
+    this.wonCheckCustomerConfirmed = !!this.inquiry.customerConfirmedAt;
+
+    this.quotesService.listQuotes(tenantId, inquiryId).subscribe({
+      next: (quotes) => {
+        this.wonCheckQuoteExists = quotes.length > 0;
+        this.checkHallStatus(tenantId);
+      },
+      error: () => {
+        this.wonCheckQuoteExists = false;
+        this.checkHallStatus(tenantId);
+      }
+    });
+  }
+
+  private checkHallStatus(tenantId: string): void {
+    const hallId = this.inquiry?.hallId;
+    const eventDate = this.inquiry?.eventDate;
+    if (!hallId || !eventDate) {
+      this.wonCheckHallStatus = null;
+      this.wonCheckLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+    this.availabilityService.list(tenantId, eventDate, eventDate, hallId).subscribe({
+      next: (blocks) => {
+        this.wonCheckHallStatus = blocks.length > 0 ? blocks[0].status : 'available';
+        this.wonCheckLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.wonCheckHallStatus = null;
+        this.wonCheckLoading = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  goCompleteConfirmation(): void {
+    if (!this.inquiry?.id) return;
+    this.showWonCheck = false;
+    this.router.navigate(['/events', this.inquiry.id]);
+  }
+
+  continueAsTentative(): void {
+    this.showWonCheck = false;
+  }
+
+  confirmMarkWon(): void {
+    if (!this.inquiry?.id) return;
+    this.markingWon = true;
+    this.inquiryService.updateStatus(this.inquiry.id, 'WON').subscribe({
+      next: (data) => {
+        this.inquiry = data;
+        // Auto-share the Final Internal BEO with the Events Team now that the deal is Won.
+        this.inquiryService.shareBeo(data.id!).subscribe({
+          next: (shared) => {
+            this.inquiry = shared;
+            this.markingWon = false;
+            this.wonSuccess = true;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.markingWon = false;
+            this.wonSuccess = true; // Won succeeded even if the BEO share failed; surface it separately.
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: () => {
+        this.markingWon = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  closeWonCheck(): void {
+    this.showWonCheck = false;
   }
 
   confirmMarkLost() {

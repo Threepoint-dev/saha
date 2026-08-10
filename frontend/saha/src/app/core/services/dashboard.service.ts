@@ -1,16 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-
-export interface DashboardStats {
-  total: number;
-  new: number;
-  contacted: number;
-  quoted: number;
-  won: number;
-  lost: number;
-}
+import { AuthService } from './auth.service';
 
 export interface RecentInquiry {
   id: string;
@@ -21,6 +13,8 @@ export interface RecentInquiry {
   sourceChannelId: string;
   createdAt: string;
   estimatedValue: number;
+  firstResponseAt: string;
+  lossReason: string;
 }
 
 @Injectable({
@@ -28,9 +22,13 @@ export interface RecentInquiry {
 })
 export class DashboardService {
   private api = environment.apiBaseUrl;
-  private tenantId = environment.tenantId;
+  private authService = inject(AuthService);
 
   constructor(private http: HttpClient) {}
+
+  private get tenantId(): string {
+    return this.authService.currentUser()?.tenantId || environment.tenantId;
+  }
 
   getInquiries(): Observable<RecentInquiry[]> {
     return this.http.get<RecentInquiry[]>(

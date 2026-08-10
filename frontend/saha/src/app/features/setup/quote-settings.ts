@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { QuoteSettingsService } from './quote-settings.service';
 
 @Component({
@@ -13,8 +13,11 @@ import { QuoteSettingsService } from './quote-settings.service';
 export class QuoteSettingsPage implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(QuoteSettingsService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
 
   readonly loading = signal(false);
   readonly saving = signal(false);

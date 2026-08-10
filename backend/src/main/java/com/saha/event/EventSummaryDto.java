@@ -15,6 +15,7 @@ public record EventSummaryDto(
         LocalDate eventDate,
         String hallName,
         String setupType,
+        String layoutDesign,
         Integer guestCount,
         String cateringStyle,
         String mainMeal,

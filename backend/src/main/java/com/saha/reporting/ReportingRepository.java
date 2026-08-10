@@ -151,4 +151,56 @@ public interface ReportingRepository extends JpaRepository<Inquiry, UUID> {
                                      @Param("ownerId") UUID ownerId,
                                      @Param("eventType") String eventType,
                                      @Param("status") String status);
+
+    // --- Lost Reason Analysis (EP-09 / F-29) ---
+
+    @Query(value = """
+            SELECT COALESCE(i.loss_reason, 'Other') AS reason, COUNT(*) AS cnt, COALESCE(SUM(i.estimated_value), 0) AS val
+            FROM inquiry i
+            WHERE i.tenant_id = :tenantId
+              AND i.status = 'LOST'
+              AND i.updated_at >= :fromDate
+              AND i.updated_at < :toExclusive
+            GROUP BY COALESCE(i.loss_reason, 'Other')
+            ORDER BY cnt DESC
+            """, nativeQuery = true)
+    List<Object[]> lostReasonBreakdown(@Param("tenantId") UUID tenantId,
+                                       @Param("fromDate") LocalDate fromDate,
+                                       @Param("toExclusive") LocalDate toExclusive);
+
+    @Query(value = """
+            SELECT to_char(date_trunc('week', i.updated_at), 'YYYY-MM-DD') AS wk, COUNT(*) AS cnt
+            FROM inquiry i
+            WHERE i.tenant_id = :tenantId
+              AND i.status = 'LOST'
+              AND i.updated_at >= :weeksStart
+            GROUP BY date_trunc('week', i.updated_at)
+            ORDER BY date_trunc('week', i.updated_at)
+            """, nativeQuery = true)
+    List<Object[]> lostTrendByWeek(@Param("tenantId") UUID tenantId,
+                                   @Param("weeksStart") LocalDate weeksStart);
+
+    // --- Response Time Analysis (EP-09 / F-30) ---
+    // Returns one row per responded inquiry: owner name, source name, response
+    // hours, and status. All bucketing/median/SLA classification happens in
+    // Java (ResponseTimeAnalysisService) — pilot data volume is small enough
+    // that in-memory aggregation is simpler and clearer than nested SQL CASE
+    // statements for every metric.
+
+    @Query(value = """
+            SELECT COALESCE(hu.full_name, 'Unassigned') AS owner_name,
+                   COALESCE(sc.name, 'Unassigned') AS source_name,
+                   EXTRACT(EPOCH FROM (i.first_response_at - i.created_at)) / 3600.0 AS response_hours,
+                   i.status AS status
+            FROM inquiry i
+            LEFT JOIN hotel_user hu ON hu.id = i.owner_id
+            LEFT JOIN source_channel sc ON sc.id = i.source_channel_id
+            WHERE i.tenant_id = :tenantId
+              AND i.first_response_at IS NOT NULL
+              AND i.created_at >= :fromDate
+              AND i.created_at < :toExclusive
+            """, nativeQuery = true)
+    List<Object[]> responseTimeRows(@Param("tenantId") UUID tenantId,
+                                    @Param("fromDate") LocalDate fromDate,
+                                    @Param("toExclusive") LocalDate toExclusive);
 }

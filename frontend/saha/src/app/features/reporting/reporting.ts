@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
-import { environment } from '../../../environments/environment';
+import { AuthService } from '../../core/services/auth.service';
 import { ReportingSummary } from './reporting.model';
 import { ReportingService } from './reporting.service';
 import { SourceChannelsService } from '../setup/source-channels.service';
@@ -24,14 +25,17 @@ const STATUS_COLORS = ['#34203a', '#f6ddae', '#2e7d5b', '#d14343', '#e0922f', '#
 
 @Component({
   selector: 'app-reporting',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './reporting.html'
 })
 export class Reporting implements OnInit, OnDestroy {
   private service = inject(ReportingService);
   private sourceChannelsService = inject(SourceChannelsService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
 
   readonly from = signal(this.isoDaysAgo(30));
   readonly to = signal(this.isoDaysAgo(0));

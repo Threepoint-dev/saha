@@ -33,7 +33,6 @@ public class HallService {
     @Transactional
     public HallDto create(UUID tenantId, HallUpsertRequest request) {
         Hall hall = new Hall();
-        hall.setId(UUID.randomUUID());
         hall.setTenantId(tenantId);
         applyRequest(hall, request);
         hall.setStatus(STATUS_ACTIVE);

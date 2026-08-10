@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { InquiryService } from '../../../core/services/inquiry.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 
@@ -44,41 +45,24 @@ export class NewInquiryComponent implements OnInit {
 
   constructor(
     private inquiryService: InquiryService,
+    private authService: AuthService,
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    const tenantId = environment.tenantId;
+    const tenantId = this.authService.currentUser()?.tenantId || environment.tenantId;
     const api = environment.apiBaseUrl;
 
     this.http.get<any[]>(`${api}/api/tenants/${tenantId}/source-channels`)
-      .subscribe({
-        next: (data) => {
-          this.sourceChannels = data;
-          this.cdr.detectChanges();
-        },
-        error: () => {}
-      });
+      .subscribe({ next: (data) => { this.sourceChannels = data; this.cdr.detectChanges(); }, error: () => {} });
 
     this.http.get<any[]>(`${api}/api/tenants/${tenantId}/halls`)
-      .subscribe({
-        next: (data) => {
-          this.halls = data;
-          this.cdr.detectChanges();
-        },
-        error: () => {}
-      });
+      .subscribe({ next: (data) => { this.halls = data; this.cdr.detectChanges(); }, error: () => {} });
 
     this.http.get<any[]>(`${api}/api/users/tenant/${tenantId}`)
-      .subscribe({
-        next: (data) => {
-          this.users = data;
-          this.cdr.detectChanges();
-        },
-        error: () => {}
-      });
+      .subscribe({ next: (data) => { this.users = data; this.cdr.detectChanges(); }, error: () => {} });
   }
 
   validate(): boolean {

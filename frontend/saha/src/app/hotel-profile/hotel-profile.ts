@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { environment } from '../../environments/environment';
+import { AuthService } from '../core/services/auth.service';
 import { HotelProfileService } from './hotel-profile.service';
 import { HotelProfile as HotelProfileData } from './hotel-profile.model';
 
@@ -14,8 +14,11 @@ import { HotelProfile as HotelProfileData } from './hotel-profile.model';
 export class HotelProfile implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(HotelProfileService);
+  private authService = inject(AuthService);
 
-  readonly tenantId = environment.tenantId;
+  get tenantId(): string {
+    return this.authService.getTenantId();
+  }
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly errorMessage = signal<string | null>(null);

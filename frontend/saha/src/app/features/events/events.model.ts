@@ -33,6 +33,7 @@ export interface EventSetup {
   hallId: string | null;
   setupType: string | null;
   layoutNotes: string | null;
+  layoutDesign: string | null;
   guestCount: number | null;
   banquetHeadcount: number | null;
   cateringStyle: string | null;
@@ -57,6 +58,7 @@ export interface EventSetupRequest {
   hallId: string | null;
   setupType: string | null;
   layoutNotes: string | null;
+  layoutDesign: string | null;
   guestCount: number | null;
   banquetHeadcount: number | null;
   cateringStyle: string | null;
@@ -115,3 +117,83 @@ export interface EventSummary {
 
 export const SETUP_TYPES = ['Banquet', 'Theater', 'Classroom', 'U-Shape', 'Cocktail', 'Custom'];
 export const CATERING_STYLES = ['Full Service', 'Buffet', 'Stations', 'None'];
+
+// --- Events Team Request Tracker & Detail (EP-08) ---
+
+export interface EventsTeamRequest {
+  inquiryId: string;
+  clientName: string | null;
+  eventType: string | null;
+  eventDate: string | null;
+  hallName: string | null;
+  guestCount: number | null;
+  setupType: string | null;
+  preparationStatus: string;
+  ownerName: string | null;
+  updatedAt: string | null;
+}
+
+export interface EventsTeamRequestDetail {
+  inquiryId: string;
+  clientName: string | null;
+  eventType: string | null;
+  inquiryStatus: string | null;
+  eventDate: string | null;
+  startTime: string | null;
+  endTime: string | null;
+  hallName: string | null;
+  guestCount: number | null;
+  setupType: string | null;
+  layoutNotes: string | null;
+  layoutDesign: string | null;
+  chairColor: string | null;
+  tableColor: string | null;
+  cateringStyle: string | null;
+  mainMeal: string | null;
+  addonNames: string[];
+  agenda: string | null;
+  opsNotes: string | null;
+  preparationStatus: string;
+  updatedAt: string | null;
+}
+
+export interface PreparationStatusUpdateRequest {
+  preparationStatus: string;
+  opsNotes?: string | null;
+}
+
+export const PREPARATION_STATUSES: { value: string; label: string }[] = [
+  { value: 'new', label: 'New' },
+  { value: 'in_prep', label: 'In Prep' },
+  { value: 'prepared', label: 'Prepared' },
+  { value: 'cancelled', label: 'Cancelled' }
+];
+
+// --- Events Director Dashboard (EP-08) ---
+
+export interface HallRevenue {
+  hallName: string;
+  valueSar: number;
+}
+
+export interface SetupTypeCount {
+  setupType: string;
+  count: number;
+}
+
+export interface MonthCount {
+  month: string;
+  count: number;
+}
+
+export interface EventsDirectorDashboard {
+  total: number;
+  confirmedCount: number;
+  confirmedValueSar: number;
+  tentativeCount: number;
+  preparedCount: number;
+  upcomingCount: number;
+  revenueByHall: HallRevenue[];
+  requestsBySetupType: SetupTypeCount[];
+  monthlyTrend: MonthCount[];
+}
