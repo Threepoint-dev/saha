@@ -26,7 +26,7 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void seedAdmin() {
-        if (!hotelUserRepository.existsByEmail(ADMIN_EMAIL)) {
+        if (!hotelUserRepository.existsByEmailIgnoreCase(ADMIN_EMAIL)) {
             HotelUser admin = new HotelUser();
             admin.setEmail(ADMIN_EMAIL);
             admin.setFullName("SAHA Admin");

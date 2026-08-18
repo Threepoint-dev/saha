@@ -29,11 +29,11 @@ public class HotelUserService {
     }
 
     public Optional<HotelUser> getByEmail(String email) {
-        return hotelUserRepository.findByEmail(email);
+        return hotelUserRepository.findByEmailIgnoreCase(email);
     }
 
     public HotelUser create(HotelUser hotelUser) {
-        if (hotelUserRepository.existsByEmail(hotelUser.getEmail())) {
+        if (hotelUserRepository.existsByEmailIgnoreCase(hotelUser.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
         return hotelUserRepository.save(hotelUser);
