@@ -10,9 +10,10 @@ import java.util.UUID;
 @Repository
 public interface HotelUserRepository extends JpaRepository<HotelUser, UUID> {
 
-    Optional<HotelUser> findByEmail(String email);
+    /** Case-insensitive on purpose — "Admin@Site.com" and "admin@site.com" must be the same account. */
+    Optional<HotelUser> findByEmailIgnoreCase(String email);
 
     List<HotelUser> findByTenantId(UUID tenantId);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmailIgnoreCase(String email);
 }
