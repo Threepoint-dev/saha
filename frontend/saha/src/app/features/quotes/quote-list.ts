@@ -3,12 +3,13 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { InquirySummary, Quote } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
 @Component({
   selector: 'app-quote-list',
-  imports: [CommonModule],
+  imports: [CommonModule, AdminPageHeader],
   templateUrl: './quote-list.html'
 })
 export class QuoteList implements OnInit {

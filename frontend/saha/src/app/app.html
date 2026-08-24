@@ -1,8 +1,30 @@
-<div class="flex">
+<div class="flex min-h-screen">
+  <!-- Desktop sidebar: hidden on mobile -->
   @if (showSidebar) {
-    <app-sidebar />
+    <div class="hidden md:block shrink-0">
+      <app-sidebar />
+    </div>
   }
-  <main [class]="showSidebar ? 'flex-1' : 'w-full'">
+
+  <main class="flex-1 min-w-0">
     <router-outlet />
+    <!-- Spacer so content clears the fixed bottom tab bar on mobile -->
+    @if (showSidebar && isSalesRoute) {
+      <div class="h-[72px] md:hidden" aria-hidden="true"></div>
+    }
   </main>
 </div>
+
+<!-- Mobile bottom tab bar: sales shell only -->
+@if (showSidebar && isSalesRoute) {
+  <div class="md:hidden">
+    <app-bottom-tab-bar />
+  </div>
+}
+
+<!-- Mobile navigation drawer (overlay, triggered by admin-page-header hamburger) -->
+@if (showSidebar) {
+  <div class="md:hidden">
+    <app-mobile-drawer />
+  </div>
+}

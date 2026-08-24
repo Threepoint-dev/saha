@@ -3,11 +3,12 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { QuoteSettingsService } from './quote-settings.service';
 
 @Component({
   selector: 'app-quote-settings',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader],
   templateUrl: './quote-settings.html'
 })
 export class QuoteSettingsPage implements OnInit {

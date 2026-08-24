@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import {
   Addon,
   EventPackage,
@@ -15,7 +16,7 @@ type ModalMode = 'create' | 'edit';
 
 @Component({
   selector: 'app-reference-data',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader],
   templateUrl: './reference-data.html'
 })
 export class ReferenceData implements OnInit {

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { DataQualityReport, ExportType } from './export.model';
 import { ExportService } from './export.service';
 
@@ -21,7 +22,7 @@ const LAST_EXPORT_KEY = 'saha.export.lastExport';
 
 @Component({
   selector: 'app-export',
-  imports: [CommonModule],
+  imports: [CommonModule, AdminPageHeader],
   templateUrl: './export.html'
 })
 export class Export implements OnInit {
