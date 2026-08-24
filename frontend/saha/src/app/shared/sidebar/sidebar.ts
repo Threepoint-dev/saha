@@ -33,12 +33,14 @@ export class Sidebar {
     { label: 'New Inquiry', path: '/inquiries/new', exact: true, section: 'SALES',
       roles: ['SAHA_ADMIN', 'DIRECTOR_OF_SALES', 'SALES_REP'] },
     { label: 'Hall Availability', hint: 'Check before you quote', path: '/availability', exact: false, section: 'SALES',
-      roles: ['SAHA_ADMIN', 'DIRECTOR_OF_SALES', 'SALES_REP', 'EVENTS_DIRECTOR'] },
+      roles: ['SAHA_ADMIN', 'DIRECTOR_OF_SALES', 'SALES_REP'] },
 
     // EVENTS OPS — Events Team and Events Director only
     { label: 'Event Requests', hint: 'Handoff from sales', path: '/events', exact: false, section: 'OPERATIONS',
       roles: ['EVENTS_TEAM', 'EVENTS_DIRECTOR'] },
     { label: 'Events Dashboard', path: '/events/dashboard', exact: false, section: 'OPERATIONS',
+      roles: ['EVENTS_DIRECTOR'] },
+    { label: 'Hall Availability', hint: 'Check before you quote', path: '/availability', exact: false, section: 'OPERATIONS',
       roles: ['EVENTS_DIRECTOR'] },
 
     // SETUP — SAHA Admin and Director of Sales only (hotel-side management)

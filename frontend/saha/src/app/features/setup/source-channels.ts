@@ -3,12 +3,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { SourceChannel } from './source-channels.model';
 import { SourceChannelsService } from './source-channels.service';
 
 @Component({
   selector: 'app-source-channels',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader],
   templateUrl: './source-channels.html'
 })
 export class SourceChannels implements OnInit {
