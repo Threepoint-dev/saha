@@ -1,132 +1,149 @@
-<div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
-  <!-- Top Bar (Quote Builder uses own header, no sidebar) -->
-  <header class="bg-white border-b border-[#E8E0D8] h-[60px] flex items-center justify-between px-8 w-full">
-    <div class="flex items-center gap-3">
-      <a [routerLink]="['/quotes', inquiryId()]" class="text-[#7A736B] hover:text-[#34203a] text-sm font-medium transition-colors flex items-center gap-1.5">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        Quotes
-      </a>
-      <span class="text-[#C9C3B8]">/</span>
-      <div class="flex items-center gap-2">
-        <h1 class="text-[#34203a] font-bold text-[18px] leading-none">{{ quote()?.quoteNumber || 'New Quote' }}</h1>
-        @if (quote()?.status) {
-          <span class="bg-[#FFF3DC] border border-[#ce8a28] text-[#B37410] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
-            {{ quote()?.status || 'Draft' }}
-          </span>
-        }
-      </div>
+<div class="min-h-screen bg-[#faf7f2] flex flex-col">
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-24 gap-3">
+      <div class="w-6 h-6 border-2 border-[#34203a] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-[#8a8478] text-sm">Loading quote…</p>
     </div>
-    <div class="flex items-center gap-2 text-[13px] text-[#7A736B]">
-      @if (inquiry()) {
-        <span>{{ inquiry()?.clientName }}</span>
-        <span class="text-[#C9C3B8]">·</span>
-        @if (inquiry()?.eventDate) {
-          <span>{{ inquiry()!.eventDate | date:'d MMM yyyy' }}</span>
-          <span class="text-[#C9C3B8]">·</span>
+  } @else {
+
+    <!-- ══════════════ BUILD VIEW ══════════════ -->
+    @if (view() === 'build') {
+      <header class="bg-white border-b border-[#e4dfd5] px-4 md:px-10 py-3 md:py-4 flex items-center gap-3 sticky top-0 z-20">
+        <a [routerLink]="['/quotes', inquiryId()]"
+           class="w-9 h-9 -ml-1 flex items-center justify-center rounded-full text-[#55514a] hover:bg-[#faf7f2] transition-colors shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </a>
+        <div class="w-8 h-8 rounded-[8px] bg-[#34203a] flex items-center justify-center shrink-0">
+          <svg class="w-4 h-4 text-[#f6ddae]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="flex flex-col leading-tight min-w-0">
+          <h1 class="text-[#34203a] font-bold text-[16px] md:text-[18px] truncate">Create quote</h1>
+          <p class="text-[#8a8478] text-[12px] truncate flex items-center gap-1.5">
+            <span>{{ quote()?.quoteNumber || 'New quote' }}</span>
+            @if (quote()?.status) { <app-status-badge [status]="isReadOnly() ? (quote()!.status || '') : 'draft'" /> }
+          </p>
+        </div>
+      </header>
+
+      <main class="flex flex-col gap-4 px-4 md:px-10 py-5 w-full max-w-[760px] mx-auto pb-[300px] md:pb-10">
+
+        @if (errorMessage()) {
+          <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">{{ errorMessage() }}</div>
         }
-        @if (inquiry()?.guestCount) {
-          <span>{{ inquiry()!.guestCount }} guests</span>
+        @if (successMessage()) {
+          <div class="bg-emerald-50 border border-emerald-300 rounded-[10px] px-4 py-3 text-emerald-700 text-[13px]">{{ successMessage() }}</div>
         }
-      }
-    </div>
-  </header>
 
-  <!-- Error / success banners -->
-  @if (errorMessage()) {
-    <div class="bg-red-50 border-b border-red-200 px-8 py-3 flex items-start gap-3">
-      <svg class="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
-      </svg>
-      <p class="text-red-700 text-[13px]">{{ errorMessage() }}</p>
-    </div>
-  }
-  @if (successMessage()) {
-    <div class="bg-emerald-50 border-b border-emerald-200 px-8 py-3 text-emerald-700 text-[13px]">{{ successMessage() }}</div>
-  }
-
-  <!-- Body -->
-  <main class="flex flex-col gap-5 px-8 py-6 w-full max-w-[1200px] mx-auto">
-
-    @if (loading()) {
-      <div class="flex items-center justify-center py-20 gap-3">
-        <div class="w-6 h-6 border-2 border-[#34203a] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-[#7A736B] text-sm">Loading quote...</p>
-      </div>
-    } @else {
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-
-        <!-- LEFT: Quote number + Line Items Table -->
-        <div class="flex flex-col gap-4">
-
-          <!-- Quote # + status -->
-          <div class="flex items-center gap-3">
-            <h2 class="text-[#34203a] text-[16px] font-bold">{{ quote()?.quoteNumber || '—' }}</h2>
-            @if (quote()?.status) {
-              <span class="bg-[#FFF3DC] border border-[#ce8a28] text-[#B37410] text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-                {{ quote()?.status }}
-              </span>
+        <!-- Validation errors — stacked red-bordered cards -->
+        @if (showValidation() && validationErrors().length > 0) {
+          <div class="flex flex-col gap-2.5">
+            <div class="bg-white border-2 border-red-400 rounded-[12px] px-4 py-3.5 flex items-start gap-3">
+              <span class="w-5 h-5 rounded-full bg-red-500 text-white text-[12px] font-bold flex items-center justify-center shrink-0 mt-0.5">!</span>
+              <div>
+                <p class="text-[#34203a] text-[14px] font-bold">Can't finalize quote</p>
+                <p class="text-[#8a8478] text-[12px]">Fix {{ validationErrors().length }} {{ validationErrors().length === 1 ? 'error' : 'errors' }} before continuing</p>
+              </div>
+            </div>
+            @for (err of validationErrors(); track err.message) {
+              <div class="bg-white border border-red-300 rounded-[12px] px-4 py-3 flex items-start gap-3">
+                <span class="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">!</span>
+                <div class="flex flex-col gap-1.5">
+                  <p class="text-[#34203a] text-[13px] font-semibold">{{ err.message }}</p>
+                  <span class="self-start bg-[#f1f0ef] text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.1px] px-2 py-0.5 rounded-full">{{ err.scope }}</span>
+                </div>
+              </div>
             }
           </div>
+        }
 
-          <!-- Line Items Card -->
-          <div class="bg-white border border-[#E4DFD5] rounded-[12px] overflow-hidden">
-            <!-- Table header -->
-            <div class="grid grid-cols-[1fr_60px_100px_100px_50px] gap-3 px-5 py-3 border-b border-[#E4DFD5] bg-[#FAF7F2]">
-              <span class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider">Item</span>
-              <span class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider text-center">QTY</span>
-              <span class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider text-right">Unit</span>
-              <span class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider text-right">TOTAL</span>
-              <span class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider text-center">Tax</span>
+        <!-- Client details — compact bordered sub-card -->
+        <section class="bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-4 flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-[#34203a] text-[13px] font-bold uppercase tracking-[0.12px]">Client details</h2>
+            <app-status-badge status="inactive" label="Inherited" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[11px]">Client name</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ inquiry()?.clientName || '—' }}</span>
             </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[11px]">Phone</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ inquiry()?.clientPhone || inquiry()?.clientEmail || '—' }}</span>
+            </div>
+          </div>
+          <p class="text-[#8a8478] text-[11px]">Edit these on the inquiry — quotes inherit the client record.</p>
+        </section>
 
-            <!-- Rows -->
-            @if (items().length === 0) {
-              <div class="px-5 py-10 text-center">
-                <p class="text-[#8A8478] text-[13px]">No line items yet. Add an item below to get started.</p>
-              </div>
-            } @else {
-              @for (item of items(); track item.id; let i = $index) {
-                <div
-                  class="grid grid-cols-[1fr_60px_100px_100px_50px] gap-3 px-5 py-3.5 border-b border-[#E4DFD5] hover:bg-[#FDFAF7] transition-colors group items-center"
-                  [class.opacity-50]="dragIndex() === i"
-                  draggable="true"
-                  (dragstart)="onDragStart(i)"
-                  (dragover)="onDragOver($event)"
-                  (drop)="onDrop(i)"
-                  (dragend)="onDragEnd()">
-                  <!-- Item name + description -->
-                  <div class="flex items-center gap-2">
-                    <span class="cursor-grab text-[#C9C3B8] text-lg select-none opacity-0 group-hover:opacity-100 transition-opacity" title="Drag to reorder">⋮⋮</span>
-                    <div>
-                      <p class="text-[#1B1A17] text-[13px] font-medium">{{ item.itemName }}</p>
-                      @if (item.description) {
-                        <p class="text-[#7A736B] text-[11px]">{{ item.description }}</p>
-                      }
-                    </div>
-                  </div>
-                  <!-- QTY -->
-                  <span class="text-[#1B1A17] text-[13px] text-center">{{ item.quantity }}</span>
-                  <!-- Unit price -->
-                  <span class="text-[#1B1A17] text-[13px] text-right">{{ item.unitPrice | number:'1.0-0' }}</span>
-                  <!-- Total -->
-                  <span class="text-[#1B1A17] text-[13px] font-semibold text-right">{{ rowTotal(item) | number:'1.0-0' }}</span>
-                  <!-- Tax -->
-                  <div class="flex justify-center">
-                    @if (item.isTaxable) {
-                      <span class="text-[10px] text-[#2E7D5B] font-semibold bg-green-50 px-1.5 py-0.5 rounded">15%</span>
-                    } @else {
-                      <span class="text-[10px] text-[#7A736B]">—</span>
-                    }
-                  </div>
+        <!-- Event details — compact bordered sub-card -->
+        <section class="bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-4 flex flex-col gap-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-[#34203a] text-[13px] font-bold uppercase tracking-[0.12px]">Event details</h2>
+            <app-status-badge status="inactive" label="Inherited" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[11px]">Event date</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ inquiry()?.eventDate ? (inquiry()!.eventDate | date:'d MMM yyyy') : '—' }}</span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[11px]">Guest count</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ inquiry()?.guestCount ?? '—' }}</span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[11px]">Valid until</span>
+              <span class="text-[#34203a] text-[13px] font-medium"
+                    [class.text-red-600]="!quote()?.validUntil">
+                {{ quote()?.validUntil ? (quote()!.validUntil | date:'d MMM yyyy') : 'Required' }}
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Line items -->
+        <section class="bg-white border border-[#e4dfd5] rounded-[12px] overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-3 border-b border-[#e4dfd5]">
+            <h2 class="text-[#34203a] text-[13px] font-bold uppercase tracking-[0.12px]">Line items</h2>
+            <span class="text-[#8a8478] text-[12px]">{{ items().length }} {{ items().length === 1 ? 'item' : 'items' }}</span>
+          </div>
+
+          @if (items().length === 0) {
+            <div class="px-4 py-8 text-center">
+              <p class="text-[#8a8478] text-[13px]">No line items yet.</p>
+            </div>
+          } @else {
+            @for (item of items(); track item.id; let i = $index) {
+              <button type="button"
+                (click)="openEditSheet(item)"
+                class="w-full text-left px-4 py-3.5 border-b border-[#f0ece3] last:border-0 flex items-center gap-3 hover:bg-[#fdfaf7] transition-colors"
+                [class.opacity-50]="dragIndex() === i"
+                draggable="true"
+                (dragstart)="onDragStart(i)" (dragover)="onDragOver($event)" (drop)="onDrop(i)" (dragend)="onDragEnd()">
+                <span class="hidden md:block cursor-grab text-[#c9c3b8] select-none" title="Drag to reorder">⋮⋮</span>
+                <div class="flex-1 min-w-0">
+                  <p class="text-[#34203a] text-[13px] font-medium truncate">{{ item.itemName }}</p>
+                  <p class="text-[#8a8478] text-[11px]">
+                    {{ item.quantity ?? 0 }} × {{ (item.unitPrice ?? 0) | number:'1.0-0' }} SAR
+                    @if (item.isTaxable) { · <span class="text-[#2e7d5b]">15% VAT</span> } @else { · <span>no VAT</span> }
+                  </p>
                 </div>
-              }
+                <span class="text-[#34203a] text-[13px] font-semibold shrink-0">{{ rowTotal(item) | number:'1.0-0' }}</span>
+                <svg class="w-4 h-4 text-[#c9c3b8] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
             }
+          }
 
-            <!-- Add line item button -->
-            <div class="px-5 py-3.5">
-              <button type="button" (click)="showAddModal = true"
+          @if (!isReadOnly()) {
+            <div class="px-4 py-3">
+              <button type="button" (click)="openAddSheet()"
                 class="flex items-center gap-2 text-[#34203a] text-[13px] font-semibold hover:text-[#46294f] transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -134,194 +151,338 @@
                 Add line item
               </button>
             </div>
-          </div>
+          }
+        </section>
+      </main>
 
-        </div>
-
-        <!-- RIGHT: Summary & Actions -->
-        <div class="flex flex-col gap-4 lg:sticky lg:top-6">
-
-          <!-- Summary Card -->
-          <div class="bg-white border border-[#E4DFD5] rounded-[12px] px-5 py-5">
-            <div class="flex items-center gap-2 mb-4">
-              <div class="w-3 h-3 rounded-full bg-[#ce8a28] animate-pulse"></div>
-              <span class="text-[#7A736B] text-[11px] font-medium">Recalculating...</span>
+      <!-- Totals block — sticky above the bottom tab bar -->
+      <div class="fixed left-0 right-0 bottom-[64px] md:static md:mt-4 z-20 px-4 md:px-10 pb-3 md:pb-10 pt-2 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent md:bg-none">
+        <div class="w-full max-w-[760px] mx-auto flex flex-col gap-2.5">
+          <div class="bg-[#34203a] rounded-[14px] px-4 py-3.5 flex flex-col gap-2 shadow-lg">
+            <div class="flex items-center justify-between">
+              <span class="text-[#c9b9d0] text-[12px]">Subtotal</span>
+              <span class="text-white text-[13px] font-medium">{{ (quote()?.subtotal ?? 0) | number:'1.0-0' }} SAR</span>
             </div>
-            <div class="flex flex-col gap-2.5">
-              <div class="flex items-center justify-between">
-                <span class="text-[#7A736B] text-[13px]">Subtotal</span>
-                <span class="text-[#1B1A17] text-[13px] font-medium">{{ (quote()?.subtotal ?? 0) | number:'1.0-0' }} SAR</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-[#7A736B] text-[13px]">VAT ({{ quote()?.vatRate ?? 15 }}%)</span>
-                <span class="text-[#1B1A17] text-[13px] font-medium">{{ (quote()?.vatAmount ?? 0) | number:'1.0-0' }} SAR</span>
-              </div>
-              <div class="border-t border-[#E4DFD5] pt-3 mt-1">
-                <div class="flex items-center justify-between">
-                  <span class="text-[#1B1A17] text-[15px] font-bold">Total</span>
-                  <span class="text-[#34203a] text-[22px] font-bold">{{ (quote()?.total ?? 0) | number:'1.0-0' }} SAR</span>
-                </div>
-              </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#c9b9d0] text-[12px]">VAT ({{ quote()?.vatRate ?? 15 }}%)</span>
+              <span class="text-white text-[13px] font-medium">{{ (quote()?.vatAmount ?? 0) | number:'1.0-0' }} SAR</span>
             </div>
-            <p class="text-[#8A8478] text-[11px] mt-3 leading-relaxed">
-              Total updates live as line items change. Taxes {{ quote()?.vatRate ?? 15 }}% VAT applied to taxable items.
-            </p>
+            <div class="flex items-center justify-between border-t border-white/15 pt-2 mt-0.5">
+              <span class="text-white text-[14px] font-bold">Total</span>
+              <span class="text-[#ce8a28] text-[20px] font-bold">{{ (quote()?.total ?? 0) | number:'1.0-0' }} SAR</span>
+            </div>
           </div>
-
-          <!-- Actions -->
-          <div class="flex flex-col gap-2">
-            <button type="button" (click)="share()" [disabled]="sharing()"
-              class="w-full bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-5 py-3 text-white text-[14px] font-semibold transition-colors">
-              {{ sharing() ? 'Generating...' : 'Save & preview' }}
+          <p class="text-[#8a8478] text-[11px] text-center md:text-left">Totals update live · simple 15% VAT only</p>
+          @if (!isReadOnly()) {
+            <div class="flex flex-col gap-2">
+              <button type="button" (click)="saveAndPreview()" [disabled]="sharing()"
+                class="w-full bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
+                {{ sharing() ? 'Saving…' : 'Save & preview' }}
+              </button>
+              <button type="button" (click)="saveDraft()" [disabled]="sharing()"
+                class="w-full bg-white border border-[#e4dfd5] hover:border-[#34203a] text-[#34203a] text-[14px] font-medium py-3 rounded-[12px] transition-colors">
+                Save draft
+              </button>
+            </div>
+          } @else {
+            <button type="button" (click)="goToInquiry()"
+              class="w-full bg-[#34203a] hover:bg-[#46294f] text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
+              Back to inquiry
             </button>
-            <button type="button" (click)="saveNotes()" [disabled]="savingNotes()"
-              class="w-full bg-white border border-[#E4DFD5] hover:border-[#34203a] rounded-[10px] px-5 py-3 text-[#34203a] text-[14px] font-medium transition-colors">
-              {{ savingNotes() ? 'Saving...' : 'Save draft' }}
-            </button>
-          </div>
-
-          <!-- Share link (if generated) -->
-          @if (shareUrl()) {
-            <div class="bg-[#ECE6F1] border border-[#C9B6CF] rounded-[10px] px-4 py-3 flex flex-col gap-2">
-              <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-wider">Shareable Link</p>
-              <div class="flex items-center gap-2">
-                <input type="text" [value]="shareUrl()" readonly
-                  class="flex-1 bg-white border border-[#E4DFD5] rounded-[8px] px-3 py-2 h-[34px] text-[11px] text-[#55514a] focus:outline-none truncate" />
-                <button type="button" (click)="copyLink()"
-                  class="bg-[#34203a] hover:bg-[#46294f] rounded-[8px] px-3 h-[34px] text-white text-[11px] font-semibold transition-colors whitespace-nowrap">
-                  {{ copied() ? 'Copied!' : 'Copy' }}
-                </button>
-              </div>
-              <a [href]="shareUrl()" target="_blank" class="text-[#8a6d1a] text-[12px] font-medium hover:underline">Open preview ↗</a>
-            </div>
           }
         </div>
       </div>
     }
-  </main>
-</div>
 
-<!-- Add Line Item Modal -->
-@if (showAddModal) {
-  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-[16px] w-[520px] shadow-2xl overflow-hidden">
-      <!-- Modal Header -->
-      <div class="flex items-start justify-between px-6 py-5 border-b border-[#E4DFD5]">
-        <div>
-          <h2 class="text-[#1B1A17] text-[16px] font-bold">Add line item</h2>
-          <p class="text-[#7A736B] text-[12px] mt-0.5">Quote {{ quote()?.quoteNumber }}</p>
-        </div>
-        <button (click)="showAddModal = false" class="text-[#7A736B] hover:text-[#1B1A17] transition-colors p-1">
+    <!-- ══════════════ REVIEW VIEW (screenshot 07) ══════════════ -->
+    @if (view() === 'review') {
+      <header class="bg-[#34203a] px-4 md:px-10 py-4 flex items-center gap-3 sticky top-0 z-20">
+        <button type="button" (click)="backToEdit()"
+          class="w-9 h-9 -ml-1 flex items-center justify-center rounded-full text-[#f6ddae] hover:bg-white/10 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
         </button>
-      </div>
+        <h1 class="text-white font-bold text-[16px] md:text-[18px]">Quote preview</h1>
+      </header>
 
-      <!-- Modal Body -->
-      <div class="px-6 py-5 flex flex-col gap-4">
-        <!-- Item Type Tabs -->
-        <div>
-          <p class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-2">Item type</p>
-          <div class="flex flex-wrap gap-2">
-            @for (type of itemTypes; track type.value) {
-              <button type="button"
-                [class]="addModel.itemType === type.value
-                  ? 'bg-[#34203a] text-white px-3 py-1.5 rounded-full text-[12px] font-semibold'
-                  : 'bg-[#F0EBE3] text-[#55514a] hover:bg-[#E4DFD5] px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors'"
-                (click)="setItemType(type.value)">
-                {{ type.label }}
+      <main class="flex flex-col gap-4 px-4 md:px-10 py-5 w-full max-w-[720px] mx-auto pb-40">
+        @if (errorMessage()) {
+          <div class="bg-red-50 border border-red-300 rounded-[10px] px-4 py-3 text-red-700 text-[13px]">{{ errorMessage() }}</div>
+        }
+
+        <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden shadow-sm">
+          <div class="bg-[#34203a] px-5 py-4">
+            <p class="text-[#f6ddae] text-[11px] font-semibold uppercase tracking-[0.16px]">Event Quotation</p>
+            <p class="text-white text-[18px] font-bold">{{ quote()?.quoteNumber || '—' }}</p>
+            <p class="text-[#c9b9d0] text-[11px]">
+              Valid until {{ quote()?.validUntil ? (quote()!.validUntil | date:'d MMM yyyy') : '—' }}
+            </p>
+          </div>
+
+          <div class="px-5 py-4 border-b border-[#efebf3] grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Client</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ inquiry()?.clientName || '—' }}</span>
+            </div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Event</span>
+              <span class="text-[#34203a] text-[13px] font-medium">
+                {{ inquiry()?.eventDate ? (inquiry()!.eventDate | date:'d MMM yyyy') : '—' }}
+                @if (inquiry()?.guestCount != null) { · {{ inquiry()!.guestCount }} guests }
+              </span>
+            </div>
+          </div>
+
+          <div class="px-5 py-4">
+            @for (item of items(); track item.id) {
+              <div class="flex items-start justify-between gap-3 py-2 border-b border-[#efebf3] last:border-0">
+                <div class="min-w-0">
+                  <p class="text-[#34203a] text-[13px] font-medium">{{ item.itemName }}</p>
+                  <p class="text-[#8a8478] text-[11px]">{{ item.quantity ?? 0 }} × {{ (item.unitPrice ?? 0) | number:'1.0-0' }}
+                    @if (!item.isTaxable) { · VAT exempt }
+                  </p>
+                </div>
+                <span class="text-[#34203a] text-[13px] font-semibold shrink-0">{{ (item.total ?? rowTotal(item)) | number:'1.0-0' }}</span>
+              </div>
+            }
+
+            <div class="flex flex-col gap-1.5 mt-4">
+              <div class="flex items-center justify-between">
+                <span class="text-[#55514a] text-[12px]">Subtotal</span>
+                <span class="text-[#34203a] text-[12px] font-medium">{{ (quote()?.subtotal ?? 0) | number:'1.0-0' }} SAR</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-[#55514a] text-[12px]">VAT ({{ quote()?.vatRate ?? 15 }}%)</span>
+                <span class="text-[#34203a] text-[12px] font-medium">{{ (quote()?.vatAmount ?? 0) | number:'1.0-0' }} SAR</span>
+              </div>
+              <div class="flex items-center justify-between border-t-2 border-[#34203a] pt-2 mt-1">
+                <span class="text-[#34203a] text-[15px] font-bold">Total</span>
+                <span class="text-[#34203a] text-[17px] font-bold">{{ (quote()?.total ?? 0) | number:'1.0-0' }} SAR</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <div class="fixed left-0 right-0 bottom-[64px] md:bottom-0 z-20 px-4 md:px-10 py-3 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent">
+        <div class="w-full max-w-[720px] mx-auto flex flex-col gap-2">
+          <button type="button" (click)="openFinalizeSheet()"
+            class="w-full bg-[#ce8a28] hover:bg-[#b87922] text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
+            Finalize quote
+          </button>
+          <button type="button" (click)="backToEdit()"
+            class="w-full bg-white border border-[#e4dfd5] hover:border-[#34203a] text-[#34203a] text-[14px] font-medium py-3 rounded-[12px] transition-colors">
+            Edit
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- ══════════════ SENT VIEW (screenshot 10 top) ══════════════ -->
+    @if (view() === 'sent') {
+      <header class="bg-white border-b border-[#e4dfd5] px-4 md:px-10 py-3 md:py-4 flex items-center gap-3">
+        <button type="button" (click)="goToInquiry()"
+          class="w-9 h-9 -ml-1 flex items-center justify-center rounded-full text-[#55514a] hover:bg-[#faf7f2] transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <h1 class="text-[#34203a] font-bold text-[16px] md:text-[18px]">{{ quote()?.quoteNumber || 'Quote' }}</h1>
+      </header>
+
+      <main class="flex flex-col gap-4 px-4 md:px-10 py-8 w-full max-w-[520px] mx-auto pb-28 md:pb-8">
+        <div class="flex flex-col items-center text-center gap-2">
+          <div class="w-14 h-14 rounded-full bg-[#dff0e8] flex items-center justify-center">
+            <svg class="w-7 h-7 text-[#1f5c41]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <p class="text-[#34203a] text-[18px] font-bold">Quote shared</p>
+          <p class="text-[#8a8478] text-[13px]">{{ quote()?.quoteNumber }} is available to the client via link.</p>
+        </div>
+
+        <div class="bg-[#f7e3e3] rounded-[10px] px-4 py-2.5 flex items-center gap-2">
+          <app-status-badge status="shared" label="Shared" />
+          <span class="text-[#8a5c5c] text-[12px]">{{ sentAt() | date:'d MMM yyyy · h:mm a' }}</span>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <div class="bg-white border border-[#e4dfd5] rounded-[10px] px-4 py-3 flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-[#dff0e8] text-[#1f5c41] text-[11px] flex items-center justify-center shrink-0">✓</span>
+            <div>
+              <p class="text-[#34203a] text-[13px] font-semibold">PDF exported</p>
+              <p class="text-[#8a8478] text-[11px]">{{ quote()?.quoteNumber }}.pdf ready</p>
+            </div>
+          </div>
+          <div class="bg-white border border-[#e4dfd5] rounded-[10px] px-4 py-3 flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-[#dff0e8] text-[#1f5c41] text-[11px] flex items-center justify-center shrink-0">✓</span>
+            <div class="min-w-0">
+              <p class="text-[#34203a] text-[13px] font-semibold">Share link ready</p>
+              <p class="text-[#8a8478] text-[11px] truncate">{{ shareUrl() }}</p>
+            </div>
+            <button type="button" (click)="copyLink()"
+              class="ml-auto text-[#34203a] text-[12px] font-semibold hover:underline shrink-0">
+              {{ copied() ? 'Copied!' : 'Copy' }}
+            </button>
+          </div>
+        </div>
+
+        <p class="text-[#8a8478] text-[12px]">Stays linked to inquiry {{ inquiryId() }}.</p>
+
+        <div class="flex flex-col gap-2 mt-2">
+          <button type="button" (click)="goToInquiry()"
+            class="w-full bg-[#34203a] hover:bg-[#46294f] text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
+            Back to inquiry
+          </button>
+          <button type="button" (click)="openSharedQuote()"
+            class="w-full bg-white border border-[#e4dfd5] hover:border-[#34203a] text-[#34203a] text-[14px] font-medium py-3 rounded-[12px] transition-colors">
+            View shared quote
+          </button>
+        </div>
+      </main>
+    }
+  }
+</div>
+
+<!-- ══════════════ ADD / EDIT LINE ITEM SHEET ══════════════ -->
+<app-bottom-sheet-modal
+  [isOpen]="sheet() === 'add' || sheet() === 'edit'"
+  [title]="sheet() === 'edit' ? 'Edit line item' : 'Add line item'"
+  [actionLabel]="sheet() === 'edit' ? 'Save changes' : 'Add item'"
+  [actionDisabled]="adding()"
+  (action)="submitSheet()"
+  (closed)="closeSheet()">
+
+  <div class="flex flex-col gap-4 py-1">
+    <!-- Item type -->
+    <div>
+      <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-2">Item type</p>
+      <div class="flex flex-wrap gap-2">
+        @for (type of itemTypes; track type.value) {
+          <button type="button" (click)="setItemType(type.value)"
+            [class]="itemModel.itemType === type.value
+              ? 'bg-[#34203a] text-white px-3 py-1.5 rounded-full text-[12px] font-semibold'
+              : 'bg-[#f0ebe3] text-[#55514a] hover:bg-[#e4dfd5] px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors'">
+            {{ type.label }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Item name + catalog suggestions -->
+    <div>
+      <label class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1.5 block">Item name</label>
+      <div class="relative">
+        <input type="text" [(ngModel)]="itemModel.itemName" placeholder="e.g. Hall rental"
+          class="w-full border border-[#d9d0c4] rounded-[10px] px-3 py-2.5 text-[14px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+        @if (filteredCatalog().length > 0) {
+          <div class="absolute top-full left-0 right-0 bg-white border border-[#e4dfd5] rounded-[10px] shadow-lg mt-1 z-10 max-h-44 overflow-y-auto">
+            @for (item of filteredCatalog(); track item.id) {
+              <button type="button" (click)="selectCatalogItem(item)"
+                class="w-full text-left px-3 py-2.5 text-[13px] text-[#34203a] hover:bg-[#faf7f2] transition-colors border-b border-[#f0ebe3] last:border-0">
+                {{ item.name }}
+                @if (item.price) { <span class="text-[#8a8478] ml-2">{{ item.price | number:'1.0-0' }} SAR</span> }
               </button>
             }
           </div>
-        </div>
-
-        <!-- Catalog Pick -->
-        <div>
-          <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-1.5 block">Item name</label>
-          <div class="relative">
-            <input type="text" [(ngModel)]="addModel.itemName" placeholder="e.g. Hall rental"
-              class="w-full border border-[#D9D0C4] rounded-[8px] px-3 py-2.5 text-[13px] text-[#1B1A17] placeholder-[#C9C3B8] focus:outline-none focus:border-[#34203a] transition-colors" />
-            <!-- Catalog dropdown -->
-            @if (filteredCatalog().length > 0) {
-              <div class="absolute top-full left-0 right-0 bg-white border border-[#E4DFD5] rounded-[8px] shadow-lg mt-1 z-10 max-h-40 overflow-y-auto">
-                @for (item of filteredCatalog(); track item.id) {
-                  <button type="button" (click)="selectCatalogItem(item)"
-                    class="w-full text-left px-3 py-2.5 text-[13px] text-[#1B1A17] hover:bg-[#FAF7F2] transition-colors border-b border-[#F0EBE3] last:border-0">
-                    {{ item.name }}
-                    @if (item.price) {
-                      <span class="text-[#7A736B] ml-2">{{ item.price | number:'1.0-0' }} SAR</span>
-                    }
-                  </button>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div>
-          <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-1.5 block">Description</label>
-          <textarea [(ngModel)]="addModel.description" rows="2" placeholder="Optional details"
-            class="w-full border border-[#D9D0C4] rounded-[8px] px-3 py-2.5 text-[13px] text-[#1B1A17] placeholder-[#C9C3B8] focus:outline-none focus:border-[#34203a] transition-colors resize-none">
-          </textarea>
-        </div>
-
-        <!-- Qty + Unit Price + Total -->
-        <div class="grid grid-cols-3 gap-3">
-          <div>
-            <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-1.5 block">Quantity</label>
-            <input type="number" min="0" [(ngModel)]="addModel.quantity"
-              class="w-full border border-[#D9D0C4] rounded-[8px] px-3 py-2.5 text-[13px] text-[#1B1A17] focus:outline-none focus:border-[#34203a] transition-colors" />
-          </div>
-          <div>
-            <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-1.5 block">Unit price</label>
-            <div class="relative">
-              <input type="number" min="0" step="0.01" [(ngModel)]="addModel.unitPrice"
-                class="w-full border border-[#D9D0C4] rounded-[8px] px-3 py-2.5 text-[13px] text-[#1B1A17] focus:outline-none focus:border-[#34203a] transition-colors pr-10" />
-              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[#7A736B] text-[11px] font-semibold">SAR</span>
-            </div>
-          </div>
-          <div>
-            <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-1.5 block">Total (auto)</label>
-            <div class="relative">
-              <div class="w-full border border-[#E4DFD5] bg-[#FAF7F2] rounded-[8px] px-3 py-2.5 text-[13px] text-[#7A736B] pr-10">
-                {{ (addModel.quantity * addModel.unitPrice) | number:'1.0-0' }}
-              </div>
-              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[#7A736B] text-[11px] font-semibold">SAR</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Taxable toggle -->
-        <div>
-          <label class="text-[#7A736B] text-[11px] font-semibold uppercase tracking-wider mb-2 block">Taxable</label>
-          <div class="flex items-center gap-3">
-            <button type="button"
-              [class]="addModel.isTaxable ? 'bg-[#34203a] text-white px-5 py-2 rounded-full text-[12px] font-semibold' : 'bg-[#F0EBE3] text-[#55514a] px-5 py-2 rounded-full text-[12px] font-medium hover:bg-[#E4DFD5] transition-colors'"
-              (click)="addModel.isTaxable = true">
-              Yes
-            </button>
-            <button type="button"
-              [class]="!addModel.isTaxable ? 'bg-[#34203a] text-white px-5 py-2 rounded-full text-[12px] font-semibold' : 'bg-[#F0EBE3] text-[#55514a] px-5 py-2 rounded-full text-[12px] font-medium hover:bg-[#E4DFD5] transition-colors'"
-              (click)="addModel.isTaxable = false">
-              No
-            </button>
-          </div>
-        </div>
+        }
       </div>
+    </div>
 
-      <!-- Modal Footer -->
-      <div class="flex justify-end gap-3 px-6 py-4 border-t border-[#E4DFD5] bg-[#FAF7F2]">
-        <button type="button" (click)="showAddModal = false"
-          class="px-5 py-2.5 text-[13px] text-[#7A736B] hover:text-[#1B1A17] transition-colors font-medium">
-          Cancel
+    <!-- Description -->
+    <div>
+      <label class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1.5 block">Description</label>
+      <input type="text" [(ngModel)]="itemModel.description" placeholder="Optional"
+        class="w-full border border-[#d9d0c4] rounded-[10px] px-3 py-2.5 text-[14px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
+    </div>
+
+    <!-- Qty + Unit price -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1.5 block">Qty</label>
+        <input type="number" min="0" inputmode="numeric" [(ngModel)]="itemModel.quantity"
+          class="w-full border border-[#d9d0c4] rounded-[10px] px-3 py-2.5 text-[14px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+      </div>
+      <div>
+        <label class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1.5 block">Unit price</label>
+        <input type="number" min="0" step="0.01" inputmode="decimal" [(ngModel)]="itemModel.unitPrice"
+          class="w-full border border-[#d9d0c4] rounded-[10px] px-3 py-2.5 text-[14px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+      </div>
+    </div>
+
+    <!-- Total (auto) -->
+    <div class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2.5 flex items-center justify-between">
+      <span class="text-[#8a8478] text-[12px]">Total (auto)</span>
+      <span class="text-[#34203a] text-[15px] font-bold">{{ sheetTotal | number:'1.0-0' }} SAR</span>
+    </div>
+
+    <!-- Taxable -->
+    <div>
+      <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.12px] mb-2">Taxable</p>
+      <div class="flex items-center gap-3">
+        <button type="button" (click)="itemModel.isTaxable = true"
+          [class]="itemModel.isTaxable
+            ? 'bg-[#34203a] text-white px-5 py-2 rounded-full text-[12px] font-semibold'
+            : 'bg-[#f0ebe3] text-[#55514a] hover:bg-[#e4dfd5] px-5 py-2 rounded-full text-[12px] font-medium transition-colors'">
+          Yes
         </button>
-        <button type="button" (click)="addItemFromModal()" [disabled]="adding()"
-          class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-5 py-2.5 text-white text-[13px] font-semibold transition-colors">
-          {{ adding() ? 'Adding...' : 'Add Item' }}
+        <button type="button" (click)="itemModel.isTaxable = false"
+          [class]="!itemModel.isTaxable
+            ? 'bg-[#34203a] text-white px-5 py-2 rounded-full text-[12px] font-semibold'
+            : 'bg-[#f0ebe3] text-[#55514a] hover:bg-[#e4dfd5] px-5 py-2 rounded-full text-[12px] font-medium transition-colors'">
+          No
         </button>
       </div>
     </div>
+
+    @if (sheet() === 'edit') {
+      <button type="button" (click)="removeEditedItem()" [disabled]="adding()"
+        class="w-full border border-red-300 text-red-600 hover:bg-red-50 text-[13px] font-semibold py-2.5 rounded-[10px] transition-colors">
+        Remove item
+      </button>
+    }
   </div>
-}
+</app-bottom-sheet-modal>
+
+<!-- ══════════════ FINALIZE CONFIRMATION SHEET (screenshot 08) ══════════════ -->
+<app-bottom-sheet-modal
+  [isOpen]="sheet() === 'finalize'"
+  title=""
+  actionLabel="Confirm & finalize"
+  [actionDisabled]="finalizing()"
+  (action)="confirmFinalize()"
+  (closed)="closeSheet()">
+
+  <div class="flex flex-col gap-4 py-2">
+    <div class="flex flex-col items-center text-center gap-2">
+      <div class="w-12 h-12 rounded-full bg-[#f6ddae] flex items-center justify-center">
+        <svg class="w-6 h-6 text-[#b87922]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <p class="text-[#34203a] text-[16px] font-bold">Finalize this quote?</p>
+      <p class="text-[#8a8478] text-[12px]">Once finalized, the quote is locked and gets a final number.</p>
+    </div>
+
+    <div class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] divide-y divide-[#e4dfd5]">
+      <div class="flex items-center justify-between px-4 py-2.5">
+        <span class="text-[#8a8478] text-[12px]">Quote number</span>
+        <span class="text-[#34203a] text-[13px] font-semibold">{{ quote()?.quoteNumber || '—' }}</span>
+      </div>
+      <div class="flex items-center justify-between px-4 py-2.5">
+        <span class="text-[#8a8478] text-[12px]">Total incl. VAT</span>
+        <span class="text-[#34203a] text-[13px] font-semibold">{{ (quote()?.total ?? 0) | number:'1.0-0' }} SAR</span>
+      </div>
+      <div class="flex items-center justify-between px-4 py-2.5">
+        <span class="text-[#8a8478] text-[12px]">Valid until</span>
+        <span class="text-[#34203a] text-[13px] font-semibold">{{ quote()?.validUntil ? (quote()!.validUntil | date:'d MMM yyyy') : '—' }}</span>
+      </div>
+    </div>
+
+    <button type="button" (click)="closeSheet()"
+      class="w-full bg-white border border-[#e4dfd5] hover:border-[#34203a] text-[#34203a] text-[14px] font-medium py-3 rounded-[12px] transition-colors">
+      Go back
+    </button>
+  </div>
+</app-bottom-sheet-modal>
