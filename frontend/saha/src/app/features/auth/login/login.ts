@@ -1,15 +1,17 @@
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { LanguageService } from '../../../core/services/language.service';
 
 type LoginStep = 'email' | 'check-email' | 'enter-code' | 'signed-in';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -21,6 +23,8 @@ export class LoginComponent implements OnDestroy {
   resendTimer = signal(30);
   canResend = signal(false);
   private timerInterval: any;
+
+  languageService = inject(LanguageService);
 
   constructor(
     private authService: AuthService,
@@ -64,6 +68,14 @@ export class LoginComponent implements OnDestroy {
 
   goToDashboard() {
     this.router.navigate(['/dashboard']);
+  }
+
+  toggleLanguage(): void {
+    this.languageService.toggle();
+  }
+
+  padded(value: number): string {
+    return value.toString().padStart(2, '0');
   }
 
   private startResendTimer() {

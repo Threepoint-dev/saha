@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import {
@@ -37,38 +38,41 @@ export interface LayoutElement {
 interface SetupTypeCard {
   value: string;
   icon: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
 }
 
 /** Color swatch for table/chair color picker */
 interface ColorSwatch {
   value: string;
-  label: string;
+  labelKey: string;
   hex: string;
 }
 
 /** Catering style card */
 interface CateringStyleCard {
   value: string;
+  labelKey: string;
   priceLabel: string;
 }
 
 /** Main meal option card */
 interface MealCard {
   value: string;
-  label: string;
+  labelKey: string;
   priceLabel: string;
 }
 
 @Component({
   selector: 'app-event-setup',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './event-setup.html'
 })
 export class EventSetupPage implements OnInit {
   private service = inject(EventsService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -96,6 +100,10 @@ export class EventSetupPage implements OnInit {
   form: EventSetupRequest = this.emptyForm();
 
   addAddonModel = { addonId: '', quantity: 1 };
+
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
 
   // ──────────────────────────────────────────────
   //  Section 1: Time slot buttons
@@ -143,12 +151,6 @@ export class EventSetupPage implements OnInit {
   // ──────────────────────────────────────────────
   //  Section 3: Setup type cards
   // ──────────────────────────────────────────────
-  readonly setupTypeCards: SetupTypeCard[] = SETUP_TYPES.map(t => ({
-    value: t,
-    icon: this.setupTypeIcon(t),
-    description: this.setupTypeDesc(t)
-  }));
-
   private setupTypeIcon(t: string): string {
     const icons: Record<string, string> = {
       'Banquet': '🍽️', 'Theater': '🎭', 'Classroom': '📚',
@@ -157,17 +159,18 @@ export class EventSetupPage implements OnInit {
     return icons[t] ?? '📋';
   }
 
-  private setupTypeDesc(t: string): string {
-    const descs: Record<string, string> = {
-      'Banquet': 'Round tables with formal dining setup',
-      'Theater': 'Rows of chairs facing a stage',
-      'Classroom': 'Tables with chairs in rows',
-      'U-Shape': 'Tables arranged in a U formation',
-      'Cocktail': 'Standing cocktail reception style',
-      'Custom': 'Custom layout per your specifications'
-    };
-    return descs[t] ?? 'Custom arrangement';
-  }
+  /** Translation keys for a setup type's label/description, e.g. 'Banquet' -> 'eventSetup.setupTypes.banquet'. */
+  private setupTypeKeyMap: Record<string, string> = {
+    'Banquet': 'banquet', 'Theater': 'theater', 'Classroom': 'classroom',
+    'U-Shape': 'uShape', 'Cocktail': 'cocktail', 'Custom': 'custom'
+  };
+
+  readonly setupTypeCards: SetupTypeCard[] = SETUP_TYPES.map(t => ({
+    value: t,
+    icon: this.setupTypeIcon(t),
+    labelKey: `eventSetup.setupTypes.${this.setupTypeKeyMap[t] ?? 'custom'}`,
+    descKey: `eventSetup.setupTypeDescs.${this.setupTypeKeyMap[t] ?? 'custom'}`
+  }));
 
   selectSetupType(value: string): void {
     this.form.setupType = value;
@@ -177,12 +180,12 @@ export class EventSetupPage implements OnInit {
   //  Section 4: Color swatches
   // ──────────────────────────────────────────────
   readonly colorSwatches: ColorSwatch[] = [
-    { value: 'Black', label: 'Black', hex: '#1a1a1a' },
-    { value: 'Beige', label: 'Beige', hex: '#d4c5a9' },
-    { value: 'Gray', label: 'Gray', hex: '#9e9e9e' },
-    { value: 'Gold', label: 'Gold', hex: '#ce8a28' },
-    { value: 'White', label: 'White', hex: '#f5f5f0' },
-    { value: '', label: 'None', hex: 'transparent' }
+    { value: 'Black', labelKey: 'eventSetup.colors.black', hex: '#1a1a1a' },
+    { value: 'Beige', labelKey: 'eventSetup.colors.beige', hex: '#d4c5a9' },
+    { value: 'Gray', labelKey: 'eventSetup.colors.gray', hex: '#9e9e9e' },
+    { value: 'Gold', labelKey: 'eventSetup.colors.gold', hex: '#ce8a28' },
+    { value: 'White', labelKey: 'eventSetup.colors.white', hex: '#f5f5f0' },
+    { value: '', labelKey: 'eventSetup.colors.none', hex: 'transparent' }
   ];
 
   selectTableColor(value: string): void {
@@ -195,10 +198,24 @@ export class EventSetupPage implements OnInit {
   // ──────────────────────────────────────────────
   //  Section 5: Hall layout drag-and-drop
   // ──────────────────────────────────────────────
+  /** Values (chip type) kept in English regardless of app language — persisted
+   *  as-is in layoutDesign JSON and displayed on the read-only Events Team
+   *  and customer summary pages. Only the draggable chip's displayed label
+   *  is translated, via layoutChipLabelKey() below. */
   readonly layoutChips = [
     'Round table', 'Rect table', 'Stage', 'Coffee break',
     'Entrance', 'AV area', 'Buffet', 'Registration'
   ];
+
+  private layoutChipKeyMap: Record<string, string> = {
+    'Round table': 'roundTable', 'Rect table': 'rectTable', 'Stage': 'stage',
+    'Coffee break': 'coffeeBreak', 'Entrance': 'entrance', 'AV area': 'avArea',
+    'Buffet': 'buffet', 'Registration': 'registration'
+  };
+
+  layoutChipLabelKey(chip: string): string {
+    return `eventSetup.layoutChips.${this.layoutChipKeyMap[chip] ?? chip}`;
+  }
 
   layoutElements: LayoutElement[] = [];
   draggingLayoutIndex: number | null = null;
@@ -264,10 +281,9 @@ export class EventSetupPage implements OnInit {
   // ──────────────────────────────────────────────
   //  Section 7: Catering style cards & Main meal
   // ──────────────────────────────────────────────
-  readonly cateringStyleCards: CateringStyleCard[] = CATERING_STYLES.map(c => ({
-    value: c,
-    priceLabel: this.cateringPrice(c)
-  }));
+  private cateringKeyMap: Record<string, string> = {
+    'Full Service': 'fullService', 'Buffet': 'buffet', 'Stations': 'stations', 'None': 'none'
+  };
 
   private cateringPrice(c: string): string {
     const prices: Record<string, string> = {
@@ -277,11 +293,17 @@ export class EventSetupPage implements OnInit {
     return prices[c] ?? '';
   }
 
+  readonly cateringStyleCards: CateringStyleCard[] = CATERING_STYLES.map(c => ({
+    value: c,
+    labelKey: `eventSetup.cateringStyles.${this.cateringKeyMap[c] ?? 'none'}`,
+    priceLabel: this.cateringPrice(c)
+  }));
+
   readonly mealCards: MealCard[] = [
-    { value: '', label: 'None', priceLabel: '—' },
-    { value: 'Breakfast', label: 'Breakfast', priceLabel: 'SAR 45/person' },
-    { value: 'Lunch', label: 'Lunch', priceLabel: 'SAR 75/person' },
-    { value: 'Dinner', label: 'Dinner', priceLabel: 'SAR 95/person' }
+    { value: '', labelKey: 'eventSetup.mealOptions.none', priceLabel: '—' },
+    { value: 'Breakfast', labelKey: 'eventSetup.mealOptions.breakfast', priceLabel: 'SAR 45/person' },
+    { value: 'Lunch', labelKey: 'eventSetup.mealOptions.lunch', priceLabel: 'SAR 75/person' },
+    { value: 'Dinner', labelKey: 'eventSetup.mealOptions.dinner', priceLabel: 'SAR 95/person' }
   ];
 
   selectCateringStyle(value: string): void {
@@ -388,7 +410,7 @@ export class EventSetupPage implements OnInit {
 
   selectedExtrasLabel(): string {
     const count = this.selectedAddonIds.size + this.eventAddons().length;
-    return count > 0 ? `${count} selected` : '—';
+    return count > 0 ? this.translateService.instant('eventSetup.extrasSelected', { count }) : '—';
   }
 
   // ──────────────────────────────────────────────
@@ -482,7 +504,7 @@ export class EventSetupPage implements OnInit {
         this.form = this.toForm(s);
         this.parseAgendaFromForm();
         this.parseLayoutDesignFromForm();
-        this.successMessage.set('Event setup saved.');
+        this.successMessage.set(this.translateService.instant('eventSetup.eventSetupSaved'));
         this.loadEventAddons();
       },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save event setup.')); }
@@ -493,9 +515,9 @@ export class EventSetupPage implements OnInit {
   addAddon(): void {
     this.clearMessages();
     const s = this.setup();
-    if (!s) { this.errorMessage.set('Save the event setup before adding add-ons.'); return; }
+    if (!s) { this.errorMessage.set(this.translateService.instant('eventSetup.saveBeforeAddons')); return; }
     const addonId = this.addAddonModel.addonId;
-    if (!addonId) { this.errorMessage.set('Choose an add-on first.'); return; }
+    if (!addonId) { this.errorMessage.set(this.translateService.instant('eventSetup.chooseAddonFirst')); return; }
     const quantity = Number(this.addAddonModel.quantity) || 1;
     this.addingAddon.set(true);
     this.service.addEventAddon(this.tenantId, s.id, { addonId, quantity }).subscribe({
@@ -503,7 +525,7 @@ export class EventSetupPage implements OnInit {
         this.addingAddon.set(false);
         this.addAddonModel = { addonId: '', quantity: 1 };
         this.loadEventAddons();
-        this.successMessage.set('Add-on added.');
+        this.successMessage.set(this.translateService.instant('eventSetup.addonAdded'));
       },
       error: (err) => { this.addingAddon.set(false); this.errorMessage.set(this.formatError(err, 'Failed to add add-on.')); }
     });
@@ -553,7 +575,7 @@ export class EventSetupPage implements OnInit {
           next: () => {
             this.confirming.set(false);
             this.summaryUrl.set(this.buildSummaryUrl());
-            this.successMessage.set('Customer confirmation sent. Share the summary link below.');
+            this.successMessage.set(this.translateService.instant('eventSetup.confirmationSent'));
           },
           error: (err) => { this.confirming.set(false); this.errorMessage.set(this.formatError(err, 'Failed to send confirmation.')); }
         });

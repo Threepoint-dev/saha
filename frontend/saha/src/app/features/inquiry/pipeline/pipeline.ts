@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InquiryService, Inquiry } from '../../../core/services/inquiry.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
@@ -10,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-pipeline',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslatePipe],
   templateUrl: './pipeline.html',
   styleUrl: './pipeline.scss'
 })
@@ -53,6 +54,7 @@ export class PipelineComponent implements OnInit {
     private inquiryService: InquiryService,
     private sourceChannelsService: SourceChannelsService,
     private authService: AuthService,
+    private translateService: TranslateService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -78,11 +80,11 @@ export class PipelineComponent implements OnInit {
       const inquiryToUpdate = this.draggedInquiry;
       if (!inquiryToUpdate.id) return;
       const originalStatus = inquiryToUpdate.status;
-      
+
       // Optimistic update
       inquiryToUpdate.status = status;
       this.cdr.detectChanges();
-      
+
       this.inquiryService.updateStatus(inquiryToUpdate.id, status).subscribe({
         error: (err) => {
           console.error('Failed to update status', err);
@@ -149,10 +151,19 @@ export class PipelineComponent implements OnInit {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
+  /** Translation key for a status word, e.g. 'NEW' -> 'status.new'. */
+  statusLabelKey(status: string | undefined): string {
+    return `status.${(status || 'new').toLowerCase()}`;
+  }
+
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
+
   formatDate(date: string): string {
     if (!date) return '—';
     const d = new Date(date);
-    return d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+    return d.toLocaleDateString(this.locale, { day: 'numeric', month: 'short' });
   }
 
   formatRelativeTime(date: string): string {

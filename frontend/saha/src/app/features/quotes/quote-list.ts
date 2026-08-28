@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { InquirySummary, Quote } from './quotes.model';
@@ -8,7 +9,7 @@ import { QuotesService } from './quotes.service';
 
 @Component({
   selector: 'app-quote-list',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './quote-list.html'
 })
 export class QuoteList implements OnInit {
@@ -16,6 +17,7 @@ export class QuoteList implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -75,7 +77,8 @@ export class QuoteList implements OnInit {
   }
 
   cancel(quote: Quote): void {
-    if (!confirm(`Cancel quote ${quote.quoteNumber ?? ''}? It will be marked as cancelled.`)) return;
+    const message = this.translateService.instant('quoteList.cancelConfirm', { number: quote.quoteNumber ?? '' });
+    if (!confirm(message)) return;
     this.errorMessage.set(null);
     this.service.cancelQuote(this.tenantId, this.inquiryId(), quote.id).subscribe({
       next: () => this.loadQuotes(),
@@ -96,6 +99,11 @@ export class QuoteList implements OnInit {
       default:
         return { bg: '#efebf3', border: '#c9c3b8', text: '#55514a' };
     }
+  }
+
+  /** Translation key for a quote status, e.g. 'draft' -> 'quoteList.status.draft'. */
+  statusLabelKey(status: string | null): string {
+    return `quoteList.status.${(status || 'draft').toLowerCase()}`;
   }
 
   private formatError(err: unknown, fallback: string): string {

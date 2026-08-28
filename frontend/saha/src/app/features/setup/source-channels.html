@@ -7,7 +7,7 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Source Channel Settings</p>
+        <p class="text-[#f6ddae] text-[11px]">{{ 'sourceChannels.headerTitle' | translate }}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -25,8 +25,8 @@
   <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1000px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Source Channels</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">Where your inquiries come from. Drag to reorder, toggle to activate.</p>
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">{{ 'sourceChannels.pageTitle' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">{{ 'sourceChannels.pageSubtitle' | translate }}</p>
     </div>
 
     @if (errorMessage()) {
@@ -42,33 +42,33 @@
 
     <!-- Section Header Pill -->
     <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2 flex items-center justify-between">
-      <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">CHANNELS</p>
-      <span class="text-[#34203a] text-[11px] font-medium">{{ activeCount() }} active</span>
+      <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">{{ 'sourceChannels.channelsLabel' | translate }}</p>
+      <span class="text-[#34203a] text-[11px] font-medium">{{ 'sourceChannels.activeCount' | translate:{ count: activeCount() } }}</span>
     </div>
 
     <!-- Add new channel -->
     <form [formGroup]="addForm" (ngSubmit)="addChannel()" class="flex items-start gap-3">
       <div class="flex flex-col gap-1.5 flex-1">
-        <input type="text" formControlName="name" placeholder="New channel name (e.g. Instagram)"
+        <input type="text" formControlName="name" [placeholder]="'sourceChannels.addPlaceholder' | translate"
           class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors w-full"
           [class.border-red-500]="addForm.controls.name.invalid && addForm.controls.name.touched" />
         @if (addForm.controls.name.invalid && addForm.controls.name.touched) {
-          <span class="text-red-600 text-[11px]">Name is required.</span>
+          <span class="text-red-600 text-[11px]">{{ 'sourceChannels.nameRequired' | translate }}</span>
         }
       </div>
       <button type="submit" [disabled]="saving()"
         class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-4 h-[44px] text-white text-[13px] font-semibold transition-colors whitespace-nowrap">
-        + Add Channel
+        {{ 'sourceChannels.addChannel' | translate }}
       </button>
     </form>
 
     <!-- List -->
     <div class="bg-white border border-[#e4dfd5] rounded-[12px] overflow-hidden">
       @if (loading()) {
-        <div class="px-5 py-6 text-[#55514a] text-[13px]">Loading...</div>
+        <div class="px-5 py-6 text-[#55514a] text-[13px]">{{ 'sourceChannels.loading' | translate }}</div>
       } @else if (channels().length === 0) {
         <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
-          No source channels yet. Add one above.
+          {{ 'sourceChannels.emptyState' | translate }}
         </div>
       } @else {
         <ul>
@@ -89,7 +89,7 @@
                 [ngClass]="channel.isActive ? 'text-[#34203a]' : 'text-[#a39c90]'">
                 {{ channel.name }}
                 @if (!channel.isActive) {
-                  <span class="ml-2 inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[10px] font-semibold px-2 py-0.5 uppercase tracking-[0.16px]">Inactive</span>
+                  <span class="ml-2 inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[10px] font-semibold px-2 py-0.5 uppercase tracking-[0.16px]">{{ 'sourceChannels.inactive' | translate }}</span>
                 }
               </span>
 
@@ -106,7 +106,7 @@
               <!-- Delete -->
               <button type="button" (click)="deleteChannel(channel)"
                 class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                Delete
+                {{ 'sourceChannels.delete' | translate }}
               </button>
             </li>
           }
@@ -115,7 +115,7 @@
     </div>
 
     <p class="text-[#8a8478] text-[11px]">
-      Deleting a channel that has been used in an inquiry will deactivate it instead of removing it.
+      {{ 'sourceChannels.footerNote' | translate }}
     </p>
   </main>
 </div>

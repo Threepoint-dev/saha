@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DashboardService, RecentInquiry } from '../../../core/services/dashboard.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
@@ -11,12 +12,13 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslatePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
 export class Dashboard implements OnInit {
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   inquiries: RecentInquiry[] = [];
   sourceChannels: SourceChannel[] = [];
@@ -49,8 +51,13 @@ export class Dashboard implements OnInit {
     return Math.round((this.lost / this.total) * 100);
   }
 
+  /** Locale follows the active app language, so the month name shows in Arabic when Arabic is selected. */
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
+
   get currentMonth(): string {
-    return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    return new Date().toLocaleDateString(this.locale, { month: 'long', year: 'numeric' });
   }
 
   // Real first response time calculation
@@ -170,6 +177,11 @@ export class Dashboard implements OnInit {
     return this.statusBadge[status] || 'bg-gray-100 text-gray-700';
   }
 
+  /** Translation key for a status badge/stat card, e.g. 'NEW' -> 'dashboard.stat.new'. */
+  statusLabelKey(status: string): string {
+    return `dashboard.stat.${(status || 'new').toLowerCase()}`;
+  }
+
   getSourceClass(sourceIdOrName: string): string {
     const channel = this.sourceChannels.find(c => c.id === sourceIdOrName || c.name === sourceIdOrName);
     const s = (channel ? channel.name : sourceIdOrName || '').toLowerCase();
@@ -197,11 +209,11 @@ export class Dashboard implements OnInit {
     if (diffHours < 24) return `${diffHours}h ago`;
     const diffDays = Math.floor(diffHours / 24);
     if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(this.locale, { month: 'short', day: 'numeric' });
   }
 
   formatDate(date: string): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return new Date(date).toLocaleDateString(this.locale, { month: 'short', day: 'numeric' });
   }
 }

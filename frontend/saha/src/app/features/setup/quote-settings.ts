@@ -1,19 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { QuoteSettingsService } from './quote-settings.service';
 
 @Component({
   selector: 'app-quote-settings',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './quote-settings.html'
 })
 export class QuoteSettingsPage implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(QuoteSettingsService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -72,7 +74,10 @@ export class QuoteSettingsPage implements OnInit {
       enablePdfBranding: v.enablePdfBranding,
       allowManualDiscount: v.allowManualDiscount
     }).subscribe({
-      next: () => { this.saving.set(false); this.successMessage.set('Quote settings saved.'); },
+      next: () => {
+        this.saving.set(false);
+        this.successMessage.set(this.translateService.instant('quoteSettings.saved'));
+      },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save quote settings.')); }
     });
   }

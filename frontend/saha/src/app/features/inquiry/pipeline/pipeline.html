@@ -3,19 +3,19 @@
   <!-- Header -->
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
     <div>
-      <h1 class="text-[#1B1A17] text-xl font-bold">Inquiries</h1>
-      <p class="text-[#7A736B] text-sm">Inquiry pipeline by stage</p>
+      <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'pipeline.title' | translate }}</h1>
+      <p class="text-[#7A736B] text-sm">{{ 'pipeline.subtitle' | translate }}</p>
     </div>
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-lg px-3 py-2 bg-white">
         <svg class="w-4 h-4 text-[#9C9690]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
         </svg>
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="text-sm focus:outline-none w-40 bg-transparent"/>
+        <input type="text" [(ngModel)]="searchQuery" [placeholder]="'pipeline.searchPlaceholder' | translate" class="text-sm focus:outline-none w-40 bg-transparent"/>
       </div>
       <a routerLink="/inquiries/new"
         class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
-        + New Inquiry
+        {{ 'pipeline.newInquiry' | translate }}
       </a>
     </div>
   </div>
@@ -28,27 +28,27 @@
         [class]="viewMode === 'board'
           ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17] border-r border-[#D9D0C4]'
           : 'px-4 py-2 text-sm text-[#7A736B] border-r border-[#D9D0C4] hover:bg-[#FAF7F2]'">
-        Board
+        {{ 'pipeline.board' | translate }}
       </button>
       <button (click)="viewMode = 'list'"
         [class]="viewMode === 'list'
           ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17]'
           : 'px-4 py-2 text-sm text-[#7A736B] hover:bg-[#FAF7F2]'">
-        List
+        {{ 'pipeline.list' | translate }}
       </button>
     </div>
 
     <!-- Filter button -->
     <select [(ngModel)]="filterStatus" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
-      <option value="">All statuses</option>
+      <option value="">{{ 'pipeline.allStatuses' | translate }}</option>
       @for (status of statuses; track status) {
-        <option [value]="status">{{ status | titlecase }}</option>
+        <option [value]="status">{{ statusLabelKey(status) | translate }}</option>
       }
     </select>
 
     <!-- All sources dropdown -->
     <select [(ngModel)]="filterSource" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
-      <option value="">All sources</option>
+      <option value="">{{ 'pipeline.allSources' | translate }}</option>
       @for (channel of sourceChannels; track channel.id) {
         <option [value]="channel.id">{{ channel.name }}</option>
       }
@@ -62,7 +62,7 @@
       <svg class="w-4 h-4 text-[#9C9690] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
       </svg>
-      <input type="text" [(ngModel)]="searchQuery" placeholder="Search inquiries..."
+      <input type="text" [(ngModel)]="searchQuery" [placeholder]="'pipeline.searchInquiries' | translate"
         class="text-sm focus:outline-none flex-1 bg-transparent text-[#1B1A17] placeholder-[#B0A99F]"/>
     </div>
   </div>
@@ -70,18 +70,18 @@
   <!-- Loading -->
   @if (isLoading) {
     <div class="flex items-center justify-center h-64">
-      <p class="text-[#7A736B]">Loading...</p>
+      <p class="text-[#7A736B]">{{ 'pipeline.loading' | translate }}</p>
     </div>
   }
 
   <!-- Empty State -->
   @if (!isLoading && inquiries.length === 0) {
     <div class="flex flex-col items-center justify-center h-64 gap-4">
-      <p class="text-[#1B1A17] font-semibold">No inquiries yet</p>
-      <p class="text-[#7A736B] text-sm">Log your first event inquiry to get started.</p>
+      <p class="text-[#1B1A17] font-semibold">{{ 'pipeline.emptyTitle' | translate }}</p>
+      <p class="text-[#7A736B] text-sm">{{ 'pipeline.emptySubtitle' | translate }}</p>
       <a routerLink="/inquiries/new"
         class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
-        + New Inquiry
+        {{ 'pipeline.newInquiry' | translate }}
       </a>
     </div>
   }
@@ -96,14 +96,14 @@
           <!-- Column header -->
           <div class="flex items-center gap-2 mb-3 px-1">
             <span [class]="'w-2.5 h-2.5 rounded-full ' + statusDotColors[status]"></span>
-            <span class="text-[#1B1A17] text-sm font-semibold">{{ status | titlecase }}</span>
+            <span class="text-[#1B1A17] text-sm font-semibold">{{ statusLabelKey(status) | translate }}</span>
             <span class="text-[#9C9690] text-xs ml-auto font-medium">{{ getByStatus(status).length }}</span>
           </div>
           <!-- Cards -->
           <div class="flex flex-col gap-2">
             @for (inquiry of getByStatus(status); track inquiry.id) {
               <a [routerLink]="['/inquiries', inquiry.id]"
-                draggable="true" 
+                draggable="true"
                 (dragstart)="onDragStart($event, inquiry)"
                 class="bg-white rounded-xl border border-[#E8E0D8] p-4 hover:shadow-sm hover:border-[#C9C0B6] transition-all block cursor-grab active:cursor-grabbing">
                 <!-- Client name + event type -->
@@ -152,7 +152,7 @@
             <!-- Add placeholder -->
             @if (getByStatus(status).length === 0) {
               <div class="border-2 border-dashed border-[#D9D0C4] rounded-xl p-4 text-center">
-                <span class="text-[#B0A99F] text-xs">+ Add</span>
+                <span class="text-[#B0A99F] text-xs">{{ 'pipeline.addPlaceholder' | translate }}</span>
               </div>
             }
           </div>
@@ -167,11 +167,11 @@
       <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
         <!-- Table Header -->
         <div class="grid grid-cols-6 px-6 py-3 border-b border-[#E8E0D8] text-[#9C9690] text-xs font-semibold uppercase tracking-wider">
-          <span class="col-span-2">Client</span>
-          <span>Event</span>
-          <span>Date</span>
-          <span>Value</span>
-          <span>Status</span>
+          <span class="col-span-2">{{ 'pipeline.table.client' | translate }}</span>
+          <span>{{ 'pipeline.table.event' | translate }}</span>
+          <span>{{ 'pipeline.table.date' | translate }}</span>
+          <span>{{ 'pipeline.table.value' | translate }}</span>
+          <span>{{ 'pipeline.table.status' | translate }}</span>
         </div>
         <!-- Table Rows -->
         @for (inquiry of filtered; track inquiry.id) {
@@ -192,12 +192,12 @@
             <span class="text-[#55514A] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
             <span class="text-[#55514A] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
             <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold w-fit ' + statusBadge[inquiry.status || 'NEW']">
-              {{ inquiry.status | titlecase }}
+              {{ statusLabelKey(inquiry.status) | translate }}
             </span>
           </a>
         }
         @if (filtered.length === 0 && !isLoading) {
-          <div class="px-6 py-8 text-center text-[#9C9690] text-sm">No inquiries match your search.</div>
+          <div class="px-6 py-8 text-center text-[#9C9690] text-sm">{{ 'pipeline.noMatch' | translate }}</div>
         }
       </div>
     </div>

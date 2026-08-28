@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { SourceChannel } from './source-channels.model';
@@ -8,13 +9,14 @@ import { SourceChannelsService } from './source-channels.service';
 
 @Component({
   selector: 'app-source-channels',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './source-channels.html'
 })
 export class SourceChannels implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(SourceChannelsService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -55,7 +57,12 @@ export class SourceChannels implements OnInit {
     const sortOrder = this.channels().length;
     this.saving.set(true);
     this.service.create(this.tenantId, { name, isActive: true, sortOrder }).subscribe({
-      next: () => { this.saving.set(false); this.addForm.reset({ name: '' }); this.load(); this.successMessage.set('Channel added.'); },
+      next: () => {
+        this.saving.set(false);
+        this.addForm.reset({ name: '' });
+        this.load();
+        this.successMessage.set(this.translateService.instant('sourceChannels.channelAdded'));
+      },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to add channel.')); }
     });
   }
@@ -79,10 +86,13 @@ export class SourceChannels implements OnInit {
 
   deleteChannel(channel: SourceChannel): void {
     this.clearMessages();
-    const message = `Delete channel "${channel.name}"?\n\nIf this channel has been used in any inquiry it cannot be removed and will be deactivated instead.`;
+    const message = this.translateService.instant('sourceChannels.deleteConfirm', { name: channel.name });
     if (!confirm(message)) return;
     this.service.delete(this.tenantId, channel.id).subscribe({
-      next: () => { this.load(); this.successMessage.set('Channel removed. If it was in use, it was deactivated instead.'); },
+      next: () => {
+        this.load();
+        this.successMessage.set(this.translateService.instant('sourceChannels.channelRemoved'));
+      },
       error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to delete channel.'))
     });
   }

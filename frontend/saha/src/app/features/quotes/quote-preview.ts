@@ -1,18 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
+import { LanguageService } from '../../core/services/language.service';
 import { PublicQuote } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
 @Component({
   selector: 'app-quote-preview',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './quote-preview.html'
 })
 export class QuotePreview implements OnInit {
   private service = inject(QuotesService);
   private route = inject(ActivatedRoute);
+  languageService = inject(LanguageService);
 
   readonly quote = signal<PublicQuote | null>(null);
   readonly loading = signal(true);
@@ -30,5 +33,9 @@ export class QuotePreview implements OnInit {
     if (typeof window !== 'undefined') {
       window.print();
     }
+  }
+
+  toggleLanguage(): void {
+    this.languageService.toggle();
   }
 }

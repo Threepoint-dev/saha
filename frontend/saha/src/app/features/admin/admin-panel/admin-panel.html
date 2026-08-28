@@ -3,12 +3,12 @@
   <!-- Header -->
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
     <div>
-      <p class="text-[#7A736B] text-xs font-semibold tracking-wider uppercase mb-0.5">SAHA Admin</p>
-      <h1 class="text-[#1B1A17] text-xl font-bold">Hotel Management</h1>
+      <p class="text-[#7A736B] text-xs font-semibold tracking-wider uppercase mb-0.5">{{ 'adminPanel.sahaAdmin' | translate }}</p>
+      <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'adminPanel.title' | translate }}</h1>
     </div>
     <a routerLink="/admin/hotels/new"
       class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
-      + Add Hotel
+      {{ 'adminPanel.addHotel' | translate }}
     </a>
   </div>
 
@@ -27,11 +27,11 @@
         <div class="w-14 h-14 bg-[#ECE6F1] rounded-full flex items-center justify-center">
           <span class="text-[#34203A] text-2xl">🏨</span>
         </div>
-        <p class="text-[#1B1A17] font-semibold">No hotels yet</p>
-        <p class="text-[#7A736B] text-sm">Add your first pilot hotel to get started.</p>
+        <p class="text-[#1B1A17] font-semibold">{{ 'adminPanel.emptyTitle' | translate }}</p>
+        <p class="text-[#7A736B] text-sm">{{ 'adminPanel.emptySubtitle' | translate }}</p>
         <a routerLink="/admin/hotels/new"
           class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold">
-          + Add Hotel
+          {{ 'adminPanel.addHotel' | translate }}
         </a>
       </div>
     }
@@ -42,11 +42,11 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-[#E8E0D8] bg-[#FAF7F2]">
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Hotel</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">City</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Contact</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Status</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Actions</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.hotel' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.city' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.contact' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.status' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#E8E0D8]">
@@ -70,16 +70,16 @@
                 </td>
                 <td class="px-6 py-4">
                   @if (hotel.isActive) {
-                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">Active</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">{{ 'adminPanel.active' | translate }}</span>
                   } @else {
-                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Inactive</span>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">{{ 'adminPanel.inactive' | translate }}</span>
                   }
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
                     <a [routerLink]="['/admin/hotels', hotel.id, 'users']"
                       class="text-[#34203A] text-xs font-medium hover:underline">
-                      Manage Users
+                      {{ 'adminPanel.manageUsers' | translate }}
                     </a>
                   </div>
                 </td>

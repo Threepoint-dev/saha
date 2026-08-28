@@ -7,7 +7,7 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Quote / VAT Settings</p>
+        <p class="text-[#f6ddae] text-[11px]">{{ 'quoteSettings.headerTitle' | translate }}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -25,8 +25,8 @@
   <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[760px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Quote &amp; VAT Settings</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">Defaults applied to every quote you generate.</p>
+      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">{{ 'quoteSettings.pageTitle' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">{{ 'quoteSettings.pageSubtitle' | translate }}</p>
     </div>
 
     @if (errorMessage()) {
@@ -41,33 +41,33 @@
     }
 
     @if (loading()) {
-      <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-6 text-[#55514a] text-[13px]">Loading...</div>
+      <div class="bg-white border border-[#e4dfd5] rounded-[12px] px-5 py-6 text-[#55514a] text-[13px]">{{ 'quoteSettings.loading' | translate }}</div>
     } @else {
       <form [formGroup]="form" (ngSubmit)="save()" class="flex flex-col gap-5">
         <!-- Numbers card -->
         <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
-          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Pricing &amp; Numbering</p>
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">{{ 'quoteSettings.pricingNumbering' | translate }}</p>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="flex flex-col gap-1.5">
-              <label class="text-[#34203a] text-[12px] font-medium" for="vatRate">VAT Rate (%)</label>
+              <label class="text-[#34203a] text-[12px] font-medium" for="vatRate">{{ 'quoteSettings.vatRate' | translate }}</label>
               <input id="vatRate" type="number" formControlName="vatRate" min="0" max="100" step="0.01" placeholder="15"
                 class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
                 [class.border-red-500]="form.controls.vatRate.invalid && form.controls.vatRate.touched" />
               @if (form.controls.vatRate.invalid && form.controls.vatRate.touched) {
-                <span class="text-red-600 text-[11px]">Enter a value between 0 and 100.</span>
+                <span class="text-red-600 text-[11px]">{{ 'quoteSettings.vatRateError' | translate }}</span>
               }
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-[#34203a] text-[12px] font-medium" for="validityDays">Quote Validity (days)</label>
+              <label class="text-[#34203a] text-[12px] font-medium" for="validityDays">{{ 'quoteSettings.validityDays' | translate }}</label>
               <input id="validityDays" type="number" formControlName="validityDays" min="0" step="1" placeholder="7"
                 class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
                 [class.border-red-500]="form.controls.validityDays.invalid && form.controls.validityDays.touched" />
               @if (form.controls.validityDays.invalid && form.controls.validityDays.touched) {
-                <span class="text-red-600 text-[11px]">Enter a positive number.</span>
+                <span class="text-red-600 text-[11px]">{{ 'quoteSettings.validityDaysError' | translate }}</span>
               }
             </div>
             <div class="flex flex-col gap-1.5">
-              <label class="text-[#34203a] text-[12px] font-medium" for="quotePrefix">Quote Number Prefix</label>
+              <label class="text-[#34203a] text-[12px] font-medium" for="quotePrefix">{{ 'quoteSettings.quotePrefix' | translate }}</label>
               <input id="quotePrefix" type="text" formControlName="quotePrefix" placeholder="QT"
                 class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
             </div>
@@ -76,27 +76,27 @@
 
         <!-- Text card -->
         <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
-          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Terms &amp; Footer</p>
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">{{ 'quoteSettings.termsAndFooter' | translate }}</p>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[#34203a] text-[12px] font-medium" for="defaultTerms">Default Terms</label>
-            <textarea id="defaultTerms" formControlName="defaultTerms" rows="4" placeholder="Terms and conditions shown on each quote"
+            <label class="text-[#34203a] text-[12px] font-medium" for="defaultTerms">{{ 'quoteSettings.defaultTerms' | translate }}</label>
+            <textarea id="defaultTerms" formControlName="defaultTerms" rows="4" [placeholder]="'quoteSettings.defaultTermsPlaceholder' | translate"
               class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
           </div>
           <div class="flex flex-col gap-1.5">
-            <label class="text-[#34203a] text-[12px] font-medium" for="footerText">Footer Text</label>
-            <textarea id="footerText" formControlName="footerText" rows="3" placeholder="Footer shown at the bottom of the quote PDF"
+            <label class="text-[#34203a] text-[12px] font-medium" for="footerText">{{ 'quoteSettings.footerText' | translate }}</label>
+            <textarea id="footerText" formControlName="footerText" rows="3" [placeholder]="'quoteSettings.footerTextPlaceholder' | translate"
               class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
           </div>
         </div>
 
         <!-- Toggles card -->
         <div class="bg-white border border-[#e4dfd5] rounded-[12px] p-5 flex flex-col gap-4">
-          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">Options</p>
+          <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">{{ 'quoteSettings.options' | translate }}</p>
 
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-0.5">
-              <span class="text-[#34203a] text-[13px] font-medium">Enable PDF Branding</span>
-              <span class="text-[#8a8478] text-[11px]">Show your workspace logo and colors on generated PDFs.</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ 'quoteSettings.pdfBranding' | translate }}</span>
+              <span class="text-[#8a8478] text-[11px]">{{ 'quoteSettings.pdfBrandingHint' | translate }}</span>
             </div>
             <button type="button" (click)="form.controls.enablePdfBranding.setValue(!form.controls.enablePdfBranding.value)"
               [attr.aria-pressed]="form.controls.enablePdfBranding.value"
@@ -111,8 +111,8 @@
 
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-0.5">
-              <span class="text-[#34203a] text-[13px] font-medium">Allow Manual Discount</span>
-              <span class="text-[#8a8478] text-[11px]">Let staff apply a custom discount when building a quote.</span>
+              <span class="text-[#34203a] text-[13px] font-medium">{{ 'quoteSettings.manualDiscount' | translate }}</span>
+              <span class="text-[#8a8478] text-[11px]">{{ 'quoteSettings.manualDiscountHint' | translate }}</span>
             </div>
             <button type="button" (click)="form.controls.allowManualDiscount.setValue(!form.controls.allowManualDiscount.value)"
               [attr.aria-pressed]="form.controls.allowManualDiscount.value"
@@ -128,7 +128,7 @@
         <div class="flex justify-end">
           <button type="submit" [disabled]="saving()"
             class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-6 py-2.5 text-white text-[13px] font-semibold transition-colors">
-            {{ saving() ? 'Saving...' : 'Save Settings' }}
+            {{ (saving() ? 'quoteSettings.saving' : 'quoteSettings.save') | translate }}
           </button>
         </div>
       </form>

@@ -7,7 +7,7 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Export &amp; Data Quality</p>
+        <p class="text-[#f6ddae] text-[11px]">{{ 'export.headerTitle' | translate }}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -24,15 +24,15 @@
   <!-- Body -->
   <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1200px] mx-auto">
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[24px] leading-none">Data Export &amp; Quality</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">Download your data as CSV and review setup completeness.</p>
+      <h1 class="text-[#34203a] font-bold text-[24px] leading-none">{{ 'export.title' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-none">{{ 'export.subtitle' | translate }}</p>
     </div>
 
     <!-- Section 1: Data Export -->
     <section class="flex flex-col gap-4 bg-white border border-[#e4dfd5] rounded-[14px] px-6 py-5">
       <div class="flex flex-col gap-1">
-        <h2 class="text-[#34203a] font-bold text-[16px] leading-none">Data Export</h2>
-        <p class="text-[#55514a] text-[12px]">Each file downloads immediately as UTF-8 CSV (Excel-ready).</p>
+        <h2 class="text-[#34203a] font-bold text-[16px] leading-none">{{ 'export.section1.title' | translate }}</h2>
+        <p class="text-[#55514a] text-[12px]">{{ 'export.section1.subtitle' | translate }}</p>
       </div>
 
       @if (exportError()) {
@@ -45,20 +45,20 @@
         @for (item of exportItems; track item.type) {
           <div class="flex flex-col gap-3 border border-[#e4dfd5] rounded-[12px] px-4 py-4 bg-[#faf7f2]">
             <div class="flex flex-col gap-1">
-              <p class="text-[#34203a] font-semibold text-[14px] leading-tight">{{ item.label }}</p>
-              <p class="text-[#55514a] text-[11px] leading-tight">{{ item.description }}</p>
+              <p class="text-[#34203a] font-semibold text-[14px] leading-tight">{{ item.labelKey | translate }}</p>
+              <p class="text-[#55514a] text-[11px] leading-tight">{{ item.descriptionKey | translate }}</p>
             </div>
             <button type="button" (click)="download(item.type)"
               [disabled]="downloading() === item.type"
               class="bg-[#34203a] hover:bg-[#46294f] text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-4 py-2 transition-colors disabled:opacity-60">
-              {{ downloading() === item.type ? 'Preparing…' : 'Download CSV' }}
+              {{ (downloading() === item.type ? 'export.preparing' : 'export.downloadCsv') | translate }}
             </button>
             @if (lastExportOf(item.type)) {
               <p class="text-[#55514a] text-[10px] leading-tight">
-                Last exported {{ formatDateTime(lastExportOf(item.type)!) }}
+                {{ 'export.lastExported' | translate:{ date: formatDateTime(lastExportOf(item.type)!) } }}
               </p>
             } @else {
-              <p class="text-[#55514a]/60 text-[10px] leading-tight">Not exported yet</p>
+              <p class="text-[#55514a]/60 text-[10px] leading-tight">{{ 'export.notExportedYet' | translate }}</p>
             }
           </div>
         }
@@ -69,13 +69,13 @@
     <section class="flex flex-col gap-4 bg-white border border-[#e4dfd5] rounded-[14px] px-6 py-5">
       <div class="flex items-start justify-between gap-4">
         <div class="flex flex-col gap-1">
-          <h2 class="text-[#34203a] font-bold text-[16px] leading-none">Data Quality</h2>
-          <p class="text-[#55514a] text-[12px]">Setup completeness across your pilot configuration.</p>
+          <h2 class="text-[#34203a] font-bold text-[16px] leading-none">{{ 'export.section2.title' | translate }}</h2>
+          <p class="text-[#55514a] text-[12px]">{{ 'export.section2.subtitle' | translate }}</p>
         </div>
         <button type="button" (click)="loadQuality()"
           [disabled]="qualityLoading()"
           class="bg-white border border-[#34203a] text-[#34203a] hover:bg-[#34203a] hover:text-[#f6ddae] text-[13px] font-semibold rounded-[8px] px-4 py-2 transition-colors disabled:opacity-60">
-          {{ qualityLoading() ? 'Checking…' : 'Refresh' }}
+          {{ (qualityLoading() ? 'export.checking' : 'export.refresh') | translate }}
         </button>
       </div>
 
@@ -89,7 +89,7 @@
         <!-- Score -->
         <div class="flex flex-col gap-2">
           <div class="flex items-end justify-between">
-            <span class="text-[#55514a] text-[12px] font-semibold uppercase tracking-[0.2px]">Quality Score</span>
+            <span class="text-[#55514a] text-[12px] font-semibold uppercase tracking-[0.2px]">{{ 'export.qualityScore' | translate }}</span>
             <span class="text-[#34203a] font-bold text-[22px] leading-none">{{ score() }}%</span>
           </div>
           <div class="w-full h-[12px] rounded-full bg-[#efe9e0] overflow-hidden">
@@ -100,12 +100,12 @@
 
         <!-- Summary cards -->
         <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-          @for (card of summaryCards(); track card.label) {
+          @for (card of summaryCards(); track card.labelKey) {
             <div class="flex flex-col gap-1 border border-[#e4dfd5] rounded-[12px] px-3 py-3 bg-[#faf7f2]">
-              <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ card.label }}</span>
+              <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ card.labelKey | translate }}</span>
               <div class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full" [style.background-color]="card.ok ? '#2e7d5b' : '#d14343'"></span>
-                <span class="text-[#34203a] font-bold text-[15px] leading-none">{{ card.value }}</span>
+                <span class="text-[#34203a] font-bold text-[15px] leading-none">{{ card.valueIsKey ? (card.value | translate) : card.value }}</span>
               </div>
             </div>
           }
@@ -113,20 +113,20 @@
 
         <!-- Issues -->
         <div class="flex flex-col gap-2">
-          <h3 class="text-[#34203a] font-semibold text-[13px]">Issues</h3>
+          <h3 class="text-[#34203a] font-semibold text-[13px]">{{ 'export.issuesTitle' | translate }}</h3>
           @if (r.issues.length === 0) {
             <div class="bg-[#eef7f1] border border-[#bfe0cd] rounded-[10px] px-4 py-3 text-[#2e7d5b] text-[13px] font-medium">
-              No issues found — your setup is complete. 🎉
+              {{ 'export.noIssues' | translate }}
             </div>
           } @else {
             <div class="overflow-x-auto border border-[#e4dfd5] rounded-[12px]">
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="bg-[#faf7f2] text-[#55514a] text-[11px] uppercase tracking-[0.2px]">
-                    <th class="px-4 py-2.5 font-semibold">Entity</th>
-                    <th class="px-4 py-2.5 font-semibold">Field</th>
-                    <th class="px-4 py-2.5 font-semibold">Issue</th>
-                    <th class="px-4 py-2.5 font-semibold text-right">Count</th>
+                    <th class="px-4 py-2.5 font-semibold">{{ 'export.issuesTable.entity' | translate }}</th>
+                    <th class="px-4 py-2.5 font-semibold">{{ 'export.issuesTable.field' | translate }}</th>
+                    <th class="px-4 py-2.5 font-semibold">{{ 'export.issuesTable.issue' | translate }}</th>
+                    <th class="px-4 py-2.5 font-semibold text-right">{{ 'export.issuesTable.count' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -144,7 +144,7 @@
           }
         </div>
       } @else if (!qualityError()) {
-        <p class="text-[#55514a] text-[13px]">Loading data quality report…</p>
+        <p class="text-[#55514a] text-[13px]">{{ 'export.loadingReport' | translate }}</p>
       }
     </section>
   </main>

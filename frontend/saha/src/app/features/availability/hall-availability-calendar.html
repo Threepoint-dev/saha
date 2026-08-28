@@ -1,13 +1,13 @@
 <div class="p-6">
   <div class="flex items-center justify-between mb-4">
     <div>
-      <h1 class="text-xl font-semibold text-[#1B1A17]">Hall Availability Calendar</h1>
-      <p class="text-sm text-[#7A736B]">Internal only · Check availability before confirming bookings</p>
+      <h1 class="text-xl font-semibold text-[#1B1A17]">{{ 'availability.title' | translate }}</h1>
+      <p class="text-sm text-[#7A736B]">{{ 'availability.subtitle' | translate }}</p>
     </div>
     <button
       (click)="openAddModal()"
       class="bg-[#34203A] text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-[#2a1830] transition-colors">
-      + Add Block
+      {{ 'availability.addBlock' | translate }}
     </button>
   </div>
 
@@ -23,7 +23,7 @@
       [(ngModel)]="hallFilter"
       (ngModelChange)="onFilterChange()"
       class="border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm text-[#1B1A17] bg-white">
-      <option value="">All halls</option>
+      <option value="">{{ 'availability.allHalls' | translate }}</option>
       @for (h of halls(); track h.id) {
         <option [value]="h.id">{{ h.name }}</option>
       }
@@ -38,23 +38,23 @@
 
   <!-- Legend -->
   <div class="flex items-center gap-4 mb-3 text-xs text-[#55514A]">
-    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#E9F5EC]"></span> Available</div>
-    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#F7E7D6]"></span> Tentative</div>
-    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#34203A]"></span> Confirmed</div>
-    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#F7DEDE]"></span> Blocked</div>
-    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#E5E1E8]"></span> Maintenance</div>
+    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#E9F5EC]"></span> {{ 'availability.legend.available' | translate }}</div>
+    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#F7E7D6]"></span> {{ 'availability.legend.tentative' | translate }}</div>
+    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#34203A]"></span> {{ 'availability.legend.confirmed' | translate }}</div>
+    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#F7DEDE]"></span> {{ 'availability.legend.blocked' | translate }}</div>
+    <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#E5E1E8]"></span> {{ 'availability.legend.maintenance' | translate }}</div>
   </div>
 
   @if (loading()) {
-    <p class="text-sm text-[#7A736B]">Loading calendar…</p>
+    <p class="text-sm text-[#7A736B]">{{ 'availability.loadingCalendar' | translate }}</p>
   } @else if (filteredHalls().length === 0) {
-    <p class="text-sm text-[#7A736B]">No halls configured yet. Add halls under Setup → Reference Data first.</p>
+    <p class="text-sm text-[#7A736B]">{{ 'availability.noHalls' | translate }}</p>
   } @else {
     <div class="overflow-x-auto bg-white border border-[#EFE9E0] rounded-xl">
       <table class="min-w-full text-sm">
         <thead>
           <tr class="border-b border-[#EFE9E0]">
-            <th class="text-left px-4 py-2 text-xs uppercase tracking-wider text-[#A39C92] whitespace-nowrap">Hall / Date</th>
+            <th class="text-left px-4 py-2 text-xs uppercase tracking-wider text-[#A39C92] whitespace-nowrap">{{ 'availability.hallDateColumn' | translate }}</th>
             @for (day of days(); track day.date) {
               <th class="px-2 py-2 text-xs text-[#A39C92] font-normal whitespace-nowrap">{{ day.dayNumber }}</th>
             }
@@ -87,25 +87,24 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
       <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-lg font-semibold text-[#1B1A17]">{{ editingId ? 'Edit' : 'Add' }} Hall Availability Block</h2>
-          <p class="text-xs text-[#A39C92]">Internal management · No public booking · No payment</p>
+          <h2 class="text-lg font-semibold text-[#1B1A17]">{{ (editingId ? 'availability.modal.editTitle' : 'availability.modal.addTitle') | translate }}</h2>
+          <p class="text-xs text-[#A39C92]">{{ 'availability.modal.subtitle' | translate }}</p>
         </div>
         <button (click)="closeModal()" class="text-[#A39C92] hover:text-[#1B1A17] text-xl leading-none">&times;</button>
       </div>
 
       @if (conflict()) {
         <div class="mb-4 bg-[#F7DEDE] border border-[#D14343] rounded-lg p-3">
-          <p class="text-sm font-medium text-[#A02F2F] mb-1">Availability conflict detected</p>
+          <p class="text-sm font-medium text-[#A02F2F] mb-1">{{ 'availability.conflictDetected' | translate }}</p>
           <p class="text-xs text-[#A02F2F] mb-2">
-            {{ hallName(conflict()!.conflict.hallId) }} already has a
-            <strong>{{ statusLabel(conflict()!.conflict.status) }}</strong> block on {{ conflict()!.conflict.eventDate }}
+            {{ 'availability.conflictMessage' | translate:{ hallName: hallName(conflict()!.conflict.hallId), status: (statusLabelKey(conflict()!.conflict.status) | translate), date: conflict()!.conflict.eventDate } }}
             @if (conflict()!.conflict.startTime) {
               ({{ conflict()!.conflict.startTime }}–{{ conflict()!.conflict.endTime }})
             }.
           </p>
           <div class="flex gap-2">
             <button (click)="saveAnyway()" class="text-xs bg-white border border-[#D14343] text-[#A02F2F] rounded-lg px-3 py-1.5 hover:bg-[#FCEFEF]">
-              Create as tentative waitlist hold anyway
+              {{ 'availability.createAnyway' | translate }}
             </button>
           </div>
         </div>
@@ -113,9 +112,9 @@
 
       <div class="space-y-3">
         <div>
-          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Hall</label>
+          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.hall' | translate }}</label>
           <select [(ngModel)]="form.hallId" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm">
-            <option value="" disabled>Choose a hall</option>
+            <option value="" disabled>{{ 'availability.modal.chooseHall' | translate }}</option>
             @for (h of halls(); track h.id) {
               <option [value]="h.id">{{ h.name }}</option>
             }
@@ -124,14 +123,14 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Date</label>
+            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.date' | translate }}</label>
             <input type="date" [(ngModel)]="form.eventDate" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
-            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Status</label>
+            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.status' | translate }}</label>
             <select [(ngModel)]="form.status" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm">
               @for (s of blockStatuses; track s.value) {
-                <option [value]="s.value">{{ s.label }}</option>
+                <option [value]="s.value">{{ statusLabelKey(s.value) | translate }}</option>
               }
             </select>
           </div>
@@ -139,24 +138,24 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Start time (optional)</label>
+            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.startTime' | translate }}</label>
             <input type="time" [(ngModel)]="form.startTime" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm" />
           </div>
           <div>
-            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">End time (optional)</label>
+            <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.endTime' | translate }}</label>
             <input type="time" [(ngModel)]="form.endTime" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm" />
           </div>
         </div>
 
         <div>
-          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Reason</label>
-          <input type="text" [(ngModel)]="form.reason" placeholder="e.g. Private reservation"
+          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.reason' | translate }}</label>
+          <input type="text" [(ngModel)]="form.reason" [placeholder]="'availability.modal.reasonPlaceholder' | translate"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm" />
         </div>
 
         <div>
-          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">Notes</label>
-          <textarea [(ngModel)]="form.notes" rows="2" placeholder="Additional ops notes"
+          <label class="text-xs uppercase tracking-wider text-[#7A736B] mb-1 block">{{ 'availability.modal.notes' | translate }}</label>
+          <textarea [(ngModel)]="form.notes" rows="2" [placeholder]="'availability.modal.notesPlaceholder' | translate"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm"></textarea>
         </div>
       </div>
@@ -164,16 +163,16 @@
       <div class="flex items-center justify-between mt-5">
         @if (editingId) {
           <button (click)="deleteBlock()" [disabled]="saving()" class="text-sm text-[#D14343] hover:underline disabled:opacity-50">
-            Remove block
+            {{ 'availability.modal.removeBlock' | translate }}
           </button>
         } @else {
           <span></span>
         }
         <div class="flex gap-2">
-          <button (click)="closeModal()" class="border border-[#D9D0C4] rounded-lg px-4 py-2 text-sm hover:bg-[#F5F1EA]">Cancel</button>
+          <button (click)="closeModal()" class="border border-[#D9D0C4] rounded-lg px-4 py-2 text-sm hover:bg-[#F5F1EA]">{{ 'availability.modal.cancel' | translate }}</button>
           <button (click)="save()" [disabled]="saving()"
             class="bg-[#34203A] text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-[#2a1830] disabled:opacity-60">
-            {{ saving() ? 'Saving...' : 'Save Block' }}
+            {{ (saving() ? 'availability.modal.saving' : 'availability.modal.saveBlock') | translate }}
           </button>
         </div>
       </div>

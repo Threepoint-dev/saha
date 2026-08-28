@@ -3,8 +3,8 @@
   <!-- Header -->
 <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
   <div>
-    <h1 class="text-[#1B1A17] text-xl font-bold">New Inquiry</h1>
-    <p class="text-[#7A736B] text-sm">Manually log an event inquiry</p>
+    <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'newInquiry.title' | translate }}</h1>
+    <p class="text-[#7A736B] text-sm">{{ 'newInquiry.subtitle' | translate }}</p>
   </div>
 </div>
 
@@ -15,105 +15,105 @@
       <div class="bg-[#E8F5E9] border border-[#2E7D5B] rounded-xl px-6 py-4 mb-6 flex items-center gap-3">
         <span class="text-[#2E7D5B] text-lg">✓</span>
         <div>
-          <p class="text-[#1B1A17] font-medium">Inquiry created successfully</p>
-          <p class="text-[#7A736B] text-sm">Inquiry {{ createdInquiryNumber }} created</p>
+          <p class="text-[#1B1A17] font-medium">{{ 'newInquiry.successTitle' | translate }}</p>
+          <p class="text-[#7A736B] text-sm">{{ 'newInquiry.successSubtitle' | translate:{ number: createdInquiryNumber } }}</p>
         </div>
       </div>
     }
 
     <!-- Form -->
     <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-      <h2 class="text-[#1B1A17] font-semibold mb-1">Inquiry details</h2>
-      <p class="text-[#7A736B] text-sm mb-6">Log a new event inquiry. Fields marked * are required.</p>
+      <h2 class="text-[#1B1A17] font-semibold mb-1">{{ 'newInquiry.formTitle' | translate }}</h2>
+      <p class="text-[#7A736B] text-sm mb-6">{{ 'newInquiry.formSubtitle' | translate }}</p>
 
       <!-- CLIENT -->
-      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">CLIENT</p>
+      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">{{ 'newInquiry.sectionClient' | translate }}</p>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">CLIENT NAME *</label>
-          <input type="text" [(ngModel)]="form.clientName" placeholder="Norah Al-Qahtani"
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.clientName' | translate }}</label>
+          <input type="text" [(ngModel)]="form.clientName" [placeholder]="'newInquiry.clientNamePlaceholder' | translate"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('clientName') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
           @if (hasError('clientName')) {
-            <p class="text-[#D14343] text-xs mt-1">Client name is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.clientNameError' | translate }}</p>
           }
         </div>
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">PHONE *</label>
-          <input type="text" [(ngModel)]="form.clientPhone" placeholder="055 123 4567"
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.phone' | translate }}</label>
+          <input type="text" [(ngModel)]="form.clientPhone" [placeholder]="'newInquiry.phonePlaceholder' | translate"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('clientPhone') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
           @if (hasError('clientPhone')) {
-            <p class="text-[#D14343] text-xs mt-1">Phone is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.phoneError' | translate }}</p>
           }
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4 mb-6">
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">EMAIL</label>
-          <input type="email" [(ngModel)]="form.clientEmail" placeholder="norah@email.com"
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.email' | translate }}</label>
+          <input type="email" [(ngModel)]="form.clientEmail" [placeholder]="'newInquiry.emailPlaceholder' | translate"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
         </div>
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">SOURCE CHANNEL *</label>
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.sourceChannel' | translate }}</label>
           <select [(ngModel)]="form.sourceChannelId"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('sourceChannelId') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')">
-            <option value="">Select channel</option>
+            <option value="">{{ 'newInquiry.selectChannel' | translate }}</option>
             @for (channel of sourceChannels; track channel.id) {
               <option [value]="channel.id">{{ channel.name }}</option>
             }
           </select>
           @if (hasError('sourceChannelId')) {
-            <p class="text-[#D14343] text-xs mt-1">Source channel is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.sourceChannelError' | translate }}</p>
           }
         </div>
       </div>
 
       <!-- EVENT -->
-      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">EVENT</p>
+      <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">{{ 'newInquiry.sectionEvent' | translate }}</p>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">EVENT TYPE *</label>
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.eventType' | translate }}</label>
           <select [(ngModel)]="form.eventType"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('eventType') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')">
-            <option value="">Select type</option>
+            <option value="">{{ 'newInquiry.selectType' | translate }}</option>
             @for (type of eventTypes; track type) {
-              <option [value]="type">{{ type }}</option>
+              <option [value]="type">{{ eventTypeLabelKey(type) | translate }}</option>
             }
           </select>
           @if (hasError('eventType')) {
-            <p class="text-[#D14343] text-xs mt-1">Event type is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.eventTypeError' | translate }}</p>
           }
         </div>
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">EVENT DATE *</label>
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.eventDate' | translate }}</label>
           <input type="date" [(ngModel)]="form.eventDate"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('eventDate') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
           @if (hasError('eventDate')) {
-            <p class="text-[#D14343] text-xs mt-1">Event date is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.eventDateError' | translate }}</p>
           }
         </div>
       </div>
 
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">GUEST COUNT *</label>
-          <input type="number" [(ngModel)]="form.guestCount" placeholder="300"
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.guestCount' | translate }}</label>
+          <input type="number" [(ngModel)]="form.guestCount" [placeholder]="'newInquiry.guestCountPlaceholder' | translate"
             [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
             (hasError('guestCount') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
           @if (hasError('guestCount')) {
-            <p class="text-[#D14343] text-xs mt-1">Guest count is required</p>
+            <p class="text-[#D14343] text-xs mt-1">{{ 'newInquiry.guestCountError' | translate }}</p>
           }
         </div>
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">HALL OF INTEREST</label>
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.hallOfInterest' | translate }}</label>
           <select [(ngModel)]="form.hallId"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]">
-            <option value="">Select hall</option>
+            <option value="">{{ 'newInquiry.selectHall' | translate }}</option>
             @for (hall of halls; track hall.id) {
               <option [value]="hall.id">{{ hall.name }}</option>
             }
@@ -123,15 +123,15 @@
 
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">ESTIMATED VALUE (SAR)</label>
-          <input type="number" [(ngModel)]="form.estimatedValue" placeholder="38,000"
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.estimatedValue' | translate }}</label>
+          <input type="number" [(ngModel)]="form.estimatedValue" [placeholder]="'newInquiry.estimatedValuePlaceholder' | translate"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]" />
         </div>
         <div>
-          <label class="text-[#7A736B] text-xs mb-1 block">ASSIGNED OWNER</label>
+          <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.assignedOwner' | translate }}</label>
           <select [(ngModel)]="form.ownerId"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]">
-            <option value="">Select owner</option>
+            <option value="">{{ 'newInquiry.selectOwner' | translate }}</option>
             @for (user of users; track user.id) {
               <option [value]="user.id">{{ user.fullName }}</option>
             }
@@ -140,9 +140,9 @@
       </div>
 
       <div class="mb-6">
-        <label class="text-[#7A736B] text-xs mb-1 block">NOTES</label>
+        <label class="text-[#7A736B] text-xs mb-1 block">{{ 'newInquiry.notes' | translate }}</label>
         <textarea [(ngModel)]="form.notes" rows="3"
-          placeholder="Client prefers warm lighting and white floral setup..."
+          [placeholder]="'newInquiry.notesPlaceholder' | translate"
           class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A] resize-none">
         </textarea>
       </div>
@@ -151,11 +151,11 @@
       <div class="flex justify-end gap-3">
         <button (click)="cancel()"
           class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-[#FAF7F2] transition-colors">
-          Cancel
+          {{ 'newInquiry.cancel' | translate }}
         </button>
         <button (click)="submit()" [disabled]="isLoading"
           class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors disabled:opacity-60">
-          {{ isLoading ? 'Saving...' : 'Save inquiry' }}
+          {{ (isLoading ? 'newInquiry.saving' : 'newInquiry.save') | translate }}
         </button>
       </div>
     </div>

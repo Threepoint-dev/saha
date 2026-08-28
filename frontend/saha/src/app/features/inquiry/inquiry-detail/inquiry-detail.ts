@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { InquiryService, Inquiry } from '../../../core/services/inquiry.service';
 import { SourceChannelsService } from '../../setup/source-channels.service';
 import { SourceChannel } from '../../setup/source-channels.model';
@@ -12,7 +13,7 @@ import { AvailabilityService } from '../../availability/availability.service';
 @Component({
   selector: 'app-inquiry-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, TranslatePipe],
   templateUrl: './inquiry-detail.html',
   styleUrl: './inquiry-detail.scss'
 })
@@ -35,6 +36,11 @@ export class InquiryDetailComponent implements OnInit {
   markingWon = false;
   wonSuccess = false;
 
+  /**
+   * Values kept in English regardless of app language — this is what's
+   * actually stored in the database as the inquiry's lossReason. Only the
+   * button's *displayed* text is translated, via lossReasonLabelKey() below.
+   */
   lossReasons = [
     'Price too high',
     'Date unavailable',
@@ -44,6 +50,20 @@ export class InquiryDetailComponent implements OnInit {
     'Chose a competitor',
     'Other'
   ];
+
+  private lossReasonKeyMap: Record<string, string> = {
+    'Price too high': 'markLostModal.reasonOptions.priceTooHigh',
+    'Date unavailable': 'markLostModal.reasonOptions.dateUnavailable',
+    'Capacity / space': 'markLostModal.reasonOptions.capacitySpace',
+    'No response from us': 'markLostModal.reasonOptions.noResponse',
+    'Client went silent': 'markLostModal.reasonOptions.clientWentSilent',
+    'Chose a competitor': 'markLostModal.reasonOptions.choseCompetitor',
+    'Other': 'markLostModal.reasonOptions.other',
+  };
+
+  lossReasonLabelKey(reason: string): string {
+    return this.lossReasonKeyMap[reason] || reason;
+  }
 
   statusBadge: Record<string, string> = {
     NEW: 'bg-blue-100 text-blue-700',
@@ -61,6 +81,7 @@ export class InquiryDetailComponent implements OnInit {
     private authService: AuthService,
     private quotesService: QuotesService,
     private availabilityService: AvailabilityService,
+    private translateService: TranslateService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -100,6 +121,11 @@ export class InquiryDetailComponent implements OnInit {
     if (!sourceChannelId) return '';
     const channel = this.sourceChannels.find(c => c.id === sourceChannelId);
     return channel ? channel.name : sourceChannelId;
+  }
+
+  /** Translation key for a status word, e.g. 'NEW' -> 'status.new'. */
+  statusLabelKey(status: string | undefined): string {
+    return `status.${(status || 'new').toLowerCase()}`;
   }
 
   moveToContacted() {
@@ -223,9 +249,13 @@ export class InquiryDetailComponent implements OnInit {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   }
 
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
+
   formatDate(date: string): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString(this.locale, {
       month: 'short', day: 'numeric', year: 'numeric'
     });
   }
@@ -233,8 +263,8 @@ export class InquiryDetailComponent implements OnInit {
   formatDateShort(date: string): string {
     if (!date) return '—';
     const d = new Date(date);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
-      d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    return d.toLocaleDateString(this.locale, { month: 'short', day: 'numeric' }) + ', ' +
+      d.toLocaleTimeString(this.locale, { hour: 'numeric', minute: '2-digit' });
   }
 
   reassign(): void {

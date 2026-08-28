@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { CatalogItem, InquirySummary, LineItemRequest, Quote, QuoteLineItem } from './quotes.model';
@@ -19,13 +20,14 @@ interface AddModel {
 
 @Component({
   selector: 'app-quote-builder',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './quote-builder.html'
 })
 export class QuoteBuilder implements OnInit {
   private service = inject(QuotesService);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -57,7 +59,11 @@ export class QuoteBuilder implements OnInit {
 
   readonly addModel: AddModel = this.emptyAddModel();
 
-  // Item type tabs matching Figma
+  /**
+   * Values (.value) kept in English regardless of app language — these match
+   * the backend's itemType enum. Only the displayed .label is translated,
+   * via itemTypeLabelKey() below.
+   */
   readonly itemTypes = [
     { label: 'Hall rental', value: 'hall' },
     { label: 'Catering package', value: 'package' },
@@ -67,6 +73,25 @@ export class QuoteBuilder implements OnInit {
     { label: 'Service staff', value: 'service_staff' },
     { label: 'Custom', value: 'custom' },
   ];
+
+  private itemTypeKeyMap: Record<string, string> = {
+    hall: 'quoteBuilder.itemTypeLabels.hall',
+    package: 'quoteBuilder.itemTypeLabels.package',
+    coffee_break: 'quoteBuilder.itemTypeLabels.coffeeBreak',
+    av_package: 'quoteBuilder.itemTypeLabels.avPackage',
+    decoration: 'quoteBuilder.itemTypeLabels.decoration',
+    service_staff: 'quoteBuilder.itemTypeLabels.serviceStaff',
+    custom: 'quoteBuilder.itemTypeLabels.custom',
+  };
+
+  itemTypeLabelKey(value: string): string {
+    return this.itemTypeKeyMap[value] || value;
+  }
+
+  /** Translation key for a quote status — reuses the same keys as the quote list page. */
+  statusLabelKey(status: string | null | undefined): string {
+    return `quoteList.status.${(status || 'draft').toLowerCase()}`;
+  }
 
   readonly halls = computed(() => this.catalog().filter((c) => c.type === 'hall'));
   readonly packages = computed(() => this.catalog().filter((c) => c.type === 'package'));
@@ -139,7 +164,7 @@ export class QuoteBuilder implements OnInit {
   addItemFromModal(): void {
     this.clearMessages();
     const name = this.addModel.itemName.trim();
-    if (!name) { this.errorMessage.set('Enter a name for the line item.'); return; }
+    if (!name) { this.errorMessage.set(this.translateService.instant('quoteBuilder.nameRequiredError')); return; }
     const body: LineItemRequest = {
       itemName: name,
       itemType: this.addModel.itemType || 'custom',
@@ -155,7 +180,7 @@ export class QuoteBuilder implements OnInit {
         this.showAddModal = false;
         Object.assign(this.addModel, this.emptyAddModel());
         this.refresh();
-        this.successMessage.set('Line item added.');
+        this.successMessage.set(this.translateService.instant('quoteBuilder.lineItemAdded'));
       },
       error: (err) => { this.adding.set(false); this.errorMessage.set(this.formatError(err, 'Failed to add line item.')); }
     });
@@ -239,7 +264,7 @@ export class QuoteBuilder implements OnInit {
     this.clearMessages();
     this.savingNotes.set(true);
     this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null }).subscribe({
-      next: (q) => { this.savingNotes.set(false); this.quote.set(q); this.successMessage.set('Quote saved as draft.'); },
+      next: (q) => { this.savingNotes.set(false); this.quote.set(q); this.successMessage.set(this.translateService.instant('quoteBuilder.quoteSavedDraft')); },
       error: (err) => { this.savingNotes.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save quote.')); }
     });
   }
@@ -254,7 +279,7 @@ export class QuoteBuilder implements OnInit {
           next: (res) => {
             this.sharing.set(false);
             this.shareUrl.set(this.buildShareUrl(res.shareToken));
-            this.successMessage.set('Shareable link generated.');
+            this.successMessage.set(this.translateService.instant('quoteBuilder.shareLinkGenerated'));
           },
           error: (err) => { this.sharing.set(false); this.errorMessage.set(this.formatError(err, 'Failed to generate link.')); }
         });

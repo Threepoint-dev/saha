@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Sidebar } from './shared/sidebar/sidebar';
 import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
+import { LanguageService } from './core/services/language.service';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +14,11 @@ import { filter } from 'rxjs/operators';
 export class App {
   protected readonly title = signal('saha');
   showSidebar = false;
+
+  // Injecting this here (even though unused directly) makes it start up
+  // immediately when the app loads, so the saved language + RTL direction
+  // are applied before the first page even renders.
+  private languageService = inject(LanguageService);
 
   constructor(private router: Router) {
     this.router.events.pipe(

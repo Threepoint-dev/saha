@@ -4,13 +4,13 @@
   <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
     <div>
       @if (isAdminContext) {
-        <a routerLink="/admin" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">← Back to hotels</a>
+        <a routerLink="/admin" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">{{ 'hotelUsers.backToHotels' | translate }}</a>
       }
-      <h1 class="text-[#1B1A17] text-xl font-bold mt-1">{{ hotelName }} — Users</h1>
+      <h1 class="text-[#1B1A17] text-xl font-bold mt-1">{{ hotelName }} {{ 'hotelUsers.titleSuffix' | translate }}</h1>
     </div>
     <button (click)="showInviteForm = true"
       class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
-      + Invite User
+      {{ 'hotelUsers.inviteUser' | translate }}
     </button>
   </div>
 
@@ -29,10 +29,10 @@
         <table class="w-full">
           <thead>
             <tr class="border-b border-[#E8E0D8] bg-[#FAF7F2]">
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">User</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Role</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Status</th>
-              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">Actions</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'hotelUsers.table.user' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'hotelUsers.table.role' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'hotelUsers.table.status' | translate }}</th>
+              <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'hotelUsers.table.actions' | translate }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-[#E8E0D8]">
@@ -49,17 +49,17 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-[#1B1A17] text-sm">{{ getRoleLabel(user.role) }}</td>
+                <td class="px-6 py-4 text-[#1B1A17] text-sm">{{ getRoleLabelKey(user.role) | translate }}</td>
                 <td class="px-6 py-4">
                   <span [class]="'px-2.5 py-1 rounded-full text-xs font-semibold ' + statusBadge[user.status || 'ACTIVE']">
-                    {{ user.status }}
+                    {{ getUserStatusKey(user.status) | translate }}
                   </span>
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex gap-2">
                     <button (click)="openEdit(user)"
                       class="text-xs border border-[#D9D0C4] text-[#1B1A17] rounded-full px-3 py-1 hover:bg-[#F5F1EA]">
-                      Edit
+                      {{ 'hotelUsers.edit' | translate }}
                     </button>
                     <button (click)="toggleStatus(user)"
                       [class]="user.role === 'SAHA_ADMIN' && user.status === 'ACTIVE'
@@ -67,8 +67,8 @@
                         : (user.status === 'ACTIVE'
                           ? 'text-xs border border-[#D14343] text-[#D14343] rounded-full px-3 py-1 hover:bg-red-50'
                           : 'text-xs bg-[#2E7D5B] text-white rounded-full px-3 py-1 hover:bg-[#256a4c]')"
-                      [title]="user.role === 'SAHA_ADMIN' && user.status === 'ACTIVE' ? 'SAHA Admin accounts cannot be deactivated' : ''">
-                      {{ user.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+                      [title]="user.role === 'SAHA_ADMIN' && user.status === 'ACTIVE' ? ('hotelUsers.cannotDeactivateAdmin' | translate) : ''">
+                      {{ (user.status === 'ACTIVE' ? 'hotelUsers.deactivate' : 'hotelUsers.activate') | translate }}
                     </button>
                   </div>
                 </td>
@@ -77,7 +77,7 @@
             @if (users.length === 0) {
               <tr>
                 <td colspan="4" class="px-6 py-12 text-center text-[#7A736B] text-sm">
-                  No users yet. Invite your first user.
+                  {{ 'hotelUsers.noUsersYet' | translate }}
                 </td>
               </tr>
             }
@@ -94,36 +94,36 @@
       <div class="bg-white rounded-2xl shadow-xl w-[480px] overflow-hidden"
            (click)="$event.stopPropagation()">
         <div class="px-6 pt-6 pb-4 border-b border-[#E8E0D8]">
-          <h2 class="text-[#1B1A17] font-semibold text-lg">Invite User</h2>
+          <h2 class="text-[#1B1A17] font-semibold text-lg">{{ 'hotelUsers.inviteModalTitle' | translate }}</h2>
           <p class="text-[#7A736B] text-sm">{{ hotelName }}</p>
         </div>
 
         <div class="px-6 py-5">
           <div class="flex flex-col gap-4">
             <div>
-              <label class="text-[#7A736B] text-xs mb-1 block">FULL NAME *</label>
-              <input type="text" [(ngModel)]="inviteForm.fullName" placeholder="Sara Al-Otaibi"
+              <label class="text-[#7A736B] text-xs mb-1 block">{{ 'hotelUsers.fullName' | translate }}</label>
+              <input type="text" [(ngModel)]="inviteForm.fullName" [placeholder]="'hotelUsers.fullNamePlaceholder' | translate"
                 [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
                 (hasError('fullName') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
               @if (hasError('fullName')) {
-                <p class="text-[#D14343] text-xs mt-1">Full name is required</p>
+                <p class="text-[#D14343] text-xs mt-1">{{ 'hotelUsers.fullNameRequired' | translate }}</p>
               }
             </div>
             <div>
-              <label class="text-[#7A736B] text-xs mb-1 block">EMAIL *</label>
-              <input type="email" [(ngModel)]="inviteForm.email" placeholder="sara@hotel.com"
+              <label class="text-[#7A736B] text-xs mb-1 block">{{ 'hotelUsers.email' | translate }}</label>
+              <input type="email" [(ngModel)]="inviteForm.email" [placeholder]="'hotelUsers.emailPlaceholder' | translate"
                 [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
                 (hasError('email') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
               @if (hasError('email')) {
-                <p class="text-[#D14343] text-xs mt-1">Email is required</p>
+                <p class="text-[#D14343] text-xs mt-1">{{ 'hotelUsers.emailRequired' | translate }}</p>
               }
             </div>
             <div>
-              <label class="text-[#7A736B] text-xs mb-1 block">ROLE *</label>
+              <label class="text-[#7A736B] text-xs mb-1 block">{{ 'hotelUsers.role' | translate }}</label>
               <select [(ngModel)]="inviteForm.role"
                 class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]">
                 @for (role of roles; track role.value) {
-                  <option [value]="role.value">{{ role.label }}</option>
+                  <option [value]="role.value">{{ getRoleLabelKey(role.value) | translate }}</option>
                 }
               </select>
             </div>
@@ -133,11 +133,11 @@
         <div class="border-t border-[#E8E0D8] bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3">
           <button (click)="showInviteForm = false"
             class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-white transition-colors">
-            Cancel
+            {{ 'hotelUsers.cancel' | translate }}
           </button>
           <button (click)="inviteUser()" [disabled]="isInviting"
             class="px-5 py-2.5 bg-[#34203A] text-white rounded-full text-sm font-semibold hover:bg-[#46294f] disabled:opacity-50 transition-colors">
-            {{ isInviting ? 'Inviting...' : 'Send Invite' }}
+            {{ (isInviting ? 'hotelUsers.inviting' : 'hotelUsers.sendInvite') | translate }}
           </button>
         </div>
       </div>
@@ -150,27 +150,27 @@
       <div class="bg-white rounded-2xl shadow-xl w-[480px] overflow-hidden"
            (click)="$event.stopPropagation()">
         <div class="px-6 pt-6 pb-4 border-b border-[#E8E0D8]">
-          <h2 class="text-[#1B1A17] font-semibold text-lg">Edit User</h2>
+          <h2 class="text-[#1B1A17] font-semibold text-lg">{{ 'hotelUsers.editModalTitle' | translate }}</h2>
           <p class="text-[#7A736B] text-sm">{{ hotelName }}</p>
         </div>
 
         <div class="px-6 py-5">
           <div class="flex flex-col gap-4">
             <div>
-              <label class="text-[#7A736B] text-xs mb-1 block">FULL NAME *</label>
-              <input type="text" [(ngModel)]="editForm.fullName" placeholder="Sara Al-Otaibi"
+              <label class="text-[#7A736B] text-xs mb-1 block">{{ 'hotelUsers.fullName' | translate }}</label>
+              <input type="text" [(ngModel)]="editForm.fullName" [placeholder]="'hotelUsers.fullNamePlaceholder' | translate"
                 [class]="'w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none ' +
                 (hasEditError('fullName') ? 'border-[#D14343]' : 'border-[#D9D0C4] focus:border-[#34203A]')" />
               @if (hasEditError('fullName')) {
-                <p class="text-[#D14343] text-xs mt-1">Full name is required</p>
+                <p class="text-[#D14343] text-xs mt-1">{{ 'hotelUsers.fullNameRequired' | translate }}</p>
               }
             </div>
             <div>
-              <label class="text-[#7A736B] text-xs mb-1 block">ROLE *</label>
+              <label class="text-[#7A736B] text-xs mb-1 block">{{ 'hotelUsers.role' | translate }}</label>
               <select [(ngModel)]="editForm.role"
                 class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#34203A]">
                 @for (role of roles; track role.value) {
-                  <option [value]="role.value">{{ role.label }}</option>
+                  <option [value]="role.value">{{ getRoleLabelKey(role.value) | translate }}</option>
                 }
               </select>
             </div>
@@ -180,11 +180,11 @@
         <div class="border-t border-[#E8E0D8] bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3">
           <button (click)="showEditForm = false"
             class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-white transition-colors">
-            Cancel
+            {{ 'hotelUsers.cancel' | translate }}
           </button>
           <button (click)="saveEdit()" [disabled]="isSavingEdit"
             class="px-5 py-2.5 bg-[#34203A] text-white rounded-full text-sm font-semibold hover:bg-[#46294f] disabled:opacity-50 transition-colors">
-            {{ isSavingEdit ? 'Saving...' : 'Save Changes' }}
+            {{ (isSavingEdit ? 'hotelUsers.saving' : 'hotelUsers.saveChanges') | translate }}
           </button>
         </div>
       </div>

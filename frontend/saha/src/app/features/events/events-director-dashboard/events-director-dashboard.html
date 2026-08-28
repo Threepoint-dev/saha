@@ -1,6 +1,6 @@
 <div class="p-6">
-  <h1 class="text-xl font-semibold text-[#1B1A17] mb-1">Events Director Dashboard</h1>
-  <p class="text-sm text-[#7A736B] mb-6">Hall load · Revenue value · Event requests</p>
+  <h1 class="text-xl font-semibold text-[#1B1A17] mb-1">{{ 'eventsDirectorDashboard.title' | translate }}</h1>
+  <p class="text-sm text-[#7A736B] mb-6">{{ 'eventsDirectorDashboard.subtitle' | translate }}</p>
 
   @if (errorMessage()) {
     <div class="mb-4 bg-[#F7DEDE] border border-[#D14343] text-[#A02F2F] text-sm rounded-lg px-4 py-2">
@@ -9,43 +9,43 @@
   }
 
   @if (loading()) {
-    <p class="text-sm text-[#7A736B]">Loading…</p>
+    <p class="text-sm text-[#7A736B]">{{ 'eventsDirectorDashboard.loading' | translate }}</p>
   } @else if (data(); as d) {
     <!-- Stat cards -->
     <div class="grid grid-cols-5 gap-4 mb-6">
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
-        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">Total</p>
+        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">{{ 'eventsDirectorDashboard.stat.total' | translate }}</p>
         <p class="text-2xl font-bold text-[#1B1A17]">{{ d.total }}</p>
-        <p class="text-[#9C9690] text-xs">This month</p>
+        <p class="text-[#9C9690] text-xs">{{ 'eventsDirectorDashboard.stat.thisMonth' | translate }}</p>
       </div>
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
-        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">Confirmed</p>
+        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">{{ 'eventsDirectorDashboard.stat.confirmed' | translate }}</p>
         <p class="text-2xl font-bold text-green-700">{{ d.confirmedCount }}</p>
         <p class="text-[#9C9690] text-xs">{{ formatSar(d.confirmedValueSar) }}</p>
       </div>
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
-        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">Tentative</p>
+        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">{{ 'eventsDirectorDashboard.stat.tentative' | translate }}</p>
         <p class="text-2xl font-bold text-[#B37410]">{{ d.tentativeCount }}</p>
-        <p class="text-[#9C9690] text-xs">Awaiting</p>
+        <p class="text-[#9C9690] text-xs">{{ 'eventsDirectorDashboard.stat.awaiting' | translate }}</p>
       </div>
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
-        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">Prepared</p>
+        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">{{ 'eventsDirectorDashboard.stat.prepared' | translate }}</p>
         <p class="text-2xl font-bold text-[#1B1A17]">{{ d.preparedCount }}</p>
-        <p class="text-[#9C9690] text-xs">Complete</p>
+        <p class="text-[#9C9690] text-xs">{{ 'eventsDirectorDashboard.stat.complete' | translate }}</p>
       </div>
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-4">
-        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">Upcoming</p>
+        <p class="text-[#9C9690] text-xs font-semibold uppercase tracking-wider mb-1">{{ 'eventsDirectorDashboard.stat.upcoming' | translate }}</p>
         <p class="text-2xl font-bold text-[#1B1A17]">{{ d.upcomingCount }}</p>
-        <p class="text-[#9C9690] text-xs">30 days</p>
+        <p class="text-[#9C9690] text-xs">{{ 'eventsDirectorDashboard.stat.days30' | translate }}</p>
       </div>
     </div>
 
     <div class="grid grid-cols-2 gap-6 mb-6">
       <!-- Revenue by hall -->
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
-        <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Revenue by hall (SAR)</h3>
+        <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'eventsDirectorDashboard.revenueByHall' | translate }}</h3>
         @if (d.revenueByHall.length === 0) {
-          <p class="text-sm text-[#9C9690]">No quoted events linked to halls yet.</p>
+          <p class="text-sm text-[#9C9690]">{{ 'eventsDirectorDashboard.noRevenueData' | translate }}</p>
         } @else {
           <div class="flex flex-col gap-3">
             @for (row of d.revenueByHall; track row.hallName) {
@@ -65,9 +65,9 @@
 
       <!-- Requests by setup type -->
       <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
-        <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Requests by setup type</h3>
+        <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'eventsDirectorDashboard.requestsBySetupType' | translate }}</h3>
         @if (d.requestsBySetupType.length === 0) {
-          <p class="text-sm text-[#9C9690]">No event setups recorded yet.</p>
+          <p class="text-sm text-[#9C9690]">{{ 'eventsDirectorDashboard.noSetupData' | translate }}</p>
         } @else {
           <div class="flex flex-col gap-3">
             @for (row of d.requestsBySetupType; track row.setupType) {
@@ -88,7 +88,7 @@
 
     <!-- Monthly trend -->
     <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
-      <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Monthly trend</h3>
+      <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'eventsDirectorDashboard.monthlyTrend' | translate }}</h3>
       <div class="flex items-end gap-6 h-32">
         @for (row of d.monthlyTrend; track row.month) {
           <div class="flex flex-col items-center gap-2">

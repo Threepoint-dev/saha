@@ -7,7 +7,7 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Measurement &amp; Reporting</p>
+        <p class="text-[#f6ddae] text-[11px]">{{ 'reporting.headerTitle' | translate }}</p>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -29,22 +29,22 @@
     <!-- Title + sample badge -->
     <div class="flex items-start justify-between">
       <div class="flex flex-col gap-1">
-        <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Hotel Measurement Dashboard</h1>
-        <p class="text-[#55514a] text-[13px] leading-none">Event sales performance · inquiries, conversion &amp; response time</p>
+        <h1 class="text-[#34203a] font-bold text-[26px] leading-none">{{ 'reporting.title' | translate }}</h1>
+        <p class="text-[#55514a] text-[13px] leading-none">{{ 'reporting.subtitle' | translate }}</p>
       </div>
       @if (!loading() && summary()) {
         <span class="inline-flex items-center gap-1.5 bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[11px] font-semibold px-3 py-1.5 rounded-full">
-          ● Sample data
+          {{ 'reporting.sampleData' | translate }}
         </span>
       }
     </div>
 
     <!-- Filters Row -->
     <div class="flex items-center gap-2 flex-wrap bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3">
-      <span class="text-[#55514a] text-[12px] font-semibold mr-1">Filters</span>
+      <span class="text-[#55514a] text-[12px] font-semibold mr-1">{{ 'reporting.filters' | translate }}</span>
 
       <div class="flex items-center gap-1 border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] cursor-pointer hover:bg-[#efebf3] transition-colors">
-        <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-wide">Date Range</span>
+        <span class="text-[#55514a] text-[10px] font-semibold uppercase tracking-wide">{{ 'reporting.dateRange' | translate }}</span>
         <span class="text-[#34203a] text-[12px] font-semibold mx-1">
           {{ from() | date:'MMM d' }} – {{ to() | date:'MMM d' }}
         </span>
@@ -52,50 +52,50 @@
       </div>
 
       <select [ngModel]="filterChannelId()" (ngModelChange)="filterChannelId.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
-        <option value="">All channels</option>
+        <option value="">{{ 'reporting.allChannels' | translate }}</option>
         @for (channel of sourceChannels(); track channel.id) {
           <option [value]="channel.id">{{ channel.name }}</option>
         }
       </select>
 
       <select [ngModel]="filterOwnerId()" (ngModelChange)="filterOwnerId.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
-        <option value="">All owners</option>
+        <option value="">{{ 'reporting.allOwners' | translate }}</option>
       </select>
 
       <select [ngModel]="filterEventType()" (ngModelChange)="filterEventType.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
-        <option value="">All types</option>
-        <option value="Wedding">Wedding</option>
-        <option value="Corporate">Corporate</option>
-        <option value="Social">Social</option>
-        <option value="Other">Other</option>
+        <option value="">{{ 'reporting.allTypes' | translate }}</option>
+        <option value="Wedding">{{ 'reporting.eventTypeOptions.wedding' | translate }}</option>
+        <option value="Corporate">{{ 'reporting.eventTypeOptions.corporate' | translate }}</option>
+        <option value="Social">{{ 'reporting.eventTypeOptions.social' | translate }}</option>
+        <option value="Other">{{ 'reporting.eventTypeOptions.other' | translate }}</option>
       </select>
 
       <select [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); apply()" class="border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 bg-[#faf7f2] text-[12px] text-[#34203a] focus:outline-none">
-        <option value="">All statuses</option>
-        <option value="NEW">New</option>
-        <option value="CONTACTED">Contacted</option>
-        <option value="QUOTED">Quoted</option>
-        <option value="WON">Won</option>
-        <option value="LOST">Lost</option>
+        <option value="">{{ 'reporting.allStatuses' | translate }}</option>
+        <option value="NEW">{{ 'status.new' | translate }}</option>
+        <option value="CONTACTED">{{ 'status.contacted' | translate }}</option>
+        <option value="QUOTED">{{ 'status.quoted' | translate }}</option>
+        <option value="WON">{{ 'status.won' | translate }}</option>
+        <option value="LOST">{{ 'status.lost' | translate }}</option>
       </select>
 
       <div class="flex items-center gap-2 ml-auto">
         <label class="flex flex-col gap-0.5">
-          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">From</span>
+          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">{{ 'reporting.from' | translate }}</span>
           <input type="date" [ngModel]="from()" (ngModelChange)="from.set($event)"
             class="border border-[#e4dfd5] rounded-[8px] px-2 py-1 text-[12px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
         </label>
         <label class="flex flex-col gap-0.5">
-          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">To</span>
+          <span class="text-[#55514a] text-[10px] font-semibold tracking-[0.2px] uppercase">{{ 'reporting.to' | translate }}</span>
           <input type="date" [ngModel]="to()" (ngModelChange)="to.set($event)"
             class="border border-[#e4dfd5] rounded-[8px] px-2 py-1 text-[12px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
         </label>
         <button type="button" (click)="apply()" [disabled]="loading()"
           class="self-end bg-[#34203a] hover:bg-[#46294f] text-white text-[12px] font-semibold rounded-[8px] px-4 py-1.5 transition-colors disabled:opacity-60">
-          {{ loading() ? 'Loading…' : 'Apply' }}
+          {{ (loading() ? 'reporting.loading' : 'reporting.apply') | translate }}
         </button>
         <button type="button" class="self-end text-[#ce8a28] text-[12px] font-semibold hover:underline">
-          Clear all
+          {{ 'reporting.clearAll' | translate }}
         </button>
       </div>
     </div>
@@ -108,21 +108,21 @@
 
     <!-- Key Metrics Section -->
     <div class="flex flex-col gap-3">
-      <h2 class="text-[#34203a] font-bold text-[16px]">Key metrics</h2>
+      <h2 class="text-[#34203a] font-bold text-[16px]">{{ 'reporting.keyMetrics' | translate }}</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3">
-        @for (kpi of kpis(); track kpi.label) {
+        @for (kpi of kpis(); track kpi.labelKey) {
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-4 py-4 flex flex-col gap-2">
             <div class="w-full h-0.5 rounded-full" [class]="kpi.barColor || 'bg-[#34203a]'"></div>
-            <p class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ kpi.label }}</p>
+            <p class="text-[#55514a] text-[10px] font-semibold uppercase tracking-[0.2px] leading-tight">{{ kpi.labelKey | translate }}</p>
             <p class="text-[#34203a] font-bold text-[24px] leading-none">{{ kpi.value }}</p>
-            @if (kpi.hint) {
-              <p class="text-[#8a8079] text-[11px] leading-none">{{ kpi.hint }}</p>
+            @if (kpi.hintKey) {
+              <p class="text-[#8a8079] text-[11px] leading-none">{{ kpi.hintKey | translate }}</p>
             }
           </div>
         }
         @if (kpis().length === 0) {
           <div class="col-span-full bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-6 text-[#55514a] text-[13px]">
-            {{ loading() ? 'Loading metrics…' : 'No data for the selected range.' }}
+            {{ (loading() ? 'reporting.loadingMetrics' : 'reporting.noDataRange') | translate }}
           </div>
         }
       </div>
@@ -131,27 +131,31 @@
     <!-- Insights Section -->
     @if (summary()) {
       <div class="flex flex-col gap-3">
-        <h2 class="text-[#34203a] font-bold text-[16px]">Insights</h2>
+        <h2 class="text-[#34203a] font-bold text-[16px]">{{ 'reporting.insights' | translate }}</h2>
 
         <!-- Conversion Funnel -->
         <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-5 flex flex-col gap-4">
           <div class="flex flex-col gap-0.5">
-            <h3 class="text-[#34203a] font-semibold text-[14px]">Conversion funnel</h3>
-            <p class="text-[#8a8079] text-[11px]">New → Contacted → Quoted → Won / Lost</p>
+            <h3 class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.conversionFunnel' | translate }}</h3>
+            <p class="text-[#8a8079] text-[11px]">{{ 'reporting.funnelSubtitle' | translate }}</p>
           </div>
           <div class="flex items-end gap-2">
-            @for (bar of funnelBars(); track bar.label) {
+            @for (bar of funnelBars(); track bar.labelKey) {
               <div class="flex-1 flex flex-col items-center gap-1.5">
                 <span class="text-[#34203a] font-bold text-[14px]">{{ bar.count }}</span>
                 <div [style.height.px]="bar.height" [class]="'w-full rounded-[6px] ' + bar.color" style="min-height: 24px;"></div>
-                <span class="text-[#55514a] text-[11px] font-medium">{{ bar.label }}</span>
+                <span class="text-[#55514a] text-[11px] font-medium">{{ bar.labelKey | translate }}</span>
               </div>
             }
           </div>
           @if (summary()) {
             <p class="text-[#8a8079] text-[11px]">
-              Won {{ summary()!.wonInquiries }} of {{ summary()!.totalInquiries }} · {{ summary()!.conversionRate | number:'1.0-0' }}% conversion.
-              {{ (summary()!.totalInquiries - summary()!.wonInquiries - summary()!.lostInquiries) }} inquiries still open across New / Contacted / Quoted.
+              {{ 'reporting.conversionSummary' | translate:{
+                won: summary()!.wonInquiries,
+                total: summary()!.totalInquiries,
+                rate: (summary()!.conversionRate | number:'1.0-0'),
+                open: (summary()!.totalInquiries - summary()!.wonInquiries - summary()!.lostInquiries)
+              } }}
             </p>
           }
         </div>
@@ -161,8 +165,8 @@
           <!-- Inquiries by source channel -->
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-0.5">
-              <h3 class="text-[#34203a] font-semibold text-[14px]">Inquiries by source channel</h3>
-              <p class="text-[#8a8079] text-[11px]">Where inquiries come from</p>
+              <h3 class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.inquiriesBySource' | translate }}</h3>
+              <p class="text-[#8a8079] text-[11px]">{{ 'reporting.whereFrom' | translate }}</p>
             </div>
             @if (summary()?.inquiriesBySource?.length) {
               <div class="flex flex-col gap-2">
@@ -181,7 +185,7 @@
                 }
               </div>
             } @else {
-              <p class="text-[#8a8079] text-[12px]">No source data.</p>
+              <p class="text-[#8a8079] text-[12px]">{{ 'reporting.noSourceData' | translate }}</p>
             }
           </div>
 
@@ -189,12 +193,12 @@
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-0.5">
-                <h3 class="text-[#34203a] font-semibold text-[14px]">Lost reason breakdown</h3>
-                <p class="text-[#8a8079] text-[11px]">Why inquiries don't convert</p>
+                <h3 class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.lostReasonBreakdown' | translate }}</h3>
+                <p class="text-[#8a8079] text-[11px]">{{ 'reporting.whyNoConvert' | translate }}</p>
               </div>
-              <a routerLink="/reporting/lost-reasons" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">View full analysis →</a>
+              <a routerLink="/reporting/lost-reasons" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">{{ 'reporting.viewFullAnalysis' | translate }}</a>
             </div>
-            <p class="text-[#8a8079] text-[12px]">No lost reason data in current range.</p>
+            <p class="text-[#8a8079] text-[12px]">{{ 'reporting.noLostData' | translate }}</p>
           </div>
         </div>
 
@@ -204,15 +208,15 @@
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-0.5">
-                <h3 class="text-[#34203a] font-semibold text-[14px]">First-response time</h3>
-                <p class="text-[#8a8079] text-[11px]">Distribution of time to first contact</p>
+                <h3 class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.firstResponseTime' | translate }}</h3>
+                <p class="text-[#8a8079] text-[11px]">{{ 'reporting.distributionTime' | translate }}</p>
               </div>
-              <a routerLink="/reporting/response-time" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">View full analysis →</a>
+              <a routerLink="/reporting/response-time" class="text-[#8a6fa8] text-[12px] font-semibold hover:underline whitespace-nowrap">{{ 'reporting.viewFullAnalysis' | translate }}</a>
             </div>
             @if (summary()?.avgResponseTimeHours !== undefined) {
               <div class="flex items-center gap-2">
                 <span class="text-[#34203a] font-bold text-[24px]">{{ formatHours(summary()!.avgResponseTimeHours) }}</span>
-                <span class="bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[10px] font-semibold px-2 py-0.5 rounded-full">median</span>
+                <span class="bg-[#f6ddae] border border-[#ce8a28] text-[#34203a] text-[10px] font-semibold px-2 py-0.5 rounded-full">{{ 'reporting.median' | translate }}</span>
               </div>
             }
           </div>
@@ -220,8 +224,8 @@
           <!-- Recent performance trend -->
           <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
             <div class="flex flex-col gap-0.5">
-              <h3 class="text-[#34203a] font-semibold text-[14px]">Recent performance trend</h3>
-              <p class="text-[#8a8079] text-[11px]">Inquiries vs. won — last 6 weeks</p>
+              <h3 class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.recentTrend' | translate }}</h3>
+              <p class="text-[#8a8079] text-[11px]">{{ 'reporting.inquiriesVsWon' | translate }}</p>
             </div>
             <div class="h-[160px] relative">
               <canvas id="chart-inquiries-month"></canvas>
@@ -237,8 +241,8 @@
         <!-- Quote Value by Month -->
         <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
           <div class="flex flex-col gap-0.5">
-            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Quote Value by Month</h2>
-            <p class="text-[#8a8079] text-[11px] leading-none">Last 6 months</p>
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">{{ 'reporting.quoteValueByMonth' | translate }}</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">{{ 'reporting.last6Months' | translate }}</p>
           </div>
           <div class="h-[240px] relative">
             <canvas id="chart-quote-month"></canvas>
@@ -248,8 +252,8 @@
         <!-- Inquiries by Status -->
         <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
           <div class="flex flex-col gap-0.5">
-            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Status</h2>
-            <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">{{ 'reporting.inquiriesByStatus' | translate }}</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">{{ 'reporting.selectedRange' | translate }}</p>
           </div>
           <div class="h-[240px] relative">
             <canvas id="chart-status"></canvas>
@@ -259,8 +263,8 @@
         <!-- Inquiries by Source Channel - chart -->
         <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-5 py-4 flex flex-col gap-3">
           <div class="flex flex-col gap-0.5">
-            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">Inquiries by Source Channel</h2>
-            <p class="text-[#8a8079] text-[11px] leading-none">Selected range</p>
+            <h2 class="text-[#34203a] font-semibold text-[15px] leading-none">{{ 'reporting.inquiriesBySourceChannel' | translate }}</h2>
+            <p class="text-[#8a8079] text-[11px] leading-none">{{ 'reporting.selectedRange' | translate }}</p>
           </div>
           <div class="h-[240px] relative">
             <canvas id="chart-source"></canvas>
@@ -277,8 +281,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
           </svg>
         </div>
-        <p class="text-[#34203a] font-semibold text-[14px]">No data for this range</p>
-        <p class="text-[#8a8079] text-[12px]">Adjust filters or wait for new inquiries.</p>
+        <p class="text-[#34203a] font-semibold text-[14px]">{{ 'reporting.noDataTitle' | translate }}</p>
+        <p class="text-[#8a8079] text-[12px]">{{ 'reporting.noDataSubtitle' | translate }}</p>
       </div>
     }
 
