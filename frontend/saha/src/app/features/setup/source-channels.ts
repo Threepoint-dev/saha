@@ -4,12 +4,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { SourceChannel } from './source-channels.model';
 import { SourceChannelsService } from './source-channels.service';
 
 @Component({
   selector: 'app-source-channels',
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader, TranslatePipe],
   templateUrl: './source-channels.html'
 })
 export class SourceChannels implements OnInit {

@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { QuoteSettingsService } from './quote-settings.service';
 
 @Component({
   selector: 'app-quote-settings',
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader, TranslatePipe],
   templateUrl: './quote-settings.html'
 })
 export class QuoteSettingsPage implements OnInit {

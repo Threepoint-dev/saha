@@ -1,0 +1,30 @@
+<div class="border border-[#e4dfd5] rounded-[12px] overflow-hidden bg-white">
+  <button
+    type="button"
+    (click)="toggle()"
+    class="w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#faf7f2] active:bg-[#faf7f2]">
+
+    <div [class]="'w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold shrink-0 transition-colors ' +
+      (isFilled() ? 'bg-[#ce8a28] text-white' : 'bg-[#34203a] text-white')">
+      {{ sectionNumber() }}
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p class="text-[#34203a] font-semibold text-[14px] leading-tight">{{ title() }}</p>
+      @if (!isExpanded() && summary()) {
+        <p class="text-[#55514a] text-[12px] leading-tight truncate mt-0.5">{{ summary() }}</p>
+      }
+    </div>
+
+    <svg [class]="'w-4 h-4 text-[#8a8478] transition-transform shrink-0 ' + (isExpanded() ? 'rotate-180' : '')"
+         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </button>
+
+  @if (isExpanded()) {
+    <div class="border-t border-[#e4dfd5] px-4 py-4">
+      <ng-content />
+    </div>
+  }
+</div>

@@ -20,12 +20,21 @@ export class QuotePreview implements OnInit {
   readonly quote = signal<PublicQuote | null>(null);
   readonly loading = signal(true);
   readonly notFound = signal(false);
+  readonly copied = signal(false);
 
   ngOnInit(): void {
     const token = this.route.snapshot.paramMap.get('shareToken') ?? '';
     this.service.getPublicQuote(token).subscribe({
       next: (q) => { this.quote.set(q); this.loading.set(false); },
       error: () => { this.notFound.set(true); this.loading.set(false); }
+    });
+  }
+
+  copyLink(): void {
+    if (typeof window === 'undefined') return;
+    navigator.clipboard?.writeText(window.location.href).then(() => {
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
     });
   }
 

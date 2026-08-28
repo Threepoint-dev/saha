@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import {
   Addon,
   EventPackage,
@@ -16,7 +17,7 @@ type ModalMode = 'create' | 'edit';
 
 @Component({
   selector: 'app-reference-data',
-  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader, TranslatePipe],
   templateUrl: './reference-data.html'
 })
 export class ReferenceData implements OnInit {
@@ -300,7 +301,6 @@ export class ReferenceData implements OnInit {
     return `${action} ${label}`;
   }
 
-  /** Translation key for the current tab's "+ Add ___" button. */
   addButtonKey(): string {
     return `referenceData.addButton.${this.activeTab()}`;
   }

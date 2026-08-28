@@ -3,6 +3,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { DataQualityReport, ExportType } from './export.model';
 import { ExportService } from './export.service';
 
@@ -23,7 +24,7 @@ const LAST_EXPORT_KEY = 'saha.export.lastExport';
 
 @Component({
   selector: 'app-export',
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule, TranslatePipe, AdminPageHeader],
   templateUrl: './export.html'
 })
 export class Export implements OnInit {

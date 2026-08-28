@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import {
   Addon,
   CATERING_STYLES,
@@ -65,7 +66,7 @@ interface MealCard {
 
 @Component({
   selector: 'app-event-setup',
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader],
   templateUrl: './event-setup.html'
 })
 export class EventSetupPage implements OnInit {
