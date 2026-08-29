@@ -1,24 +1,13 @@
 <div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
-  <!-- Top Bar -->
-  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
-    <div class="flex items-center gap-3">
-      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
-        <span class="text-white font-bold text-sm">S</span>
-      </div>
-      <div class="flex flex-col gap-px leading-none">
-        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Measurement &amp; Reporting</p>
-      </div>
-    </div>
-  </header>
+  <app-admin-page-header [subtitle]="'reporting.headerTitle' | translate" />
 
   <!-- Body -->
-  <main class="flex flex-col gap-6 px-10 py-7 w-full max-w-[1400px] mx-auto">
+  <main class="flex flex-col gap-6 px-4 md:px-10 py-5 md:py-7 w-full max-w-[1400px] mx-auto">
 
     <div class="flex flex-col gap-1">
       <a routerLink="/reporting" class="text-[#8a8478] hover:text-[#34203a] text-[12px] font-medium transition-colors">← Back to Dashboard</a>
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Response Time Analysis</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">First-response speed, distribution, owner &amp; source breakdown — and impact on conversion</p>
+      <h1 class="text-[#34203a] font-bold text-[22px] md:text-[26px] leading-tight">Response Time Analysis</h1>
+      <p class="text-[#55514a] text-[13px] leading-snug">First-response speed, distribution, owner &amp; source breakdown — and impact on conversion</p>
     </div>
 
     @if (errorMessage()) {
@@ -30,7 +19,7 @@
     } @else if (data(); as d) {
 
       <!-- Top 4 cards -->
-      <div class="grid grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
           <p class="text-[10px] font-semibold uppercase tracking-[0.1px] text-blue-700 bg-blue-100 inline-block px-2 py-0.5 rounded-full mb-2">Acceptable</p>
           <p class="text-[#8a8478] text-[10px] uppercase tracking-wide mb-1">Median First Response</p>
@@ -53,7 +42,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Response time distribution -->
         <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-6 py-5">
           <h3 class="text-[#34203a] font-semibold text-[15px] mb-1">Response time distribution</h3>
@@ -93,14 +82,15 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- By owner -->
         <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden">
           <div class="px-5 py-4 border-b border-[#efebf3]">
             <h3 class="text-[#34203a] font-semibold text-[14px]">Response time by owner</h3>
             <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
           </div>
-          <table class="w-full text-left">
+          <div class="overflow-x-auto">
+          <table class="w-full text-left min-w-[460px]">
             <thead>
               <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
                 <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Name</th>
@@ -127,6 +117,7 @@
               }
             </tbody>
           </table>
+          </div>
         </div>
 
         <!-- By source -->
@@ -135,7 +126,8 @@
             <h3 class="text-[#34203a] font-semibold text-[14px]">Response time by source</h3>
             <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
           </div>
-          <table class="w-full text-left">
+          <div class="overflow-x-auto">
+          <table class="w-full text-left min-w-[460px]">
             <thead>
               <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
                 <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Source</th>
@@ -162,6 +154,7 @@
               }
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     }

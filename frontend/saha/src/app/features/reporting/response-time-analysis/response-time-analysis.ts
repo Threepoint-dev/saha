@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { ResponseTimeAnalysis } from '../reporting.model';
 import { ReportingService } from '../reporting.service';
+import { AdminPageHeader } from '../../../shared/admin-page-header/admin-page-header';
 
 @Component({
   selector: 'app-response-time-analysis',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe, AdminPageHeader],
   templateUrl: './response-time-analysis.html'
 })
 export class ResponseTimeAnalysisPage implements OnInit {

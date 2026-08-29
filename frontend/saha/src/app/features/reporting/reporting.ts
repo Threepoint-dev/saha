@@ -8,6 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ReportingSummary } from './reporting.model';
 import { ReportingService } from './reporting.service';
 import { SourceChannelsService } from '../setup/source-channels.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 
 /** Chart.js is loaded globally via CDN (see index.html). */
 declare const Chart: any;
@@ -26,7 +27,7 @@ const STATUS_COLORS = ['#34203a', '#f6ddae', '#2e7d5b', '#d14343', '#e0922f', '#
 
 @Component({
   selector: 'app-reporting',
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader],
   templateUrl: './reporting.html'
 })
 export class Reporting implements OnInit, OnDestroy {

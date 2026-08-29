@@ -341,6 +341,7 @@
     "saved": "Quote settings saved."
   },
   "adminPanel": {
+    "headerTitle": "Admin",
     "sahaAdmin": "SAHA Admin",
     "title": "Hotel Management",
     "addHotel": "+ Add Hotel",
@@ -358,6 +359,7 @@
     "manageUsers": "Manage Users"
   },
   "hotelUsers": {
+    "headerTitle": "Users",
     "backToHotels": "← Back to hotels",
     "titleSuffix": "— Users",
     "inviteUser": "+ Invite User",
@@ -400,6 +402,7 @@
     }
   },
   "createHotel": {
+    "headerTitle": "Admin",
     "backToHotels": "← Back to hotels",
     "title": "Create Hotel Tenant",
     "isolationNote": "Each hotel workspace is fully isolated. Hotel users cannot see data from other hotels.",
