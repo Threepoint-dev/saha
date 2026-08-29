@@ -2,11 +2,11 @@
   <app-admin-page-header [subtitle]="'sourceChannels.headerTitle' | translate" />
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1000px] mx-auto">
+  <main class="flex flex-col gap-5 px-4 md:px-10 py-5 md:py-7 w-full max-w-[1000px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">{{ 'sourceChannels.pageTitle' | translate }}</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">{{ 'sourceChannels.pageSubtitle' | translate }}</p>
+      <h1 class="text-[#34203a] font-bold text-[22px] md:text-[26px] leading-tight">{{ 'sourceChannels.pageTitle' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-snug">{{ 'sourceChannels.pageSubtitle' | translate }}</p>
     </div>
 
     @if (errorMessage()) {
@@ -27,7 +27,7 @@
     </div>
 
     <!-- Add new channel -->
-    <form [formGroup]="addForm" (ngSubmit)="addChannel()" class="flex items-start gap-3">
+    <form [formGroup]="addForm" (ngSubmit)="addChannel()" class="flex flex-col sm:flex-row items-stretch sm:items-start gap-3">
       <div class="flex flex-col gap-1.5 flex-1">
         <input type="text" formControlName="name" [placeholder]="'sourceChannels.addPlaceholder' | translate"
           class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors w-full"
@@ -60,12 +60,12 @@
               (drop)="onDrop(i)"
               (dragend)="onDragEnd()"
               [class.opacity-50]="dragIndex() === i"
-              class="flex items-center gap-4 px-5 py-3.5 border-t border-[#e4dfd5] first:border-t-0 hover:bg-[#faf7f2] transition-colors">
-              <!-- Drag handle -->
-              <span class="cursor-grab active:cursor-grabbing text-[#c9c3b8] hover:text-[#55514a] select-none text-[16px] leading-none" title="Drag to reorder">⋮⋮</span>
+              class="flex items-center flex-wrap gap-x-3 gap-y-2 px-4 md:px-5 py-3.5 border-t border-[#e4dfd5] first:border-t-0 hover:bg-[#faf7f2] transition-colors">
+              <!-- Drag handle: pointer only (no touch DnD) -->
+              <span class="hidden sm:inline cursor-grab active:cursor-grabbing text-[#c9c3b8] hover:text-[#55514a] select-none text-[16px] leading-none" title="Drag to reorder">⋮⋮</span>
 
               <!-- Name -->
-              <span class="flex-1 text-[13px] font-medium"
+              <span class="flex-1 min-w-[140px] text-[13px] font-medium"
                 [ngClass]="channel.isActive ? 'text-[#34203a]' : 'text-[#a39c90]'">
                 {{ channel.name }}
                 @if (!channel.isActive) {

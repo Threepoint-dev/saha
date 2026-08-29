@@ -2,15 +2,15 @@
   <app-admin-page-header [subtitle]="'referenceData.headerTitle' | translate" />
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1440px] mx-auto">
+  <main class="flex flex-col gap-5 px-4 md:px-10 py-5 md:py-7 w-full max-w-[1440px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">{{ 'referenceData.pageTitle' | translate }}</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">{{ 'referenceData.pageSubtitle' | translate }}</p>
+      <h1 class="text-[#34203a] font-bold text-[22px] md:text-[26px] leading-tight">{{ 'referenceData.pageTitle' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-snug">{{ 'referenceData.pageSubtitle' | translate }}</p>
     </div>
 
     <!-- Tabs: bordered button group like Figma -->
-    <div class="flex items-center border border-[#e4dfd5] rounded-[12px] bg-white w-fit overflow-hidden">
+    <div class="flex items-center border border-[#e4dfd5] rounded-[12px] bg-white w-full sm:w-fit overflow-x-auto">
       <button
         type="button"
         (click)="setTab('halls')"
@@ -79,7 +79,8 @@
                 {{ 'referenceData.emptyHallsPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.halls' | translate }}</span> {{ 'referenceData.emptyHallsSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[760px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
                     <th class="text-left px-5 py-3">{{ 'referenceData.table.hallName' | translate }}</th>
@@ -100,7 +101,7 @@
                       <td class="px-5 py-3 text-right">{{ formatPrice(hall.basePrice) }}</td>
                       <td class="px-5 py-3 text-[#55514a]">{{ hall.defaultSetup || '—' }}</td>
                       <td class="px-5 py-3">
-                        <span class="inline-flex items-center rounded-[6px] px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-100 text-emerald-700">{{ 'referenceData.active' | translate }}</span>
+                        <app-status-badge status="active" [label]="'referenceData.active' | translate" />
                       </td>
                       <td class="px-5 py-3">
                         <div class="flex items-center justify-end gap-2">
@@ -118,6 +119,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
           @case ('packages') {
@@ -126,7 +128,8 @@
                 {{ 'referenceData.emptyPackagesPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.packages' | translate }}</span> {{ 'referenceData.emptyPackagesSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[640px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
                     <th class="text-left px-5 py-3">{{ 'referenceData.table.name' | translate }}</th>
@@ -165,6 +168,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
           @case ('addons') {
@@ -173,7 +177,8 @@
                 {{ 'referenceData.emptyAddonsPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.addons' | translate }}</span> {{ 'referenceData.emptyAddonsSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[520px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
                     <th class="text-left px-5 py-3">{{ 'referenceData.table.name' | translate }}</th>
@@ -210,6 +215,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
         }
@@ -243,7 +249,7 @@
                   <span class="text-red-600 text-[11px]">{{ 'referenceData.form.nameRequired' | translate }}</span>
                 }
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                   <label class="text-[#34203a] text-[12px] font-medium" for="hall-capacity">{{ 'referenceData.form.capacity' | translate }}</label>
                   <input id="hall-capacity" type="number" formControlName="capacity" min="0" [placeholder]="'referenceData.form.capacityPlaceholder' | translate"
@@ -255,7 +261,7 @@
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                   <label class="text-[#34203a] text-[12px] font-medium" for="hall-setup">{{ 'referenceData.form.defaultSetup' | translate }}</label>
                   <input id="hall-setup" type="text" formControlName="defaultSetup" [placeholder]="'referenceData.form.defaultSetupPlaceholder' | translate"
@@ -284,7 +290,7 @@
                 <textarea id="pkg-description" formControlName="description" rows="3" [placeholder]="'referenceData.form.descriptionPlaceholder' | translate"
                   class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                   <label class="text-[#34203a] text-[12px] font-medium" for="pkg-price">{{ 'referenceData.form.price' | translate }}</label>
                   <input id="pkg-price" type="number" formControlName="price" min="0" step="0.01" [placeholder]="'referenceData.form.pricePlaceholderPackage' | translate"
@@ -310,7 +316,7 @@
                   <span class="text-red-600 text-[11px]">{{ 'referenceData.form.nameRequired' | translate }}</span>
                 }
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
                   <label class="text-[#34203a] text-[12px] font-medium" for="addon-price">{{ 'referenceData.form.price' | translate }}</label>
                   <input id="addon-price" type="number" formControlName="price" min="0" step="0.01" [placeholder]="'referenceData.form.pricePlaceholderAddon' | translate"
