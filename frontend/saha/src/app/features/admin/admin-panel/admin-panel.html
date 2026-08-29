@@ -1,18 +1,19 @@
-<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+<div class="min-h-screen bg-[#FAF7F2] flex flex-col pb-12">
+  <app-admin-page-header [subtitle]="'adminPanel.headerTitle' | translate" />
 
-  <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
-    <div>
-      <p class="text-[#7A736B] text-xs font-semibold tracking-wider uppercase mb-0.5">{{ 'adminPanel.sahaAdmin' | translate }}</p>
-      <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'adminPanel.title' | translate }}</h1>
+  <div class="w-full max-w-[1100px] mx-auto px-4 md:px-8 py-5 md:py-6 flex flex-col gap-5">
+
+    <!-- Title + primary action -->
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div class="flex flex-col gap-1">
+        <h1 class="text-[#1B1A17] text-[22px] md:text-[26px] font-bold leading-tight">{{ 'adminPanel.title' | translate }}</h1>
+        <p class="text-[#7A736B] text-[13px]">{{ 'adminPanel.emptySubtitle' | translate }}</p>
+      </div>
+      <a routerLink="/admin/hotels/new"
+        class="shrink-0 text-center bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+        {{ 'adminPanel.addHotel' | translate }}
+      </a>
     </div>
-    <a routerLink="/admin/hotels/new"
-      class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
-      {{ 'adminPanel.addHotel' | translate }}
-    </a>
-  </div>
-
-  <div class="px-8 py-6">
 
     <!-- Loading -->
     @if (isLoading) {
@@ -36,10 +37,47 @@
       </div>
     }
 
-    <!-- Hotels Table -->
     @if (!isLoading && hotels.length > 0) {
-      <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
-        <table class="w-full">
+      <!-- Mobile: list-detail cards -->
+      <div class="flex flex-col gap-3 md:hidden">
+        @for (hotel of hotels; track hotel.id) {
+          <div class="bg-white border border-[#E8E0D8] rounded-[12px] px-4 py-3.5 flex flex-col gap-2.5">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-lg bg-[#34203A] flex items-center justify-center shrink-0">
+                  <span class="text-white text-xs font-bold">{{ getInitials(hotel.name) }}</span>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-[#1B1A17] text-sm font-semibold truncate">{{ hotel.name }}</p>
+                  <p class="text-[#7A736B] text-xs truncate">{{ hotel.district || hotel.city || '—' }}</p>
+                </div>
+              </div>
+              <app-status-badge
+                [status]="hotel.isActive ? 'active' : 'inactive'"
+                [label]="(hotel.isActive ? 'adminPanel.active' : 'adminPanel.inactive') | translate" />
+            </div>
+            <div class="flex gap-6 text-xs">
+              <div class="flex flex-col">
+                <span class="text-[#8A8478] uppercase tracking-[0.4px] text-[10px] font-semibold">{{ 'adminPanel.table.city' | translate }}</span>
+                <span class="text-[#1B1A17]">{{ hotel.city || '—' }}</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="text-[#8A8478] uppercase tracking-[0.4px] text-[10px] font-semibold">{{ 'adminPanel.table.contact' | translate }}</span>
+                <span class="text-[#1B1A17] truncate">{{ hotel.mainContactName || '—' }}</span>
+              </div>
+            </div>
+            <a [routerLink]="['/admin/hotels', hotel.id, 'users']"
+              class="text-[#34203A] text-xs font-semibold hover:underline self-start">
+              {{ 'adminPanel.manageUsers' | translate }} →
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- Desktop: table -->
+      <div class="hidden md:block bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
+        <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px]">
           <thead>
             <tr class="border-b border-[#E8E0D8] bg-[#FAF7F2]">
               <th class="text-left px-6 py-3 text-[#7A736B] text-xs font-semibold uppercase tracking-wider">{{ 'adminPanel.table.hotel' | translate }}</th>
@@ -69,11 +107,9 @@
                   <p class="text-[#7A736B] text-xs">{{ hotel.mainContactEmail || '' }}</p>
                 </td>
                 <td class="px-6 py-4">
-                  @if (hotel.isActive) {
-                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">{{ 'adminPanel.active' | translate }}</span>
-                  } @else {
-                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">{{ 'adminPanel.inactive' | translate }}</span>
-                  }
+                  <app-status-badge
+                    [status]="hotel.isActive ? 'active' : 'inactive'"
+                    [label]="(hotel.isActive ? 'adminPanel.active' : 'adminPanel.inactive') | translate" />
                 </td>
                 <td class="px-6 py-4">
                   <div class="flex items-center gap-2">
@@ -87,6 +123,7 @@
             }
           </tbody>
         </table>
+        </div>
       </div>
     }
 

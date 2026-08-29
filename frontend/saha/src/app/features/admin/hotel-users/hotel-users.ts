@@ -6,11 +6,13 @@ import { HttpClient } from '@angular/common/http';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminPageHeader } from '../../../shared/admin-page-header/admin-page-header';
+import { StatusBadge } from '../../../shared/mobile/status-badge/status-badge';
 
 @Component({
   selector: 'app-hotel-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader, StatusBadge],
   templateUrl: './hotel-users.html',
   styleUrl: './hotel-users.scss'
 })
@@ -65,12 +67,6 @@ export class HotelUsers implements OnInit {
     ACTIVE: 'hotelUsers.userStatus.active',
     INVITED: 'hotelUsers.userStatus.invited',
     INACTIVE: 'hotelUsers.userStatus.inactive',
-  };
-
-  statusBadge: Record<string, string> = {
-    ACTIVE: 'bg-green-100 text-green-700',
-    INVITED: 'bg-yellow-100 text-yellow-700',
-    INACTIVE: 'bg-gray-100 text-gray-600',
   };
 
   constructor(

@@ -341,6 +341,7 @@
     "saved": "تم حفظ إعدادات العروض."
   },
   "adminPanel": {
+    "headerTitle": "المشرف",
     "sahaAdmin": "إدارة SAHA",
     "title": "إدارة الفنادق",
     "addHotel": "+ إضافة فندق",
@@ -358,6 +359,7 @@
     "manageUsers": "إدارة المستخدمين"
   },
   "hotelUsers": {
+    "headerTitle": "المستخدمون",
     "backToHotels": "← رجوع للفنادق",
     "titleSuffix": "— المستخدمين",
     "inviteUser": "+ دعوة مستخدم",
@@ -400,6 +402,7 @@
     }
   },
   "createHotel": {
+    "headerTitle": "المشرف",
     "backToHotels": "← رجوع للفنادق",
     "title": "إنشاء فندق جديد",
     "isolationNote": "كل مساحة عمل فندق معزولة بالكامل. مستخدمو الفندق ما يقدرون يشوفون بيانات فنادق ثانية.",

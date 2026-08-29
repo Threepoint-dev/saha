@@ -1,15 +1,13 @@
-<div class="flex-1 bg-[#FAF7F2] min-h-screen">
+<div class="bg-[#FAF7F2] min-h-screen flex flex-col pb-12">
+  <app-admin-page-header [subtitle]="'createHotel.headerTitle' | translate" />
 
-  <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
-    <div>
-      <a routerLink="/admin" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">{{ 'createHotel.backToHotels' | translate }}</a>
-      <h1 class="text-[#1B1A17] text-xl font-bold mt-1">{{ 'createHotel.title' | translate }}</h1>
+  <div class="w-full max-w-2xl mx-auto px-4 md:px-8 py-5 md:py-6 flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <a routerLink="/admin" class="text-[#7A736B] text-[12px] font-medium hover:text-[#1B1A17]">{{ 'createHotel.backToHotels' | translate }}</a>
+      <h1 class="text-[#1B1A17] text-[22px] md:text-[26px] font-bold leading-tight">{{ 'createHotel.title' | translate }}</h1>
     </div>
-  </div>
 
-  <div class="px-8 py-6 max-w-2xl">
-    <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+    <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-6">
 
       <p class="text-xs text-[#7A736B] bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6">
         {{ 'createHotel.isolationNote' | translate }}
@@ -17,7 +15,7 @@
 
       <!-- Hotel Info -->
       <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">{{ 'createHotel.hotelInfo' | translate }}</p>
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="text-[#7A736B] text-xs mb-1 block">{{ 'createHotel.hotelName' | translate }}</label>
           <input type="text" [(ngModel)]="form.name" [placeholder]="'createHotel.hotelNamePlaceholder' | translate"
@@ -38,7 +36,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div>
           <label class="text-[#7A736B] text-xs mb-1 block">{{ 'createHotel.district' | translate }}</label>
           <input type="text" [(ngModel)]="form.district" [placeholder]="'createHotel.districtPlaceholder' | translate"
@@ -53,7 +51,7 @@
 
       <!-- Contact -->
       <p class="text-[#E8A33D] text-xs font-bold tracking-wider mb-3">{{ 'createHotel.mainContact' | translate }}</p>
-      <div class="grid grid-cols-2 gap-4 mb-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
           <label class="text-[#7A736B] text-xs mb-1 block">{{ 'createHotel.fullName' | translate }}</label>
           <input type="text" [(ngModel)]="form.mainContactName" [placeholder]="'createHotel.fullNamePlaceholder' | translate"
@@ -77,13 +75,13 @@
       </div>
 
       <!-- Actions -->
-      <div class="flex justify-end gap-3">
+      <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
         <a routerLink="/admin"
-          class="px-6 py-2.5 text-sm text-[#7A736B] hover:text-[#1B1A17] transition-colors">
+          class="text-center px-6 py-2.5 text-sm text-[#7A736B] hover:text-[#1B1A17] transition-colors">
           {{ 'createHotel.cancel' | translate }}
         </a>
         <button (click)="submit()" [disabled]="isLoading"
-          class="bg-[#34203A] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#46294f] transition-colors disabled:opacity-60">
+          class="w-full sm:w-auto bg-[#34203A] text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#46294f] transition-colors disabled:opacity-60">
           {{ (isLoading ? 'createHotel.creating' : 'createHotel.createTenant') | translate }}
         </button>
       </div>
