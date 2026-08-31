@@ -3,12 +3,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AuthService } from '../core/services/auth.service';
+import { AdminPageHeader } from '../shared/admin-page-header/admin-page-header';
 import { HotelProfileService } from './hotel-profile.service';
 import { HotelProfile as HotelProfileData } from './hotel-profile.model';
 
 @Component({
   selector: 'app-hotel-profile',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader],
   templateUrl: './hotel-profile.html'
 })
 export class HotelProfile implements OnInit {

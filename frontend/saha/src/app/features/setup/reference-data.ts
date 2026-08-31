@@ -1,8 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
+import { StatusBadge } from '../../shared/mobile/status-badge/status-badge';
 import {
   Addon,
   EventPackage,
@@ -15,13 +18,14 @@ type ModalMode = 'create' | 'edit';
 
 @Component({
   selector: 'app-reference-data',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, AdminPageHeader, TranslatePipe, StatusBadge],
   templateUrl: './reference-data.html'
 })
 export class ReferenceData implements OnInit {
   private fb = inject(FormBuilder);
   private service = inject(ReferenceDataService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -203,7 +207,12 @@ export class ReferenceData implements OnInit {
       ? this.service.updateHall(this.tenantId, editingId, body)
       : this.service.createHall(this.tenantId, body);
     call.subscribe({
-      next: () => { this.saving.set(false); this.modalOpen.set(false); this.loadHalls(); this.successMessage.set(editingId ? 'Hall updated.' : 'Hall created.'); },
+      next: () => {
+        this.saving.set(false);
+        this.modalOpen.set(false);
+        this.loadHalls();
+        this.successMessage.set(this.translateService.instant(editingId ? 'referenceData.hallUpdated' : 'referenceData.hallCreated'));
+      },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save hall.')); }
     });
   }
@@ -223,7 +232,12 @@ export class ReferenceData implements OnInit {
       ? this.service.updatePackage(this.tenantId, editingId, body)
       : this.service.createPackage(this.tenantId, body);
     call.subscribe({
-      next: () => { this.saving.set(false); this.modalOpen.set(false); this.loadPackages(); this.successMessage.set(editingId ? 'Package updated.' : 'Package created.'); },
+      next: () => {
+        this.saving.set(false);
+        this.modalOpen.set(false);
+        this.loadPackages();
+        this.successMessage.set(this.translateService.instant(editingId ? 'referenceData.packageUpdated' : 'referenceData.packageCreated'));
+      },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save package.')); }
     });
   }
@@ -242,47 +256,54 @@ export class ReferenceData implements OnInit {
       ? this.service.updateAddon(this.tenantId, editingId, body)
       : this.service.createAddon(this.tenantId, body);
     call.subscribe({
-      next: () => { this.saving.set(false); this.modalOpen.set(false); this.loadAddons(); this.successMessage.set(editingId ? 'Add-on updated.' : 'Add-on created.'); },
+      next: () => {
+        this.saving.set(false);
+        this.modalOpen.set(false);
+        this.loadAddons();
+        this.successMessage.set(this.translateService.instant(editingId ? 'referenceData.addonUpdated' : 'referenceData.addonCreated'));
+      },
       error: (err) => { this.saving.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save add-on.')); }
     });
   }
 
   archiveHall(hall: Hall): void {
-    if (!confirm(`Archive hall "${hall.name}"?`)) return;
+    const message = this.translateService.instant('referenceData.archiveConfirmHall', { name: hall.name });
+    if (!confirm(message)) return;
     this.service.archiveHall(this.tenantId, hall.id).subscribe({
-      next: () => { this.loadHalls(); this.successMessage.set('Hall archived.'); },
+      next: () => { this.loadHalls(); this.successMessage.set(this.translateService.instant('referenceData.hallArchived')); },
       error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to archive hall.'))
     });
   }
 
   archivePackage(pkg: EventPackage): void {
-    if (!confirm(`Archive package "${pkg.name}"?`)) return;
+    const message = this.translateService.instant('referenceData.archiveConfirmPackage', { name: pkg.name });
+    if (!confirm(message)) return;
     this.service.archivePackage(this.tenantId, pkg.id).subscribe({
-      next: () => { this.loadPackages(); this.successMessage.set('Package archived.'); },
+      next: () => { this.loadPackages(); this.successMessage.set(this.translateService.instant('referenceData.packageArchived')); },
       error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to archive package.'))
     });
   }
 
   archiveAddon(addon: Addon): void {
-    if (!confirm(`Archive add-on "${addon.name}"?`)) return;
+    const message = this.translateService.instant('referenceData.archiveConfirmAddon', { name: addon.name });
+    if (!confirm(message)) return;
     this.service.archiveAddon(this.tenantId, addon.id).subscribe({
-      next: () => { this.loadAddons(); this.successMessage.set('Add-on archived.'); },
+      next: () => { this.loadAddons(); this.successMessage.set(this.translateService.instant('referenceData.addonArchived')); },
       error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to archive add-on.'))
     });
   }
 
   modalTitle(): string {
-    const action = this.modalMode() === 'create' ? 'Add' : 'Edit';
-    const label = this.modalTab() === 'halls' ? 'Hall' : this.modalTab() === 'packages' ? 'Package' : 'Add-on';
+    const action = this.translateService.instant(this.modalMode() === 'create' ? 'referenceData.modal.add' : 'referenceData.modal.edit');
+    const labelKey = this.modalTab() === 'halls' ? 'referenceData.modal.hallLabel'
+      : this.modalTab() === 'packages' ? 'referenceData.modal.packageLabel'
+      : 'referenceData.modal.addonLabel';
+    const label = this.translateService.instant(labelKey);
     return `${action} ${label}`;
   }
 
-  addButtonLabel(): string {
-    switch (this.activeTab()) {
-      case 'halls': return '+ Add Hall';
-      case 'packages': return '+ Add Package';
-      case 'addons': return '+ Add Add-on';
-    }
+  addButtonKey(): string {
+    return `referenceData.addButton.${this.activeTab()}`;
   }
 
   formatPrice(value: number | null | undefined): string {

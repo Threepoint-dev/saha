@@ -2,12 +2,15 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslatePipe } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
+import { AdminPageHeader } from '../../../shared/admin-page-header/admin-page-header';
+import { StatusBadge } from '../../../shared/mobile/status-badge/status-badge';
 
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe, AdminPageHeader, StatusBadge],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.scss'
 })

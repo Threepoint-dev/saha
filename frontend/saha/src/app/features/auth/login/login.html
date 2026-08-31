@@ -1,5 +1,12 @@
 <div class="min-h-screen bg-[#FAF7F2] flex items-center justify-center p-4">
 
+  <!-- Language toggle — always visible, even before signing in -->
+  <button
+    (click)="toggleLanguage()"
+    class="fixed top-4 end-4 flex items-center gap-1.5 rounded-[8px] border border-[#D9D0C4] bg-white text-[#34203A] text-[12px] font-medium px-3 py-1.5 hover:bg-[#F5F1EA] transition-colors">
+    🌐 {{ 'common.languageToggle' | translate }}
+  </button>
+
   <!-- Email Step -->
   @if (step() === 'email') {
   <div class="w-[380px] rounded-[22px] overflow-hidden shadow-[0px_8px_32px_rgba(51,33,59,0.1)]">
@@ -10,17 +17,17 @@
         </div>
         <span class="text-white font-bold text-lg">saha</span>
       </div>
-      <p class="text-white/60 text-xs mt-1">Events &amp; Sales Workspace</p>
+      <p class="text-white/60 text-xs mt-1">{{ 'common.workspace' | translate }}</p>
     </div>
     <div class="bg-white px-6 py-6">
-      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">Sign in</h1>
-      <p class="text-[#7A736B] text-sm mb-4">Enter your work email and we'll send a 6-digit code.</p>
-      <label class="text-[#7A736B] text-xs uppercase tracking-wider mb-1 block">Work Email</label>
+      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">{{ 'login.title' | translate }}</h1>
+      <p class="text-[#7A736B] text-sm mb-4">{{ 'login.subtitle' | translate }}</p>
+      <label class="text-[#7A736B] text-xs uppercase tracking-wider mb-1 block">{{ 'login.emailLabel' | translate }}</label>
       <input
         type="email"
         [ngModel]="email()"
         (ngModelChange)="email.set($event); errorMessage.set('')"
-        placeholder="you@hotel.com"
+        [placeholder]="'login.emailPlaceholder' | translate"
         class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2.5 text-sm text-[#1B1A17] focus:outline-none focus:border-[#34203A] mb-4"
       />
       @if (errorMessage()) {
@@ -30,9 +37,9 @@
         (click)="sendCode()"
         [disabled]="isLoading() || !email()"
         class="w-full bg-[#34203A] text-white rounded-lg py-2.5 text-sm font-medium hover:bg-[#2a1830] transition-colors disabled:opacity-60">
-        {{ isLoading() ? 'Sending...' : 'Send code' }}
+        {{ (isLoading() ? 'login.sending' : 'login.sendCode') | translate }}
       </button>
-      <p class="text-[#A39C92] text-xs text-center mt-3">Email verification only · passwordless</p>
+      <p class="text-[#A39C92] text-xs text-center mt-3">{{ 'login.footer' | translate }}</p>
     </div>
   </div>
   }
@@ -47,30 +54,30 @@
         </div>
         <span class="text-white font-bold text-lg">saha</span>
       </div>
-      <p class="text-white/60 text-xs mt-1">Events &amp; Sales Workspace</p>
+      <p class="text-white/60 text-xs mt-1">{{ 'common.workspace' | translate }}</p>
     </div>
     <div class="bg-white px-6 py-6 text-center">
       <div class="w-12 h-12 bg-[#E8F5E9] rounded-full flex items-center justify-center mx-auto mb-4">
         <span class="text-2xl">✉️</span>
       </div>
-      <h1 class="text-[#1B1A17] text-xl font-semibold mb-2">Check your email</h1>
+      <h1 class="text-[#1B1A17] text-xl font-semibold mb-2">{{ 'login.checkEmailTitle' | translate }}</h1>
       <p class="text-[#7A736B] text-sm mb-6">
-        We sent a 6-digit code to <strong>{{ email() }}</strong>. Enter it on the next screen.
+        {{ 'login.checkEmailSubtitle' | translate:{ email: email() } }}
       </p>
       <button
         (click)="goToEnterCode()"
         class="w-full bg-[#34203A] text-white rounded-lg py-2.5 text-sm font-medium hover:bg-[#2a1830] transition-colors mb-3">
-        Enter code
+        {{ 'login.enterCodeButton' | translate }}
       </button>
       <div class="text-center">
         @if (!canResend()) {
           <p class="text-[#A39C92] text-xs">
-            Didn't get it? Resend in 00:{{ resendTimer().toString().padStart(2, '0') }}
+            {{ 'login.resendIn' | translate:{ sec: padded(resendTimer()) } }}
           </p>
         } @else {
           <button (click)="sendCode()"
             class="text-[#34203A] text-xs font-medium hover:underline">
-            Resend code
+            {{ 'login.resendCode' | translate }}
           </button>
         }
       </div>
@@ -88,12 +95,11 @@
         </div>
         <span class="text-white font-bold text-lg">saha</span>
       </div>
-      <p class="text-white/60 text-xs mt-1">Events &amp; Sales Workspace</p>
+      <p class="text-white/60 text-xs mt-1">{{ 'common.workspace' | translate }}</p>
     </div>
     <div class="bg-white px-6 py-6">
-      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">Enter verification code</h1>
-      <p class="text-[#7A736B] text-sm mb-4">Enter the 6-digit code sent to your email.</p>
-
+      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">{{ 'login.verifyTitle' | translate }}</h1>
+      <p class="text-[#7A736B] text-sm mb-4">{{ 'login.verifySubtitle' | translate }}</p>
       <input
         type="text"
         [ngModel]="otp()"
@@ -103,29 +109,26 @@
         [class]="'w-full border rounded-lg px-3 py-2.5 text-center tracking-widest focus:outline-none mb-1 text-lg font-mono ' +
         (errorMessage() ? 'border-[#D14343] text-[#D14343]' : 'border-[#D9D0C4] text-[#1B1A17] focus:border-[#34203A]')"
       />
-
       @if (errorMessage()) {
         <p class="text-[#D14343] text-xs mb-3">{{ errorMessage() }}</p>
       } @else {
         <div class="mb-3"></div>
       }
-
       <button
         (click)="verifyCode()"
         [disabled]="isLoading() || !otp()"
         class="w-full bg-[#34203A] text-white rounded-lg py-2.5 text-sm font-medium hover:bg-[#2a1830] transition-colors disabled:opacity-60 mb-3">
-        {{ isLoading() ? 'Verifying...' : 'Verify &amp; sign in' }}
+        {{ (isLoading() ? 'login.verifying' : 'login.verify') | translate }}
       </button>
-
       <div class="text-center">
         @if (!canResend()) {
           <p class="text-[#A39C92] text-xs">
-            Resend code in 00:{{ resendTimer().toString().padStart(2, '0') }}
+            {{ 'login.resendInShort' | translate:{ sec: padded(resendTimer()) } }}
           </p>
         } @else {
           <button (click)="requestNewCode()"
             class="text-[#34203A] text-xs font-medium hover:underline">
-            Resend code
+            {{ 'login.resendCode' | translate }}
           </button>
         }
       </div>
@@ -139,24 +142,23 @@
     <div class="bg-[#34203A] px-6 py-5">
       <div class="flex items-center gap-2">
         <div class="w-7 h-7 bg-white/20 rounded-lg flex items-center justify-center">
-          <span class="text-white text-xs font-bold">S</span>
+          <img src="/logo.svg" alt="SAHA logo" class="w-full h-full object-contain" />
         </div>
         <span class="text-white font-bold text-lg">saha</span>
       </div>
-      <p class="text-white/60 text-xs mt-1">Events &amp; Sales Workspace</p>
+      <p class="text-white/60 text-xs mt-1">{{ 'common.workspace' | translate }}</p>
     </div>
     <div class="bg-white px-6 py-6 text-center">
       <div class="w-12 h-12 bg-[#2E7D5B] rounded-full flex items-center justify-center mx-auto mb-4">
         <span class="text-white text-xl">✓</span>
       </div>
-      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">You're signed in</h1>
-      <p class="text-[#7A736B] text-sm mb-6">Welcome back. Taking you to your dashboard...</p>
+      <h1 class="text-[#1B1A17] text-xl font-semibold mb-1">{{ 'login.signedInTitle' | translate }}</h1>
+      <p class="text-[#7A736B] text-sm mb-6">{{ 'login.signedInSubtitle' | translate }}</p>
       <button (click)="goToDashboard()"
         class="w-full bg-[#E8A33D] text-white rounded-full py-2.5 text-sm font-medium hover:bg-[#d4922e] transition-colors">
-        Go to dashboard
+        {{ 'login.goToDashboard' | translate }}
       </button>
     </div>
   </div>
   }
-
 </div>

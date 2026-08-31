@@ -1,19 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 import { DataQualityReport, ExportType } from './export.model';
 import { ExportService } from './export.service';
 
 interface ExportItem {
   type: ExportType;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
 }
 
 interface SummaryCard {
-  label: string;
+  labelKey: string;
   value: string;
+  valueIsKey: boolean;
   ok: boolean;
 }
 
@@ -21,23 +24,24 @@ const LAST_EXPORT_KEY = 'saha.export.lastExport';
 
 @Component({
   selector: 'app-export',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe, AdminPageHeader],
   templateUrl: './export.html'
 })
 export class Export implements OnInit {
   private service = inject(ExportService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
   }
 
   readonly exportItems: ExportItem[] = [
-    { type: 'inquiries', label: 'Inquiries CSV', description: 'All inquiries with source & response times' },
-    { type: 'quotes', label: 'Quotes CSV', description: 'Quotes with totals & validity' },
-    { type: 'halls', label: 'Halls CSV', description: 'Halls, capacity & pricing' },
-    { type: 'packages', label: 'Packages CSV', description: 'Event packages & pricing' },
-    { type: 'addons', label: 'Add-ons CSV', description: 'Add-ons & pricing' }
+    { type: 'inquiries', labelKey: 'export.items.inquiries.label', descriptionKey: 'export.items.inquiries.description' },
+    { type: 'quotes', labelKey: 'export.items.quotes.label', descriptionKey: 'export.items.quotes.description' },
+    { type: 'halls', labelKey: 'export.items.halls.label', descriptionKey: 'export.items.halls.description' },
+    { type: 'packages', labelKey: 'export.items.packages.label', descriptionKey: 'export.items.packages.description' },
+    { type: 'addons', labelKey: 'export.items.addons.label', descriptionKey: 'export.items.addons.description' }
   ];
 
   readonly downloading = signal<ExportType | null>(null);
@@ -49,6 +53,10 @@ export class Export implements OnInit {
   readonly qualityError = signal<string | null>(null);
 
   readonly score = computed(() => this.report()?.score ?? 0);
+
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
 
   /** Progress-bar colour: green > 80, yellow 50-80, red < 50. */
   readonly scoreColor = computed(() => {
@@ -63,12 +71,12 @@ export class Export implements OnInit {
     if (!r) return [];
     const s = r.summary;
     return [
-      { label: 'Hotel Profile', value: s.hotelsComplete ? 'Complete' : 'Incomplete', ok: s.hotelsComplete },
-      { label: 'Halls', value: `${s.hallsCount}`, ok: s.hallsCount > 0 },
-      { label: 'Packages', value: `${s.packagesCount}`, ok: s.packagesCount > 0 },
-      { label: 'Add-ons', value: `${s.addonsCount}`, ok: s.addonsCount > 0 },
-      { label: 'Source Channels', value: `${s.sourceChannelsCount}`, ok: s.sourceChannelsCount > 0 },
-      { label: 'Quote Settings', value: s.quoteSettingsConfigured ? 'Configured' : 'Not set', ok: s.quoteSettingsConfigured }
+      { labelKey: 'export.summaryCard.hotelProfile', value: s.hotelsComplete ? 'export.complete' : 'export.incomplete', valueIsKey: true, ok: s.hotelsComplete },
+      { labelKey: 'export.summaryCard.halls', value: `${s.hallsCount}`, valueIsKey: false, ok: s.hallsCount > 0 },
+      { labelKey: 'export.summaryCard.packages', value: `${s.packagesCount}`, valueIsKey: false, ok: s.packagesCount > 0 },
+      { labelKey: 'export.summaryCard.addons', value: `${s.addonsCount}`, valueIsKey: false, ok: s.addonsCount > 0 },
+      { labelKey: 'export.summaryCard.sourceChannels', value: `${s.sourceChannelsCount}`, valueIsKey: false, ok: s.sourceChannelsCount > 0 },
+      { labelKey: 'export.summaryCard.quoteSettings', value: s.quoteSettingsConfigured ? 'export.configured' : 'export.notSet', valueIsKey: true, ok: s.quoteSettingsConfigured }
     ];
   });
 
@@ -113,7 +121,7 @@ export class Export implements OnInit {
 
   formatDateTime(iso: string): string {
     const d = new Date(iso);
-    return Number.isNaN(d.getTime()) ? iso : d.toLocaleString('en-US');
+    return Number.isNaN(d.getTime()) ? iso : d.toLocaleString(this.locale);
   }
 
   private saveBlob(blob: Blob, filename: string): void {

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { Hall } from '../setup/reference-data.model';
@@ -19,11 +20,12 @@ interface DayCell {
   dayNumber: number;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  tentative: 'Tentative',
-  confirmed: 'Confirmed',
-  blocked: 'Blocked',
-  maintenance: 'Maintenance'
+/** Translation-key map — the displayed label always goes through the `translate` pipe now, not this text directly. */
+const STATUS_KEYS: Record<string, string> = {
+  tentative: 'availability.legend.tentative',
+  confirmed: 'availability.legend.confirmed',
+  blocked: 'availability.legend.blocked',
+  maintenance: 'availability.legend.maintenance'
 };
 
 const STATUS_CLASSES: Record<string, string> = {
@@ -36,13 +38,14 @@ const STATUS_CLASSES: Record<string, string> = {
 @Component({
   selector: 'app-hall-availability-calendar',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './hall-availability-calendar.html'
 })
 export class HallAvailabilityCalendar implements OnInit {
   private service = inject(AvailabilityService);
   private hallsService = inject(ReferenceDataService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -84,8 +87,12 @@ export class HallAvailabilityCalendar implements OnInit {
     return cells;
   });
 
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
+
   readonly monthLabel = computed(() =>
-    this.monthStart().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    this.monthStart().toLocaleDateString(this.locale, { month: 'long', year: 'numeric' })
   );
 
   ngOnInit(): void {
@@ -122,8 +129,10 @@ export class HallAvailabilityCalendar implements OnInit {
     return this.blocks().find((b) => b.hallId === hallId && b.eventDate === date);
   }
 
-  statusLabel(status: string): string {
-    return STATUS_LABELS[status] ?? status;
+  /** Translation key for a status word, e.g. 'tentative' -> 'availability.legend.tentative'. */
+  statusLabelKey(status: string | undefined): string {
+    if (!status) return 'availability.legend.available';
+    return STATUS_KEYS[status] ?? status;
   }
 
   statusClass(status: string | undefined): string {
@@ -133,7 +142,8 @@ export class HallAvailabilityCalendar implements OnInit {
 
   cellLabel(hallId: string, date: string): string {
     const block = this.blockFor(hallId, date);
-    return block ? this.statusLabel(block.status) : 'Available';
+    const key = this.statusLabelKey(block?.status);
+    return this.translateService.instant(key);
   }
 
   // --- Modal ---
@@ -179,7 +189,7 @@ export class HallAvailabilityCalendar implements OnInit {
 
   save(): void {
     if (!this.form.hallId || !this.form.eventDate || !this.form.status) {
-      this.errorMessage.set('Hall, date, and status are required.');
+      this.errorMessage.set(this.translateService.instant('availability.requiredFields'));
       return;
     }
     this.errorMessage.set(null);
@@ -213,7 +223,7 @@ export class HallAvailabilityCalendar implements OnInit {
 
   deleteBlock(): void {
     if (!this.editingId) return;
-    if (!confirm('Remove this block? The hall will show as Available again.')) return;
+    if (!confirm(this.translateService.instant('availability.confirmRemove'))) return;
     this.saving.set(true);
     this.service.delete(this.tenantId, this.editingId).subscribe({
       next: () => { this.saving.set(false); this.modalOpen.set(false); this.loadBlocks(); },

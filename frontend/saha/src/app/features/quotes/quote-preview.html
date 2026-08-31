@@ -1,139 +1,123 @@
-<div class="min-h-screen bg-[#faf7f2] py-10 px-4 flex justify-center">
+<div class="min-h-screen bg-[#faf7f2] flex flex-col items-center pb-32 print:pb-0">
+
+  <!-- Language toggle — always visible on this public/shared page -->
+  <button
+    (click)="toggleLanguage()"
+    class="fixed top-4 end-4 z-30 flex items-center gap-1.5 rounded-[8px] border border-[#D9D0C4] bg-white text-[#34203A] text-[12px] font-medium px-3 py-1.5 hover:bg-[#F5F1EA] transition-colors print:hidden">
+    🌐 {{ 'common.languageToggle' | translate }}
+  </button>
+
+  <!-- Wordmark bar -->
+  <div class="w-full bg-white border-b border-[#e4dfd5] px-4 py-3 flex items-center gap-2 print:hidden">
+    <div class="w-6 h-6 rounded-[6px] bg-[#34203a] flex items-center justify-center">
+      <img src="/logo.svg" alt="SAHA" class="w-full h-full object-contain" />
+    </div>
+    <span class="text-[#34203a] font-bold text-[14px]">saha</span>
+  </div>
+
   @if (loading()) {
-    <div class="text-[#55514a] text-[14px] mt-20">Loading quote…</div>
+    <div class="text-[#55514a] text-[14px] mt-20">{{ 'quotePreview.loading' | translate }}</div>
   } @else if (notFound()) {
-    <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-8 py-12 max-w-[520px] text-center mt-10">
-      <p class="text-[#34203a] text-[18px] font-bold mb-2">Quote not available</p>
-      <p class="text-[#8a8478] text-[13px]">This link may have expired or the quote is no longer shared.</p>
+    <div class="bg-white border border-[#e4dfd5] rounded-[16px] px-8 py-12 max-w-[520px] text-center mt-10 mx-4">
+      <p class="text-[#34203a] text-[18px] font-bold mb-2">{{ 'quotePreview.notAvailable' | translate }}</p>
+      <p class="text-[#8a8478] text-[13px]">{{ 'quotePreview.notAvailableSubtitle' | translate }}</p>
     </div>
   } @else if (quote(); as q) {
-    <div class="w-full max-w-[820px] flex flex-col gap-5">
-      <!-- Document -->
+    <div class="w-full max-w-[560px] flex flex-col gap-4 px-4 pt-4">
+
+      <span class="self-start bg-[#f7e7d6] text-[#b06d1a] text-[10px] font-semibold uppercase tracking-[0.1px] px-2.5 py-1 rounded-full print:hidden">
+        {{ 'quotePreview.pilotBadge' | translate }}
+      </span>
+
       <div class="bg-white border border-[#e4dfd5] rounded-[16px] overflow-hidden shadow-sm">
-        <!-- Letterhead -->
-        <div class="bg-[#34203a] px-8 py-7 flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-[12px] bg-white/10 flex items-center justify-center overflow-hidden">
+        <!-- Header -->
+        <div class="bg-[#34203a] px-5 py-4 flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-9 h-9 rounded-[8px] bg-white/10 flex items-center justify-center shrink-0 overflow-hidden">
               @if (q.hotel?.logoUrl) {
-                <img [src]="q.hotel!.logoUrl" alt="Hotel logo" class="w-full h-full object-contain" />
+                <img [src]="q.hotel!.logoUrl" alt="" class="w-full h-full object-contain" />
               } @else {
-                <span class="text-[#f6ddae] font-bold text-lg">{{ (q.hotel?.name || 'S')[0] }}</span>
+                <span class="text-[#f6ddae] font-bold text-[14px]">{{ (q.hotel?.name || 'S')[0] }}</span>
               }
             </div>
-            <div class="flex flex-col gap-1">
-              <p class="text-white font-bold text-[20px] leading-none">{{ q.hotel?.name || 'Hotel' }}</p>
-              <p class="text-[#f6ddae] text-[12px]">
-                {{ q.hotel?.district ? q.hotel!.district + ', ' : '' }}{{ q.hotel?.city || '' }}
-              </p>
-              @if (q.hotel?.phone) { <p class="text-[#e9d7f0] text-[11px]">{{ q.hotel!.phone }}</p> }
+            <div class="min-w-0">
+              <p class="text-white text-[16px] font-bold truncate">{{ q.quoteNumber || ('quotePreview.quotation' | translate) }}</p>
+              @if (q.hotel?.name) { <p class="text-[#c9b9d0] text-[11px] truncate">{{ q.hotel!.name }}</p> }
             </div>
           </div>
-          <div class="text-right">
-            <p class="text-[#f6ddae] text-[11px] font-semibold uppercase tracking-[0.16px]">Quotation</p>
-            <p class="text-white text-[18px] font-bold">{{ q.quoteNumber || '' }}</p>
+          <div class="text-end shrink-0">
+            <span class="inline-block bg-white/15 text-white text-[10px] font-semibold uppercase tracking-[0.1px] px-2 py-0.5 rounded-full">
+              {{ 'quotePreview.readOnlyBadge' | translate }}
+            </span>
+            <p class="text-[#c9b9d0] text-[11px] mt-1">
+              {{ 'quotePreview.validUntil' | translate }} {{ q.validUntil ? (q.validUntil | date:'d MMM yyyy') : '—' }}
+            </p>
           </div>
         </div>
 
-        <!-- Meta -->
-        <div class="px-8 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-[#efebf3]">
-          <div class="flex flex-col gap-1">
-            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Prepared For</p>
-            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.client?.clientName || '—' }}</p>
-          </div>
-          <div class="flex flex-col gap-1">
-            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Event Date</p>
-            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.client?.eventDate ? (q.client!.eventDate | date:'mediumDate') : '—' }}</p>
-          </div>
-          <div class="flex flex-col gap-1">
-            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Issued</p>
-            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.issuedDate ? (q.issuedDate | date:'mediumDate') : '—' }}</p>
-          </div>
-          <div class="flex flex-col gap-1">
-            <p class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.14px]">Valid Until</p>
-            <p class="text-[#34203a] text-[14px] font-semibold">{{ q.validUntil ? (q.validUntil | date:'mediumDate') : '—' }}</p>
-          </div>
+        <!-- Client strip -->
+        <div class="bg-[#f6ddae]/40 px-5 py-3">
+          <p class="text-[#34203a] text-[13px] font-semibold">{{ q.client?.clientName || '—' }}</p>
+          <p class="text-[#8a6d3a] text-[11px]">
+            @if (q.client?.guestCount != null) { {{ q.client!.guestCount }} {{ 'quotePreview.guestsSuffix' | translate }} }
+            @if (q.client?.eventDate) { · {{ q.client!.eventDate | date:'d MMM yyyy' }} }
+          </p>
         </div>
 
-        <!-- Line items table -->
-        <div class="px-8 py-6">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b-2 border-[#34203a]">
-                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px]">Item</th>
-                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-center w-[60px]">Qty</th>
-                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-right w-[120px]">Unit</th>
-                  <th class="py-2.5 text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] text-right w-[130px]">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (item of q.lineItems; track item.id) {
-                  <tr class="border-b border-[#efebf3]">
-                    <td class="py-3 pr-3">
-                      <p class="text-[#34203a] text-[13px] font-medium">{{ item.itemName }}</p>
-                      @if (item.description) { <p class="text-[#8a8478] text-[11px]">{{ item.description }}</p> }
-                      @if (!item.isTaxable) { <span class="text-[#8a8478] text-[10px] italic">VAT exempt</span> }
-                    </td>
-                    <td class="py-3 text-center text-[#55514a] text-[13px]">{{ item.quantity ?? 0 }}</td>
-                    <td class="py-3 text-right text-[#55514a] text-[13px]">{{ (item.unitPrice ?? 0) | number:'1.2-2' }}</td>
-                    <td class="py-3 text-right text-[#34203a] text-[13px] font-semibold">{{ (item.total ?? 0) | number:'1.2-2' }}</td>
-                  </tr>
-                }
-                @if (q.lineItems.length === 0) {
-                  <tr><td colspan="4" class="py-6 text-center text-[#8a8478] text-[12px]">No items on this quote.</td></tr>
-                }
-              </tbody>
-            </table>
-          </div>
+        <!-- Line items -->
+        <div class="px-5 py-4">
+          @for (item of q.lineItems; track item.id) {
+            <div class="flex items-start justify-between gap-3 py-2.5 border-b border-[#efebf3] last:border-0">
+              <div class="min-w-0">
+                <p class="text-[#34203a] text-[13px] font-medium">{{ item.itemName }}</p>
+                <p class="text-[#8a8478] text-[11px]">
+                  {{ item.quantity ?? 0 }} × {{ (item.unitPrice ?? 0) | number:'1.0-0' }}
+                  @if (!item.isTaxable) { · {{ 'quotePreview.vatExempt' | translate }} }
+                </p>
+              </div>
+              <span class="text-[#34203a] text-[13px] font-semibold shrink-0">{{ (item.total ?? 0) | number:'1.0-0' }}</span>
+            </div>
+          }
+          @if (q.lineItems.length === 0) {
+            <p class="py-4 text-center text-[#8a8478] text-[12px]">{{ 'quotePreview.noItems' | translate }}</p>
+          }
 
-          <!-- Totals -->
-          <div class="flex justify-end mt-5">
-            <div class="w-full max-w-[300px] flex flex-col gap-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[#55514a] text-[13px]">Subtotal</span>
-                <span class="text-[#34203a] text-[13px] font-medium">SAR {{ (q.subtotal ?? 0) | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex items-center justify-between">
-                <span class="text-[#55514a] text-[13px]">VAT ({{ (q.vatRate ?? 0) | number:'1.0-2' }}%)</span>
-                <span class="text-[#34203a] text-[13px] font-medium">SAR {{ (q.vatAmount ?? 0) | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex items-center justify-between border-t-2 border-[#34203a] pt-2 mt-1">
-                <span class="text-[#34203a] text-[15px] font-bold">Total</span>
-                <span class="text-[#34203a] text-[17px] font-bold">SAR {{ (q.total ?? 0) | number:'1.2-2' }}</span>
-              </div>
+          <div class="flex flex-col gap-1.5 mt-4">
+            <div class="flex items-center justify-between">
+              <span class="text-[#55514a] text-[12px]">{{ 'quotePreview.subtotal' | translate }}</span>
+              <span class="text-[#34203a] text-[12px] font-medium">{{ (q.subtotal ?? 0) | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-[#55514a] text-[12px]">{{ 'quotePreview.vat' | translate:{ rate: ((q.vatRate ?? 15) | number:'1.0-0') } }}</span>
+              <span class="text-[#34203a] text-[12px] font-medium">{{ (q.vatAmount ?? 0) | number:'1.0-0' }}</span>
+            </div>
+            <div class="flex items-center justify-between border-t-2 border-[#34203a] pt-2 mt-1">
+              <span class="text-[#34203a] text-[14px] font-bold">{{ 'quotePreview.totalInclVat' | translate }}</span>
+              <span class="text-[#34203a] text-[17px] font-bold">{{ (q.total ?? 0) | number:'1.0-0' }} SAR</span>
             </div>
           </div>
 
-          <!-- Notes / terms -->
-          @if (q.notes || q.hotel?.termsNotes) {
-            <div class="mt-6 pt-4 border-t border-[#efebf3] flex flex-col gap-2">
-              @if (q.notes) {
-                <div>
-                  <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1">Notes</p>
-                  <p class="text-[#55514a] text-[12px] whitespace-pre-line">{{ q.notes }}</p>
-                </div>
-              }
-              @if (q.hotel?.termsNotes) {
-                <div>
-                  <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px] mb-1">Terms</p>
-                  <p class="text-[#55514a] text-[12px] whitespace-pre-line">{{ q.hotel!.termsNotes }}</p>
-                </div>
-              }
-            </div>
+          @if (q.notes) {
+            <p class="text-[#55514a] text-[12px] whitespace-pre-line mt-4 pt-3 border-t border-[#efebf3]">{{ q.notes }}</p>
           }
         </div>
 
-        <!-- Footer -->
-        <div class="bg-[#faf7f2] px-8 py-4 border-t border-[#efebf3] text-center">
-          <p class="text-[#8a8478] text-[11px]">{{ q.hotel?.quoteFooterText || 'Thank you for your business.' }}</p>
+        <div class="bg-[#faf7f2] px-5 py-3 border-t border-[#efebf3]">
+          <p class="text-[#8a8478] text-[11px]">{{ 'quotePreview.nonTaxInvoiceNote' | translate }}</p>
         </div>
       </div>
+    </div>
 
-      <!-- Print action (hidden on print) -->
-      <div class="flex justify-center print:hidden">
+    <!-- Fixed action bar -->
+    <div class="fixed start-0 end-0 bottom-0 z-20 px-4 py-3 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent print:hidden">
+      <div class="w-full max-w-[560px] mx-auto flex flex-col gap-2">
+        <button type="button" (click)="copyLink()"
+          class="w-full bg-[#34203a] hover:bg-[#46294f] text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
+          {{ (copied() ? 'quotePreview.copied' : 'quotePreview.copyQuoteLink') | translate }}
+        </button>
         <button type="button" (click)="print()"
-          class="bg-[#34203a] hover:bg-[#46294f] rounded-[12px] px-6 py-3 text-white text-[13px] font-semibold transition-colors">
-          Print / Save as PDF
+          class="w-full bg-white border border-[#e4dfd5] hover:border-[#34203a] text-[#34203a] text-[14px] font-medium py-3 rounded-[12px] transition-colors">
+          {{ 'quotePreview.downloadPdf' | translate }}
         </button>
       </div>
     </div>

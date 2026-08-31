@@ -1,52 +1,52 @@
 <div class="flex-1 bg-[#FAF7F2] min-h-screen">
 
   <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+  <div class="border-b border-[#E8E0D8] bg-white px-4 md:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div>
-      <h1 class="text-[#1B1A17] text-[20px] font-semibold">Dashboard</h1>
-      <p class="text-[#7A736B] text-[13px]">Event inquiries overview · {{ currentMonth }}</p>
+      <h1 class="text-[#1B1A17] text-[20px] font-semibold">{{ 'dashboard.title' | translate }}</h1>
+      <p class="text-[#7A736B] text-[13px]">{{ 'dashboard.subtitle' | translate:{ month: currentMonth } }}</p>
     </div>
     <div class="flex items-center gap-3">
-      <div class="flex items-center border border-[#D9D0C4] rounded-xl px-3 py-2 gap-2 bg-white w-56">
-        <svg class="w-4 h-4 text-[#7A736B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-center border border-[#D9D0C4] rounded-xl px-3 py-2 gap-2 bg-white flex-1 sm:w-56">
+        <svg class="w-4 h-4 text-[#7A736B] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
         </svg>
-        <input type="text" [(ngModel)]="searchQuery" placeholder="Search..." class="outline-none text-sm text-[#1B1A17] bg-transparent w-full" />
+        <input type="text" [(ngModel)]="searchQuery" [placeholder]="'dashboard.searchPlaceholder' | translate" class="outline-none text-sm text-[#1B1A17] bg-transparent w-full" />
       </div>
       <a routerLink="/inquiries/new"
-         class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors flex items-center gap-1">
-        + Log Inquiry
+         class="hidden sm:flex bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors items-center gap-1 shrink-0">
+        {{ 'dashboard.logInquiry' | translate }}
       </a>
     </div>
   </div>
 
-  <div class="px-8 py-6">
+  <div class="px-4 md:px-8 py-4 md:py-6">
 
     <!-- Loading -->
     @if (isLoading) {
       <div class="flex items-center justify-center h-64">
         <div class="flex flex-col items-center gap-3">
           <div class="w-8 h-8 border-2 border-[#34203A] border-t-transparent rounded-full animate-spin"></div>
-          <p class="text-[#7A736B] text-sm">Loading dashboard...</p>
+          <p class="text-[#7A736B] text-sm">{{ 'dashboard.loading' | translate }}</p>
         </div>
       </div>
     }
 
     <!-- Empty State -->
     @if (!isLoading && inquiries.length === 0) {
-      <div class="flex flex-col items-center justify-center py-24 gap-4">
+      <div class="flex flex-col items-center justify-center py-16 md:py-24 gap-4">
         <div class="w-14 h-14 bg-[#ECE6F1] rounded-full flex items-center justify-center">
           <svg class="w-6 h-6 text-[#34203A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
           </svg>
         </div>
         <div class="text-center">
-          <p class="text-[#1B1A17] font-semibold text-base mb-1">No inquiries yet</p>
-          <p class="text-[#7A736B] text-sm max-w-sm">Log your first event inquiry and it'll appear here as soon as there's data.</p>
+          <p class="text-[#1B1A17] font-semibold text-base mb-1">{{ 'dashboard.emptyTitle' | translate }}</p>
+          <p class="text-[#7A736B] text-sm max-w-sm">{{ 'dashboard.emptySubtitle' | translate }}</p>
         </div>
         <a routerLink="/inquiries/new"
            class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
-          + Log Inquiry
+          {{ 'dashboard.logInquiry' | translate }}
         </a>
       </div>
     }
@@ -55,71 +55,71 @@
     @if (!isLoading && inquiries.length > 0) {
 
       <!-- Stats Row -->
-      <div class="grid grid-cols-6 gap-3 mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">TOTAL</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.total' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ total }}</p>
-          <p class="text-[#2E7D5B] text-xs font-medium">▲ {{ newCount }} new</p>
+          <p class="text-[#2E7D5B] text-xs font-medium">{{ 'dashboard.newCountLabel' | translate:{ count: newCount } }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">WON</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.won' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ won }}</p>
-          <p class="text-[#2E7D5B] text-xs font-medium">{{ winRate }}% rate</p>
+          <p class="text-[#2E7D5B] text-xs font-medium">{{ 'dashboard.winRateLabel' | translate:{ rate: winRate } }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">NEW</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.new' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ newCount }}</p>
-          <p class="text-[#7A736B] text-xs">Awaiting contact</p>
+          <p class="text-[#7A736B] text-xs">{{ 'dashboard.awaitingContact' | translate }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">CONTACTED</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.contacted' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ contacted }}</p>
-          <p class="text-[#7A736B] text-xs">In progress</p>
+          <p class="text-[#7A736B] text-xs">{{ 'dashboard.inProgress' | translate }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">QUOTED</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.quoted' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ quoted }}</p>
-          <p class="text-[#7A736B] text-xs">Awaiting decision</p>
+          <p class="text-[#7A736B] text-xs">{{ 'dashboard.awaitingDecision' | translate }}</p>
         </div>
         <div class="bg-white rounded-xl p-4 border border-[#E8E0D8]">
-          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">LOST</p>
+          <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-2">{{ 'dashboard.stat.lost' | translate }}</p>
           <p class="text-[#1B1A17] text-[26px] font-bold leading-none mb-1">{{ lost }}</p>
           @if (lost > 0) {
-            <p class="text-[#D14343] text-xs font-medium">▼ {{ lossRate }}% loss</p>
+            <p class="text-[#D14343] text-xs font-medium">{{ 'dashboard.lossRateLabel' | translate:{ rate: lossRate } }}</p>
           } @else {
-            <p class="text-[#7A736B] text-xs">None lost</p>
+            <p class="text-[#7A736B] text-xs">{{ 'dashboard.noneLost' | translate }}</p>
           }
         </div>
       </div>
 
       <!-- Mid Row: First Response + Conversion + Source + Recent + Why Lost -->
-      <div class="grid grid-cols-3 gap-5 mb-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
 
         <!-- First Response + Conversion Rate -->
         <div class="flex flex-col gap-3">
           <!-- First Response Dark Card -->
           <div class="bg-[#2D1B35] rounded-xl p-5 text-white">
-            <p class="text-[#F6DDAE]/60 text-[10px] font-semibold tracking-wider uppercase mb-3">MEDIAN FIRST RESPONSE</p>
+            <p class="text-[#F6DDAE]/60 text-[10px] font-semibold tracking-wider uppercase mb-3">{{ 'dashboard.medianFirstResponse' | translate }}</p>
             <p class="text-white text-[36px] font-bold leading-none mb-1">{{ firstResponseDisplay }}</p>
             @if (firstResponseMinutes > 0) {
-              <p class="text-[#F6DDAE]/70 text-xs">{{ firstResponseMinutes < 60 ? firstResponseMinutes + 'm faster than baseline' : 'Average response time' }}</p>
+              <p class="text-[#F6DDAE]/70 text-xs">{{ firstResponseMinutes < 60 ? ('dashboard.fasterThanBaseline' | translate:{ minutes: firstResponseMinutes }) : ('dashboard.averageResponseTime' | translate) }}</p>
             } @else {
-              <p class="text-[#F6DDAE]/70 text-xs">No responses recorded yet</p>
+              <p class="text-[#F6DDAE]/70 text-xs">{{ 'dashboard.noResponsesYet' | translate }}</p>
             }
           </div>
 
           <!-- Conversion Rate Card -->
           <div class="bg-white rounded-xl p-5 border border-[#E8E0D8]">
-            <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-3">CONVERSION RATE (WIN)</p>
+            <p class="text-[#7A736B] text-[10px] font-semibold tracking-wider uppercase mb-3">{{ 'dashboard.conversionRate' | translate }}</p>
             <p class="text-[#1B1A17] text-[32px] font-bold leading-none mb-1">{{ winRate }}%</p>
-            <p class="text-[#7A736B] text-xs">{{ won }} won of {{ total }} total</p>
+            <p class="text-[#7A736B] text-xs">{{ 'dashboard.wonOfTotal' | translate:{ won: won, total: total } }}</p>
           </div>
         </div>
 
         <!-- Inquiries by Source -->
         <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-[#1B1A17] text-sm font-semibold">Inquiries by source</h2>
+            <h2 class="text-[#1B1A17] text-sm font-semibold">{{ 'dashboard.inquiriesBySource' | translate }}</h2>
           </div>
           <div class="flex flex-col gap-2.5">
             @for (src of sourceSummary; track src.name) {
@@ -135,25 +135,25 @@
             }
           </div>
           @if (sourceSummary.length === 0) {
-            <p class="text-[#7A736B] text-xs mt-4">No source data yet</p>
+            <p class="text-[#7A736B] text-xs mt-4">{{ 'dashboard.noSourceData' | translate }}</p>
           }
         </div>
 
         <!-- Why We Lose Inquiries -->
         <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
-          <h2 class="text-[#1B1A17] text-sm font-semibold mb-4">Why we lose inquiries</h2>
+          <h2 class="text-[#1B1A17] text-sm font-semibold mb-4">{{ 'dashboard.whyWeLose' | translate }}</h2>
           <div class="flex flex-col gap-2.5">
             @for (reason of lossReasonSummary; track reason.label) {
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2 flex-1">
-                  <div class="h-2 bg-[#D14343] rounded-full" [style.width.%]="reason.pct * 0.8" style="min-width: 4px; max-width: 140px"></div>
-                  <span class="text-[#1B1A17] text-xs">{{ reason.label }}</span>
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                  <div class="h-2 bg-[#D14343] rounded-full shrink-0" [style.width.%]="reason.pct * 0.8" style="min-width: 4px; max-width: 140px"></div>
+                  <span class="text-[#1B1A17] text-xs truncate">{{ reason.label }}</span>
                 </div>
-                <span class="text-[#7A736B] text-xs font-semibold ml-2">{{ reason.count }}</span>
+                <span class="text-[#7A736B] text-xs font-semibold ms-2 shrink-0">{{ reason.count }}</span>
               </div>
             }
             @if (lossReasonSummary.length === 0) {
-              <p class="text-[#7A736B] text-xs">No lost inquiries yet</p>
+              <p class="text-[#7A736B] text-xs">{{ 'dashboard.noLostYet' | translate }}</p>
             }
           </div>
         </div>
@@ -161,33 +161,33 @@
 
       <!-- Recent Inquiries -->
       <div class="bg-white rounded-xl border border-[#E8E0D8]">
-        <div class="px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
-          <h2 class="text-[#1B1A17] font-semibold">Recent Inquiries</h2>
-          <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17] transition-colors">View all →</a>
+        <div class="px-4 md:px-6 py-4 border-b border-[#E8E0D8] flex items-center justify-between">
+          <h2 class="text-[#1B1A17] font-semibold">{{ 'dashboard.recentInquiries' | translate }}</h2>
+          <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17] transition-colors">{{ 'dashboard.viewAll' | translate }}</a>
         </div>
         <div class="divide-y divide-[#E8E0D8]">
           @for (inquiry of filteredInquiries; track inquiry.id) {
             <a [routerLink]="['/inquiries', inquiry.id]"
-               class="flex items-center justify-between px-6 py-3.5 hover:bg-[#FAF7F2] transition-colors group">
-              <div class="flex items-center gap-3">
+               class="flex flex-col sm:flex-row sm:items-center justify-between px-4 md:px-6 py-3.5 hover:bg-[#FAF7F2] transition-colors group gap-2">
+              <div class="flex items-center gap-3 min-w-0">
                 <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
                   <span class="text-white text-xs font-semibold">{{ inquiry.clientName.charAt(0) }}</span>
                 </div>
-                <div>
-                  <p class="text-[#1B1A17] text-sm font-medium group-hover:text-[#34203A] transition-colors">{{ inquiry.clientName }}</p>
-                  <p class="text-[#7A736B] text-xs">{{ inquiry.eventType }}</p>
+                <div class="min-w-0">
+                  <p class="text-[#1B1A17] text-sm font-medium group-hover:text-[#34203A] transition-colors truncate">{{ inquiry.clientName }}</p>
+                  <p class="text-[#7A736B] text-xs truncate">{{ inquiry.eventType }}</p>
                 </div>
               </div>
-              <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2 sm:gap-4 ms-11 sm:ms-0">
                 <!-- Source badge -->
                 @if (inquiry.sourceChannelId) {
                   <span [class]="'px-2 py-0.5 rounded text-[10px] font-semibold ' + getSourceClass(inquiry.sourceChannelId)">
                     {{ getChannelName(inquiry.sourceChannelId) }}
                   </span>
                 }
-                <span class="text-[#7A736B] text-xs">{{ timeAgo(inquiry.createdAt || '') }}</span>
-                <span [class]="'px-2.5 py-1 rounded-full text-[11px] font-medium ' + statusBadge[inquiry.status || 'NEW']">
-                  {{ inquiry.status }}
+                <span class="text-[#7A736B] text-xs whitespace-nowrap">{{ timeAgo(inquiry.createdAt || '') }}</span>
+                <span [class]="'px-2.5 py-1 rounded-full text-[11px] font-medium whitespace-nowrap ' + statusBadge[inquiry.status || 'NEW']">
+                  {{ statusLabelKey(inquiry.status || 'NEW') | translate }}
                 </span>
               </div>
             </a>

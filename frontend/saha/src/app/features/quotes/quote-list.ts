@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { StatusBadge } from '../../shared/mobile/status-badge/status-badge';
 import { InquirySummary, Quote } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
 @Component({
   selector: 'app-quote-list',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, StatusBadge, TranslatePipe],
   templateUrl: './quote-list.html'
 })
 export class QuoteList implements OnInit {
@@ -16,6 +18,7 @@ export class QuoteList implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -27,6 +30,7 @@ export class QuoteList implements OnInit {
   readonly loading = signal(false);
   readonly creating = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly copiedId = signal<string | null>(null);
 
   readonly quoteCount = computed(() => this.quotes().length);
 
@@ -49,7 +53,7 @@ export class QuoteList implements OnInit {
     this.errorMessage.set(null);
     this.service.listQuotes(this.tenantId, this.inquiryId()).subscribe({
       next: (list) => { this.quotes.set(list); this.loading.set(false); },
-      error: (err) => { this.errorMessage.set(this.formatError(err, 'Failed to load quotes.')); this.loading.set(false); }
+      error: (err) => { this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedLoadQuotes'))); this.loading.set(false); }
     });
   }
 
@@ -58,7 +62,7 @@ export class QuoteList implements OnInit {
     this.errorMessage.set(null);
     this.service.createQuote(this.tenantId, this.inquiryId()).subscribe({
       next: (quote) => { this.creating.set(false); this.openBuilder(quote.id); },
-      error: (err) => { this.creating.set(false); this.errorMessage.set(this.formatError(err, 'Failed to create quote.')); }
+      error: (err) => { this.creating.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedCreateQuote'))); }
     });
   }
 
@@ -70,32 +74,80 @@ export class QuoteList implements OnInit {
     this.errorMessage.set(null);
     this.service.duplicateQuote(this.tenantId, this.inquiryId(), quote.id).subscribe({
       next: (copy) => this.openBuilder(copy.id),
-      error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to duplicate quote.'))
+      error: (err) => this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedDuplicateQuote')))
     });
   }
 
   cancel(quote: Quote): void {
-    if (!confirm(`Cancel quote ${quote.quoteNumber ?? ''}? It will be marked as cancelled.`)) return;
+    const message = this.translateService.instant('quoteList.cancelConfirm', { number: quote.quoteNumber ?? '' });
+    if (!confirm(message)) return;
     this.errorMessage.set(null);
     this.service.cancelQuote(this.tenantId, this.inquiryId(), quote.id).subscribe({
       next: () => this.loadQuotes(),
-      error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to cancel quote.'))
+      error: (err) => this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedCancelQuote')))
     });
   }
 
-  statusStyle(status: string | null): { bg: string; border: string; text: string } {
-    switch ((status ?? '').toLowerCase()) {
-      case 'draft':
-        return { bg: '#f7e7d6', border: '#e0922f', text: '#b06d1a' };
-      case 'sent':
-        return { bg: '#d6edf5', border: '#2c7a8c', text: '#1f5b68' };
-      case 'accepted':
-        return { bg: '#dff0e8', border: '#2e7d5b', text: '#1f5c41' };
-      case 'cancelled':
-        return { bg: '#f7dede', border: '#d14343', text: '#a02f2f' };
-      default:
-        return { bg: '#efebf3', border: '#c9c3b8', text: '#55514a' };
+  pdf(quote: Quote): void {
+    if (quote.shareLink) {
+      window.open(this.buildShareUrl(quote.shareLink), '_blank');
+      return;
     }
+    this.errorMessage.set(null);
+    this.service.share(this.tenantId, quote.id).subscribe({
+      next: (res) => window.open(this.buildShareUrl(res.shareToken), '_blank'),
+      error: (err) => this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedOpenPdf')))
+    });
+  }
+
+  copyLink(quote: Quote): void {
+    const done = (token: string) => {
+      navigator.clipboard?.writeText(this.buildShareUrl(token)).then(() => {
+        this.copiedId.set(quote.id);
+        setTimeout(() => this.copiedId.set(null), 2000);
+      });
+    };
+    if (quote.shareLink) { done(quote.shareLink); return; }
+    this.errorMessage.set(null);
+    this.service.share(this.tenantId, quote.id).subscribe({
+      next: (res) => { done(res.shareToken); this.loadQuotes(); },
+      error: (err) => this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteList.failedShareLink')))
+    });
+  }
+
+  /** Draft | Shared | Final | Expired | Cancelled — the pill shown on the card. */
+  displayStatus(quote: Quote): string {
+    const s = (quote.status ?? 'draft').toLowerCase();
+    if (s === 'cancelled') return 'cancelled';
+    if (s === 'final' || s === 'accepted') return 'final';
+    if (this.isExpired(quote)) return 'expired';
+    if (quote.shareLink || s === 'sent' || s === 'shared') return 'shared';
+    return 'draft';
+  }
+
+  isExpired(quote: Quote): boolean {
+    const s = (quote.status ?? '').toLowerCase();
+    if (s === 'final' || s === 'accepted' || s === 'cancelled') return false;
+    if (!quote.validUntil) return false;
+    const until = new Date(quote.validUntil);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return until.getTime() < today.getTime();
+  }
+
+  isReadOnly(quote: Quote): boolean {
+    const s = this.displayStatus(quote);
+    return s === 'final' || s === 'expired' || s === 'cancelled';
+  }
+
+  private buildShareUrl(token: string): string {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/quotes/preview/${token}`;
+  }
+
+  /** Translation key for a quote status, e.g. 'draft' -> 'quoteList.status.draft'. */
+  statusLabelKey(status: string | null): string {
+    return `quoteList.status.${(status || 'draft').toLowerCase()}`;
   }
 
   private formatError(err: unknown, fallback: string): string {

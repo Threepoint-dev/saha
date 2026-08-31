@@ -1,14 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
+import { BottomSheetModal } from '../../shared/mobile/bottom-sheet-modal/bottom-sheet-modal';
+import { StatusBadge } from '../../shared/mobile/status-badge/status-badge';
 import { CatalogItem, InquirySummary, LineItemRequest, Quote, QuoteLineItem } from './quotes.model';
 import { QuotesService } from './quotes.service';
 
-interface AddModel {
-  source: string;
+interface ItemModel {
   itemName: string;
   itemType: string;
   description: string;
@@ -17,15 +19,24 @@ interface AddModel {
   isTaxable: boolean;
 }
 
+interface ValidationError {
+  messageKey: string;
+  scopeKey: string;
+}
+
+type BuilderView = 'build' | 'review' | 'sent';
+
 @Component({
   selector: 'app-quote-builder',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, BottomSheetModal, StatusBadge, TranslatePipe],
   templateUrl: './quote-builder.html'
 })
 export class QuoteBuilder implements OnInit {
   private service = inject(QuotesService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -39,28 +50,34 @@ export class QuoteBuilder implements OnInit {
   readonly catalog = signal<CatalogItem[]>([]);
 
   readonly loading = signal(false);
-  readonly savingNotes = signal(false);
   readonly adding = signal(false);
   readonly sharing = signal(false);
+  readonly finalizing = signal(false);
   readonly copied = signal(false);
   readonly shareUrl = signal<string | null>(null);
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
 
+  readonly view = signal<BuilderView>('build');
+  readonly sheet = signal<'none' | 'add' | 'edit' | 'finalize'>('none');
+  readonly sentAt = signal<Date | null>(null);
+  readonly showValidation = signal(false);
+
   readonly dragIndex = signal<number | null>(null);
 
-  // Modal state
-  showAddModal = false;
-  editingItem: QuoteLineItem | null = null;
+  editingId: string | null = null;
+  readonly itemModel: ItemModel = this.emptyItemModel();
 
   notes = '';
 
-  readonly addModel: AddModel = this.emptyAddModel();
-
-  // Item type tabs matching Figma
+  /**
+   * Values (.value) kept in English regardless of app language — these match
+   * the backend's itemType enum. Only the displayed label is translated,
+   * via itemTypeLabelKey() below.
+   */
   readonly itemTypes = [
     { label: 'Hall rental', value: 'hall' },
-    { label: 'Catering package', value: 'package' },
+    { label: 'Catering', value: 'package' },
     { label: 'Coffee break', value: 'coffee_break' },
     { label: 'AV package', value: 'av_package' },
     { label: 'Decoration', value: 'decoration' },
@@ -68,19 +85,53 @@ export class QuoteBuilder implements OnInit {
     { label: 'Custom', value: 'custom' },
   ];
 
-  readonly halls = computed(() => this.catalog().filter((c) => c.type === 'hall'));
-  readonly packages = computed(() => this.catalog().filter((c) => c.type === 'package'));
-  readonly addons = computed(() => this.catalog().filter((c) => c.type === 'addon'));
+  private itemTypeKeyMap: Record<string, string> = {
+    hall: 'quoteBuilder.itemTypeLabels.hall',
+    package: 'quoteBuilder.itemTypeLabels.package',
+    coffee_break: 'quoteBuilder.itemTypeLabels.coffeeBreak',
+    av_package: 'quoteBuilder.itemTypeLabels.avPackage',
+    decoration: 'quoteBuilder.itemTypeLabels.decoration',
+    service_staff: 'quoteBuilder.itemTypeLabels.serviceStaff',
+    custom: 'quoteBuilder.itemTypeLabels.custom',
+  };
 
-  // Catalog items filtered by the currently selected item type and name search
+  itemTypeLabelKey(value: string): string {
+    return this.itemTypeKeyMap[value] || value;
+  }
+
   readonly filteredCatalog = computed(() => {
-    const type = this.addModel.itemType;
-    const name = (this.addModel.itemName || '').toLowerCase().trim();
+    const type = this.itemModel.itemType;
+    const name = (this.itemModel.itemName || '').toLowerCase().trim();
     if (!name) return [];
-    return this.catalog().filter(
-      (c) => c.name.toLowerCase().includes(name) && (type === 'custom' || c.type === type || !type)
-    ).slice(0, 6);
+    return this.catalog()
+      .filter((c) => c.name.toLowerCase().includes(name) && (type === 'custom' || c.type === type || !type))
+      .slice(0, 6);
   });
+
+  readonly isReadOnly = computed(() => {
+    const s = (this.quote()?.status ?? '').toLowerCase();
+    return s === 'final' || s === 'accepted' || s === 'cancelled';
+  });
+
+  readonly validationErrors = computed<ValidationError[]>(() => {
+    const q = this.quote();
+    const errors: ValidationError[] = [];
+    if (!q?.validUntil) {
+      errors.push({ messageKey: 'quoteBuilder.validation.validUntilRequired', scopeKey: 'quoteBuilder.validation.scopeHotelDetails' });
+    }
+    if (this.items().length === 0) {
+      errors.push({ messageKey: 'quoteBuilder.validation.addLineItem', scopeKey: 'quoteBuilder.validation.scopeLineItems' });
+    }
+    if (this.items().some((i) => (Number(i.quantity) || 0) <= 0)) {
+      errors.push({ messageKey: 'quoteBuilder.validation.zeroQuantity', scopeKey: 'quoteBuilder.validation.scopeLineItems' });
+    }
+    if ((q?.total ?? 0) <= 0) {
+      errors.push({ messageKey: 'quoteBuilder.validation.belowMinimum', scopeKey: 'quoteBuilder.validation.scopeLineItems' });
+    }
+    return errors;
+  });
+
+  readonly canFinalize = computed(() => this.validationErrors().length === 0);
 
   ngOnInit(): void {
     this.inquiryId.set(this.route.snapshot.paramMap.get('inquiryId') ?? '');
@@ -100,166 +151,222 @@ export class QuoteBuilder implements OnInit {
     this.loading.set(true);
     this.service.getQuote(this.tenantId, this.inquiryId(), this.quoteId()).subscribe({
       next: (q) => {
-        this.quote.set(q);
-        this.items.set(q.lineItems ?? []);
+        this.applyQuote(q);
         this.notes = q.notes ?? '';
-        if (q.shareLink) {
-          this.shareUrl.set(this.buildShareUrl(q.shareLink));
-        }
+        if (q.shareLink) this.shareUrl.set(this.buildShareUrl(q.shareLink));
         this.loading.set(false);
       },
-      error: (err) => { this.errorMessage.set(this.formatError(err, 'Failed to load quote.')); this.loading.set(false); }
+      error: (err) => { this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedLoadQuote'))); this.loading.set(false); }
     });
   }
 
   private refresh(): void {
     this.service.getQuote(this.tenantId, this.inquiryId(), this.quoteId()).subscribe({
-      next: (q) => { this.quote.set(q); this.items.set(q.lineItems ?? []); }
+      next: (q) => this.applyQuote(q)
     });
   }
 
-  // --- Item type selection ---
+  private applyQuote(q: Quote): void {
+    this.quote.set(q);
+    this.items.set([...(q.lineItems ?? [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)));
+  }
+
+  // ── Line-item sheet ────────────────────────────────
+  openAddSheet(): void {
+    if (this.isReadOnly()) return;
+    this.editingId = null;
+    Object.assign(this.itemModel, this.emptyItemModel());
+    this.clearMessages();
+    this.sheet.set('add');
+  }
+
+  openEditSheet(item: QuoteLineItem): void {
+    if (this.isReadOnly()) return;
+    this.editingId = item.id;
+    this.itemModel.itemName = item.itemName ?? '';
+    this.itemModel.itemType = item.itemType ?? 'custom';
+    this.itemModel.description = item.description ?? '';
+    this.itemModel.quantity = Number(item.quantity) || 1;
+    this.itemModel.unitPrice = Number(item.unitPrice) || 0;
+    this.itemModel.isTaxable = item.isTaxable ?? true;
+    this.clearMessages();
+    this.sheet.set('edit');
+  }
+
+  closeSheet(): void {
+    this.sheet.set('none');
+  }
+
   setItemType(type: string): void {
-    this.addModel.itemType = type;
-    // Clear name on type change if from catalog
-    if (type !== 'custom') {
-      this.addModel.itemName = '';
-      this.addModel.unitPrice = 0;
-    }
+    this.itemModel.itemType = type;
   }
 
   selectCatalogItem(item: CatalogItem): void {
-    this.addModel.itemName = item.name;
-    this.addModel.unitPrice = item.price ?? 0;
-    this.addModel.isTaxable = item.isTaxable;
-    this.addModel.itemType = item.type;
+    this.itemModel.itemName = item.name;
+    this.itemModel.unitPrice = item.price ?? 0;
+    this.itemModel.isTaxable = item.isTaxable;
+    this.itemModel.itemType = item.type;
   }
 
-  // --- Add line item from modal ---
-  addItemFromModal(): void {
+  get sheetTotal(): number {
+    return (Number(this.itemModel.quantity) || 0) * (Number(this.itemModel.unitPrice) || 0);
+  }
+
+  submitSheet(): void {
+    if (this.editingId) this.saveEditedItem();
+    else this.addItem();
+  }
+
+  private addItem(): void {
     this.clearMessages();
-    const name = this.addModel.itemName.trim();
-    if (!name) { this.errorMessage.set('Enter a name for the line item.'); return; }
-    const body: LineItemRequest = {
-      itemName: name,
-      itemType: this.addModel.itemType || 'custom',
-      description: this.addModel.description?.trim() || null,
-      quantity: Number(this.addModel.quantity) || 1,
-      unitPrice: Number(this.addModel.unitPrice) || 0,
-      isTaxable: this.addModel.isTaxable
-    };
+    const name = this.itemModel.itemName.trim();
+    if (!name) { this.errorMessage.set(this.translateService.instant('quoteBuilder.nameRequiredError')); return; }
+    const body = this.toRequest();
     this.adding.set(true);
     this.service.addLineItem(this.tenantId, this.quoteId(), body).subscribe({
       next: () => {
         this.adding.set(false);
-        this.showAddModal = false;
-        Object.assign(this.addModel, this.emptyAddModel());
+        this.sheet.set('none');
         this.refresh();
-        this.successMessage.set('Line item added.');
+        this.successMessage.set(this.translateService.instant('quoteBuilder.lineItemAdded'));
       },
-      error: (err) => { this.adding.set(false); this.errorMessage.set(this.formatError(err, 'Failed to add line item.')); }
+      error: (err) => { this.adding.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedAddLineItem'))); }
     });
   }
 
-  // Keep old addItem method for compatibility
-  addItem(): void {
-    this.addItemFromModal();
-  }
-
-  // --- Edit line item ---
-  openEditModal(item: QuoteLineItem): void {
-    this.editingItem = { ...item };
-  }
-
-  closeEditModal(): void {
-    this.editingItem = null;
-  }
-
-  saveEditedItem(): void {
-    if (!this.editingItem) return;
-    this.saveItem(this.editingItem);
-    this.editingItem = null;
-  }
-
-  saveItem(item: QuoteLineItem): void {
+  private saveEditedItem(): void {
+    if (!this.editingId) return;
     this.clearMessages();
-    const body: LineItemRequest = {
-      itemName: (item.itemName ?? '').trim() || 'Item',
-      itemType: item.itemType ?? 'custom',
-      description: item.description,
-      quantity: Number(item.quantity) || 0,
-      unitPrice: Number(item.unitPrice) || 0,
-      isTaxable: item.isTaxable ?? true,
-      sortOrder: item.sortOrder
+    const name = this.itemModel.itemName.trim();
+    if (!name) { this.errorMessage.set(this.translateService.instant('quoteBuilder.nameRequiredError')); return; }
+    const existing = this.items().find((i) => i.id === this.editingId);
+    const body: LineItemRequest = { ...this.toRequest(), sortOrder: existing?.sortOrder ?? null };
+    this.adding.set(true);
+    this.service.updateLineItem(this.tenantId, this.quoteId(), this.editingId, body).subscribe({
+      next: () => {
+        this.adding.set(false);
+        this.sheet.set('none');
+        this.refresh();
+        this.successMessage.set(this.translateService.instant('quoteBuilder.lineItemUpdated'));
+      },
+      error: (err) => { this.adding.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedUpdateLineItem'))); }
+    });
+  }
+
+  removeEditedItem(): void {
+    if (!this.editingId) return;
+    const id = this.editingId;
+    this.clearMessages();
+    this.adding.set(true);
+    this.service.deleteLineItem(this.tenantId, this.quoteId(), id).subscribe({
+      next: () => {
+        this.adding.set(false);
+        this.sheet.set('none');
+        this.refresh();
+        this.successMessage.set(this.translateService.instant('quoteBuilder.lineItemRemoved'));
+      },
+      error: (err) => { this.adding.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedRemoveLineItem'))); }
+    });
+  }
+
+  private toRequest(): LineItemRequest {
+    return {
+      itemName: this.itemModel.itemName.trim(),
+      itemType: this.itemModel.itemType || 'custom',
+      description: this.itemModel.description?.trim() || null,
+      quantity: Number(this.itemModel.quantity) || 0,
+      unitPrice: Number(this.itemModel.unitPrice) || 0,
+      isTaxable: this.itemModel.isTaxable
     };
-    this.service.updateLineItem(this.tenantId, this.quoteId(), item.id, body).subscribe({
-      next: () => this.refresh(),
-      error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to update line item.'))
-    });
-  }
-
-  toggleTaxable(item: QuoteLineItem): void {
-    item.isTaxable = !item.isTaxable;
-    this.saveItem(item);
-  }
-
-  deleteItem(item: QuoteLineItem): void {
-    this.clearMessages();
-    this.service.deleteLineItem(this.tenantId, this.quoteId(), item.id).subscribe({
-      next: () => this.refresh(),
-      error: (err) => this.errorMessage.set(this.formatError(err, 'Failed to remove line item.'))
-    });
   }
 
   rowTotal(item: QuoteLineItem): number {
     return (Number(item.quantity) || 0) * (Number(item.unitPrice) || 0);
   }
 
-  // --- Drag to reorder ---
-  onDragStart(index: number): void { this.dragIndex.set(index); }
+  // ── Drag to reorder (desktop) ──────────────────────
+  onDragStart(index: number): void { if (!this.isReadOnly()) this.dragIndex.set(index); }
   onDragOver(event: DragEvent): void { event.preventDefault(); }
   onDragEnd(): void { this.dragIndex.set(null); }
 
   onDrop(targetIndex: number): void {
     const from = this.dragIndex();
     this.dragIndex.set(null);
-    if (from === null || from === targetIndex) return;
+    if (from === null || from === targetIndex || this.isReadOnly()) return;
     const reordered = [...this.items()];
     const [moved] = reordered.splice(from, 1);
     reordered.splice(targetIndex, 0, moved);
     this.items.set(reordered);
     this.service.reorderLineItems(this.tenantId, this.quoteId(), reordered.map((i) => i.id)).subscribe({
       next: () => this.refresh(),
-      error: (err) => { this.errorMessage.set(this.formatError(err, 'Failed to save order.')); this.refresh(); }
+      error: (err) => { this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedSaveOrder'))); this.refresh(); }
     });
   }
 
-  // --- Notes / save ---
-  saveNotes(): void {
-    this.clearMessages();
-    this.savingNotes.set(true);
-    this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null }).subscribe({
-      next: (q) => { this.savingNotes.set(false); this.quote.set(q); this.successMessage.set('Quote saved as draft.'); },
-      error: (err) => { this.savingNotes.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save quote.')); }
-    });
+  // ── Save / preview / finalize ──────────────────────
+  private persistDraft() {
+    return this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null });
   }
 
-  // --- Share / preview ---
-  share(): void {
+  saveDraft(): void {
     this.clearMessages();
     this.sharing.set(true);
-    this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: null }).subscribe({
-      next: () => {
+    this.persistDraft().subscribe({
+      next: (q) => { this.sharing.set(false); this.quote.set(q); this.successMessage.set(this.translateService.instant('quoteBuilder.draftSaved')); },
+      error: (err) => { this.sharing.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedSaveDraft'))); }
+    });
+  }
+
+  saveAndPreview(): void {
+    this.clearMessages();
+    this.sharing.set(true);
+    this.persistDraft().subscribe({
+      next: (q) => {
+        this.sharing.set(false);
+        this.quote.set(q);
+        this.view.set('review');
+        window.scrollTo({ top: 0 });
+      },
+      error: (err) => { this.sharing.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedSaveQuote'))); }
+    });
+  }
+
+  backToEdit(): void {
+    this.view.set('build');
+    window.scrollTo({ top: 0 });
+  }
+
+  openFinalizeSheet(): void {
+    if (!this.canFinalize()) {
+      this.showValidation.set(true);
+      this.view.set('build');
+      window.scrollTo({ top: 0 });
+      return;
+    }
+    this.showValidation.set(false);
+    this.sheet.set('finalize');
+  }
+
+  confirmFinalize(): void {
+    this.clearMessages();
+    this.finalizing.set(true);
+    this.service.updateQuote(this.tenantId, this.inquiryId(), this.quoteId(), { notes: this.notes, status: 'final' }).subscribe({
+      next: (q) => {
+        this.quote.set(q);
         this.service.share(this.tenantId, this.quoteId()).subscribe({
           next: (res) => {
-            this.sharing.set(false);
+            this.finalizing.set(false);
+            this.sheet.set('none');
             this.shareUrl.set(this.buildShareUrl(res.shareToken));
-            this.successMessage.set('Shareable link generated.');
+            this.sentAt.set(new Date());
+            this.view.set('sent');
+            window.scrollTo({ top: 0 });
+            this.refresh();
           },
-          error: (err) => { this.sharing.set(false); this.errorMessage.set(this.formatError(err, 'Failed to generate link.')); }
+          error: (err) => { this.finalizing.set(false); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.quoteFinalizedShareFailed'))); }
         });
       },
-      error: (err) => { this.sharing.set(false); this.errorMessage.set(this.formatError(err, 'Failed to save before sharing.')); }
+      error: (err) => { this.finalizing.set(false); this.sheet.set('none'); this.errorMessage.set(this.formatError(err, this.translateService.instant('quoteBuilder.failedFinalizeQuote'))); }
     });
   }
 
@@ -272,13 +379,22 @@ export class QuoteBuilder implements OnInit {
     });
   }
 
+  openSharedQuote(): void {
+    const url = this.shareUrl();
+    if (url) window.open(url, '_blank');
+  }
+
+  goToInquiry(): void {
+    this.router.navigate(['/inquiries', this.inquiryId()]);
+  }
+
   private buildShareUrl(token: string): string {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return `${origin}/quotes/preview/${token}`;
   }
 
-  private emptyAddModel(): AddModel {
-    return { source: 'custom', itemName: '', itemType: 'hall', description: '', quantity: 1, unitPrice: 0, isTaxable: true };
+  private emptyItemModel(): ItemModel {
+    return { itemName: '', itemType: 'hall', description: '', quantity: 1, unitPrice: 0, isTaxable: true };
   }
 
   private clearMessages(): void {
@@ -290,12 +406,5 @@ export class QuoteBuilder implements OnInit {
     const anyErr = err as { error?: { message?: string } };
     if (anyErr?.error?.message) return anyErr.error.message;
     return fallback;
-  }
-
-  // Keep for catalog dropdown backward compat
-  onSourceChange(): void {
-    this.selectCatalogItem(
-      (this.catalog().find(c => c.id === this.addModel.source) || { id: '', name: '', type: 'custom', isTaxable: true, price: 0 }) as CatalogItem
-    );
   }
 }

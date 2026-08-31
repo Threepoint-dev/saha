@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { EventsTeamRequest } from '../events.model';
@@ -11,13 +12,14 @@ type FilterTab = 'all' | 'new' | 'in_prep' | 'prepared';
 @Component({
   selector: 'app-events-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './events-list.html'
 })
 export class EventsList implements OnInit {
   private service = inject(EventsService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private translateService = inject(TranslateService);
 
   readonly requests = signal<EventsTeamRequest[]>([]);
   readonly loading = signal(false);
@@ -30,12 +32,17 @@ export class EventsList implements OnInit {
     return this.requests().filter((r) => r.preparationStatus === tab);
   });
 
-  readonly tabs: { key: FilterTab; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'new', label: 'New' },
-    { key: 'in_prep', label: 'In Prep' },
-    { key: 'prepared', label: 'Prepared' }
+  /** Translation keys for tab labels — value/key still drive filtering logic. */
+  readonly tabs: { key: FilterTab; labelKey: string }[] = [
+    { key: 'all', labelKey: 'eventsList.tabs.all' },
+    { key: 'new', labelKey: 'eventsList.tabs.new' },
+    { key: 'in_prep', labelKey: 'eventsList.tabs.inPrep' },
+    { key: 'prepared', labelKey: 'eventsList.tabs.prepared' }
   ];
+
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
 
   ngOnInit(): void {
     this.load();
@@ -68,12 +75,13 @@ export class EventsList implements OnInit {
     this.router.navigate(['/events/requests', request.inquiryId]);
   }
 
-  statusLabel(status: string): string {
+  /** Translation key for a preparation status, e.g. 'in_prep' -> 'eventsList.status.inPrep'. */
+  statusLabelKey(status: string): string {
     switch (status) {
-      case 'new': return 'New';
-      case 'in_prep': return 'In Prep';
-      case 'prepared': return 'Prepared';
-      case 'cancelled': return 'Cancelled';
+      case 'new': return 'eventsList.status.new';
+      case 'in_prep': return 'eventsList.status.inPrep';
+      case 'prepared': return 'eventsList.status.prepared';
+      case 'cancelled': return 'eventsList.status.cancelled';
       default: return status;
     }
   }
@@ -90,7 +98,7 @@ export class EventsList implements OnInit {
 
   formatDate(date: string | null): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+    return new Date(date).toLocaleDateString(this.locale, { day: 'numeric', month: 'short' });
   }
 
   timeAgo(date: string | null): string {

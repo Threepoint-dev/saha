@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { EventsDirectorDashboard } from '../events.model';
@@ -8,7 +9,7 @@ import { EventsService } from '../events.service';
 @Component({
   selector: 'app-events-director-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './events-director-dashboard.html'
 })
 export class EventsDirectorDashboardPage implements OnInit {

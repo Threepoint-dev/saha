@@ -8,23 +8,25 @@
       </div>
       <div class="flex flex-col gap-px leading-none">
         <p class="text-white font-bold text-[16px] tracking-[0.16px]">saha</p>
-        <p class="text-[#f6ddae] text-[11px]">Events &amp; Sales Workspace</p>
+        <p class="text-[#f6ddae] text-[11px]">{{ 'common.workspace' | translate }}</p>
       </div>
     </div>
+
+
 
     <!-- Navigation -->
     <nav class="flex flex-col gap-4 flex-1">
       @for (section of getSections(); track section) {
         <div class="flex flex-col gap-1">
-          <p class="text-[#f6ddae]/60 text-[10px] font-semibold tracking-[0.22px] px-3 pb-1">{{ section }}</p>
+          <p class="text-[#f6ddae]/60 text-[10px] font-semibold tracking-[0.22px] px-3 pb-1">{{ sectionLabelKey(section) | translate }}</p>
           @for (link of getLinksBySection(section); track link.path) {
             @if (link.path === '/inquiries') {
               <a [routerLink]="link.path"
                  [class]="'flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 transition-colors ' +
                  (isInquiriesActive() ? 'bg-[#f6ddae] text-[#34203a] font-semibold' : 'text-[#f6ddae] hover:bg-[#46294f]')">
-                <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
+                <span class="text-[13px] font-medium leading-tight">{{ link.label | translate }}</span>
                 @if (link.hint) {
-                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
+                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint | translate }}</span>
                 }
               </a>
             } @else {
@@ -32,9 +34,9 @@
                  routerLinkActive="bg-[#f6ddae] !text-[#34203a] font-semibold"
                  [routerLinkActiveOptions]="{ exact: link.exact }"
                  class="flex flex-col gap-0.5 rounded-[10px] px-3 py-2.5 text-[#f6ddae] hover:bg-[#46294f] transition-colors">
-                <span class="text-[13px] font-medium leading-tight">{{ link.label }}</span>
+                <span class="text-[13px] font-medium leading-tight">{{ link.label | translate }}</span>
                 @if (link.hint) {
-                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint }}</span>
+                  <span class="text-[11px] opacity-70 leading-tight">{{ link.hint | translate }}</span>
                 }
               </a>
             }
@@ -43,6 +45,13 @@
       }
     </nav>
 
+        <!-- Language toggle -->
+    <button
+      (click)="toggleLanguage()"
+      class="mx-2 flex items-center justify-center gap-1.5 rounded-[8px] border border-white/15 text-[#f6ddae] text-[12px] font-medium py-1.5 hover:bg-[#46294f] transition-colors">
+      🌐 {{ 'common.languageToggle' | translate }}
+    </button>
+    
     <!-- User Account -->
     <div class="border-t border-white/10 pt-4 px-2">
       <div class="flex items-center gap-3 py-2">
@@ -62,7 +71,7 @@
         <button
           (click)="signOut()"
           class="text-[#f6ddae]/40 text-[10px] hover:text-red-400 transition-colors whitespace-nowrap">
-          Sign out
+          {{ 'sidebar.signOut' | translate }}
         </button>
       </div>
     </div>

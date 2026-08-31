@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { InquiryService } from '../../../core/services/inquiry.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +11,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-new-inquiry',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './new-inquiry.html',
   styleUrl: './new-inquiry.scss'
 })
@@ -38,10 +39,30 @@ export class NewInquiryComponent implements OnInit {
     notes: ''
   };
 
+  /**
+   * Values kept in English regardless of app language — this is what's
+   * actually stored in the database as the inquiry's eventType. Only the
+   * dropdown's *displayed* text is translated, via eventTypeLabelKey() below.
+   */
   eventTypes = [
     'Wedding', 'Conference', 'Graduation', 'Corporate Gala',
     'Birthday', 'Meeting', 'Exhibition', 'Other'
   ];
+
+  private eventTypeKeyMap: Record<string, string> = {
+    'Wedding': 'newInquiry.eventTypeOptions.wedding',
+    'Conference': 'newInquiry.eventTypeOptions.conference',
+    'Graduation': 'newInquiry.eventTypeOptions.graduation',
+    'Corporate Gala': 'newInquiry.eventTypeOptions.corporateGala',
+    'Birthday': 'newInquiry.eventTypeOptions.birthday',
+    'Meeting': 'newInquiry.eventTypeOptions.meeting',
+    'Exhibition': 'newInquiry.eventTypeOptions.exhibition',
+    'Other': 'newInquiry.eventTypeOptions.other',
+  };
+
+  eventTypeLabelKey(type: string): string {
+    return this.eventTypeKeyMap[type] || type;
+  }
 
   constructor(
     private inquiryService: InquiryService,

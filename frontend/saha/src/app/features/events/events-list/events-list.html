@@ -1,7 +1,7 @@
 <div class="p-6">
   <div class="mb-4">
-    <h1 class="text-xl font-semibold text-[#1B1A17]">Events Team Request Tracker</h1>
-    <p class="text-sm text-[#7A736B]">All handoff requests from Sales</p>
+    <h1 class="text-xl font-semibold text-[#1B1A17]">{{ 'eventsList.title' | translate }}</h1>
+    <p class="text-sm text-[#7A736B]">{{ 'eventsList.subtitle' | translate }}</p>
   </div>
 
   @if (errorMessage()) {
@@ -17,31 +17,31 @@
         [class]="activeTab() === tab.key
           ? 'bg-[#34203A] text-white rounded-full px-4 py-1.5 text-sm font-medium'
           : 'bg-white border border-[#D9D0C4] text-[#1B1A17] rounded-full px-4 py-1.5 text-sm hover:bg-[#F5F1EA]'">
-        {{ tab.label }} ({{ countFor(tab.key) }})
+        {{ tab.labelKey | translate }} ({{ countFor(tab.key) }})
       </button>
     }
   </div>
 
   @if (loading()) {
-    <p class="text-sm text-[#7A736B]">Loading requests…</p>
+    <p class="text-sm text-[#7A736B]">{{ 'eventsList.loading' | translate }}</p>
   } @else if (filtered().length === 0) {
     <div class="bg-white border border-[#EFE9E0] rounded-xl p-10 text-center">
-      <p class="text-[#1B1A17] font-medium mb-1">No requests here</p>
-      <p class="text-sm text-[#7A736B]">Events appear here once Sales shares the Final Internal BEO after a deal is Won.</p>
+      <p class="text-[#1B1A17] font-medium mb-1">{{ 'eventsList.emptyTitle' | translate }}</p>
+      <p class="text-sm text-[#7A736B]">{{ 'eventsList.emptySubtitle' | translate }}</p>
     </div>
   } @else {
     <div class="bg-white border border-[#EFE9E0] rounded-xl overflow-hidden">
       <table class="min-w-full text-sm">
         <thead>
           <tr class="border-b border-[#EFE9E0] text-left text-xs uppercase tracking-wider text-[#A39C92]">
-            <th class="px-4 py-3">Event Name</th>
-            <th class="px-4 py-3">Date</th>
-            <th class="px-4 py-3">Status</th>
-            <th class="px-4 py-3">Hall</th>
-            <th class="px-4 py-3">Guests</th>
-            <th class="px-4 py-3">Owner</th>
-            <th class="px-4 py-3">Updated</th>
-            <th class="px-4 py-3">Actions</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.eventName' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.date' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.status' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.hall' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.guests' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.owner' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.updated' | translate }}</th>
+            <th class="px-4 py-3">{{ 'eventsList.table.actions' | translate }}</th>
           </tr>
         </thead>
         <tbody>
@@ -53,7 +53,7 @@
               <td class="px-4 py-3 text-[#1B1A17]">{{ formatDate(r.eventDate) }}</td>
               <td class="px-4 py-3">
                 <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold ' + statusClass(r.preparationStatus)">
-                  {{ statusLabel(r.preparationStatus) }}
+                  {{ statusLabelKey(r.preparationStatus) | translate }}
                 </span>
               </td>
               <td class="px-4 py-3 text-[#1B1A17]">{{ r.hallName || '—' }}</td>
@@ -62,8 +62,8 @@
               <td class="px-4 py-3 text-[#7A736B]">{{ timeAgo(r.updatedAt) }}</td>
               <td class="px-4 py-3">
                 <div class="flex gap-2">
-                  <button (click)="view(r)" class="text-xs border border-[#D9D0C4] rounded-full px-3 py-1 hover:bg-[#F5F1EA]">View</button>
-                  <button (click)="prep(r)" class="text-xs bg-[#34203A] text-white rounded-full px-3 py-1 hover:bg-[#46294f]">Prep</button>
+                  <button (click)="view(r)" class="text-xs border border-[#D9D0C4] rounded-full px-3 py-1 hover:bg-[#F5F1EA]">{{ 'eventsList.view' | translate }}</button>
+                  <button (click)="prep(r)" class="text-xs bg-[#34203A] text-white rounded-full px-3 py-1 hover:bg-[#46294f]">{{ 'eventsList.prep' | translate }}</button>
                 </div>
               </td>
             </tr>

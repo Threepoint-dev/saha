@@ -1,18 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
+import { LanguageService } from '../../core/services/language.service';
 import { EventSummary } from './events.model';
 import { EventsService } from './events.service';
 
 @Component({
   selector: 'app-event-summary',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './event-summary.html'
 })
 export class EventSummaryPage implements OnInit {
   private service = inject(EventsService);
   private route = inject(ActivatedRoute);
+  languageService = inject(LanguageService);
 
   readonly summary = signal<EventSummary | null>(null);
   readonly loading = signal(true);
@@ -30,5 +33,9 @@ export class EventSummaryPage implements OnInit {
     if (typeof window !== 'undefined') {
       window.print();
     }
+  }
+
+  toggleLanguage(): void {
+    this.languageService.toggle();
   }
 }

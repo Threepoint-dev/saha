@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../../core/services/auth.service';
 import { EventsTeamRequestDetail, PREPARATION_STATUSES } from '../events.model';
@@ -10,7 +11,7 @@ import { EventsService } from '../events.service';
 @Component({
   selector: 'app-events-team-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './events-team-detail.html'
 })
 export class EventsTeamDetailPage implements OnInit {
@@ -18,6 +19,7 @@ export class EventsTeamDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   readonly preparationStatuses = PREPARATION_STATUSES;
 
@@ -30,6 +32,10 @@ export class EventsTeamDetailPage implements OnInit {
   selectedStatus = '';
   opsNote = '';
   layoutElements: { type: string; x: number; y: number }[] = [];
+
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
 
   ngOnInit(): void {
     const inquiryId = this.route.snapshot.paramMap.get('inquiryId');
@@ -75,7 +81,7 @@ export class EventsTeamDetailPage implements OnInit {
     }).subscribe({
       next: () => {
         this.saving.set(false);
-        this.successMessage.set('Saved.');
+        this.successMessage.set(this.translateService.instant('eventsTeamDetail.saved'));
         this.load(d.inquiryId);
       },
       error: (err) => {
@@ -89,8 +95,15 @@ export class EventsTeamDetailPage implements OnInit {
     this.router.navigate(['/events']);
   }
 
-  statusLabel(status: string): string {
-    return this.preparationStatuses.find((s) => s.value === status)?.label ?? status;
+  /** Translation key for a preparation status — reuses the same keys as the events list page. */
+  statusLabelKey(status: string): string {
+    switch (status) {
+      case 'new': return 'eventsList.status.new';
+      case 'in_prep': return 'eventsList.status.inPrep';
+      case 'prepared': return 'eventsList.status.prepared';
+      case 'cancelled': return 'eventsList.status.cancelled';
+      default: return status;
+    }
   }
 
   private parseLayoutDesign(raw: string | null): { type: string; x: number; y: number }[] {
@@ -105,7 +118,7 @@ export class EventsTeamDetailPage implements OnInit {
 
   formatDate(date: string | null): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(date).toLocaleDateString(this.locale, { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   private formatError(err: unknown, fallback: string): string {

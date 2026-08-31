@@ -1,5 +1,5 @@
 <div class="p-6 max-w-5xl mx-auto">
-  <button (click)="back()" class="text-sm text-[#7A736B] hover:text-[#1B1A17] mb-4">← Back to requests</button>
+  <button (click)="back()" class="text-sm text-[#7A736B] hover:text-[#1B1A17] mb-4">{{ 'eventsTeamDetail.backToRequests' | translate }}</button>
 
   @if (errorMessage()) {
     <div class="mb-4 bg-[#F7DEDE] border border-[#D14343] text-[#A02F2F] text-sm rounded-lg px-4 py-2">
@@ -13,7 +13,7 @@
   }
 
   @if (loading()) {
-    <p class="text-sm text-[#7A736B]">Loading…</p>
+    <p class="text-sm text-[#7A736B]">{{ 'eventsTeamDetail.loading' | translate }}</p>
   } @else if (detail(); as d) {
     <div class="flex items-center justify-between mb-4">
       <div>
@@ -24,50 +24,50 @@
       </div>
       <button (click)="markPrepared()" [disabled]="saving()"
         class="bg-[#2E7D5B] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#256a4c] disabled:opacity-50 transition-colors">
-        Mark as Prepared
+        {{ 'eventsTeamDetail.markPrepared' | translate }}
       </button>
     </div>
 
     <div class="bg-[#EAF4FB] border border-[#BFDCEE] text-[#1F5B68] text-xs rounded-lg px-3 py-2 mb-4">
-      Operational view only — no sales pricing or margins shown here.
+      {{ 'eventsTeamDetail.operationalViewNote' | translate }}
     </div>
 
     <div class="grid grid-cols-3 gap-6">
       <!-- Left: Operational details -->
       <div class="col-span-2 flex flex-col gap-4">
         <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-          <h3 class="text-[#1B1A17] font-semibold text-base mb-4">Operational Details</h3>
+          <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'eventsTeamDetail.operationalDetails' | translate }}</h3>
           <div class="flex flex-col divide-y divide-[#F0EBE3]">
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Date</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.date' | translate }}</span>
               <span class="text-[#1B1A17] text-sm font-medium">{{ formatDate(d.eventDate) }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Time</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.time' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.startTime || '—' }}@if (d.endTime) { – {{ d.endTime }} }</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Hall</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.hall' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.hallName || '—' }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Guests</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.guests' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.guestCount || '—' }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Layout / Setup</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.layoutSetup' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.setupType || '—' }}{{ d.layoutNotes ? ' · ' + d.layoutNotes : '' }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Colors</span>
-              <span class="text-[#1B1A17] text-sm">{{ d.tableColor || '—' }} table · {{ d.chairColor || '—' }} chairs</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.colors' | translate }}</span>
+              <span class="text-[#1B1A17] text-sm">{{ d.tableColor || '—' }} {{ 'eventsTeamDetail.table' | translate }} · {{ d.chairColor || '—' }} {{ 'eventsTeamDetail.chairs' | translate }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Catering</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.catering' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.cateringStyle || '—' }}{{ d.mainMeal ? ' · ' + d.mainMeal : '' }}</span>
             </div>
             <div class="flex items-center justify-between py-3">
-              <span class="text-[#7A736B] text-sm">Add-ons</span>
+              <span class="text-[#7A736B] text-sm">{{ 'eventsTeamDetail.addons' | translate }}</span>
               <span class="text-[#1B1A17] text-sm">{{ d.addonNames.length ? d.addonNames.join(', ') : '—' }}</span>
             </div>
           </div>
@@ -75,13 +75,13 @@
 
         @if (layoutElements.length > 0) {
           <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-            <h3 class="text-[#1B1A17] font-semibold text-base mb-1">Hall Floor Plan</h3>
-            <p class="text-[#9C9690] text-xs mb-3">As designed by Sales — read only</p>
-            <div class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] relative min-h-[280px]">
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-1">{{ 'eventsTeamDetail.floorPlanTitle' | translate }}</h3>
+            <p class="text-[#9C9690] text-xs mb-3">{{ 'eventsTeamDetail.floorPlanNote' | translate }}</p>
+            <div class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] relative min-h-[320px]">
               @for (el of layoutElements; track $index) {
                 <div class="absolute bg-white border border-[#34203a] rounded-[6px] px-2 py-1 text-[11px] font-medium text-[#34203a] select-none shadow-sm"
-                  [style.left.px]="el.x - 30"
-                  [style.top.px]="el.y - 12">
+                  [style.left]="'calc(' + el.x + '% - 30px)'"
+                  [style.top]="'calc(' + el.y + '% - 12px)'">
                   {{ el.type }}
                 </div>
               }
@@ -91,7 +91,7 @@
 
         @if (d.agenda) {
           <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
-            <h3 class="text-[#1B1A17] font-semibold text-base mb-3">Agenda</h3>
+            <h3 class="text-[#1B1A17] font-semibold text-base mb-3">{{ 'eventsTeamDetail.agenda' | translate }}</h3>
             <p class="text-[#7A736B] text-sm whitespace-pre-line">{{ d.agenda }}</p>
           </div>
         }
@@ -100,20 +100,20 @@
       <!-- Right: Status + notes -->
       <div class="flex flex-col gap-4">
         <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
-          <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">Preparation Status</p>
+          <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">{{ 'eventsTeamDetail.preparationStatus' | translate }}</p>
           <select [(ngModel)]="selectedStatus" class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm mb-3">
             @for (s of preparationStatuses; track s.value) {
-              <option [value]="s.value">{{ s.label }}</option>
+              <option [value]="s.value">{{ statusLabelKey(s.value) | translate }}</option>
             }
           </select>
 
-          <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-2">Notes from Sales (operational only)</p>
-          <textarea [(ngModel)]="opsNote" rows="4" placeholder="Add ops notes for this event…"
+          <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-2">{{ 'eventsTeamDetail.notesFromSales' | translate }}</p>
+          <textarea [(ngModel)]="opsNote" rows="4" [placeholder]="'eventsTeamDetail.notesPlaceholder' | translate"
             class="w-full border border-[#D9D0C4] rounded-lg px-3 py-2 text-sm resize-none"></textarea>
 
           <button (click)="save()" [disabled]="saving()"
             class="w-full mt-3 bg-[#34203A] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] disabled:opacity-50 transition-colors">
-            {{ saving() ? 'Saving...' : 'Save' }}
+            {{ (saving() ? 'eventsTeamDetail.saving' : 'eventsTeamDetail.save') | translate }}
           </button>
         </div>
       </div>

@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../core/services/auth.service';
+import { AdminPageHeader } from '../../../shared/admin-page-header/admin-page-header';
+import { StatusBadge } from '../../../shared/mobile/status-badge/status-badge';
 
 @Component({
   selector: 'app-hotel-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader, StatusBadge],
   templateUrl: './hotel-users.html',
   styleUrl: './hotel-users.scss'
 })
@@ -41,6 +44,11 @@ export class HotelUsers implements OnInit {
     status: 'INVITED'
   };
 
+  /**
+   * Values kept in English regardless of app language — these match the
+   * backend's role enum. Only the *displayed* label is translated, via
+   * getRoleLabelKey() below.
+   */
   roles = [
     { value: 'DIRECTOR_OF_SALES', label: 'Director of Sales' },
     { value: 'SALES_REP', label: 'Sales Rep' },
@@ -48,16 +56,24 @@ export class HotelUsers implements OnInit {
     { value: 'EVENTS_DIRECTOR', label: 'Events Director' },
   ];
 
-  statusBadge: Record<string, string> = {
-    ACTIVE: 'bg-green-100 text-green-700',
-    INVITED: 'bg-yellow-100 text-yellow-700',
-    INACTIVE: 'bg-gray-100 text-gray-600',
+  private roleKeyMap: Record<string, string> = {
+    DIRECTOR_OF_SALES: 'hotelUsers.roleOptions.directorOfSales',
+    SALES_REP: 'hotelUsers.roleOptions.salesRep',
+    EVENTS_TEAM: 'hotelUsers.roleOptions.eventsTeam',
+    EVENTS_DIRECTOR: 'hotelUsers.roleOptions.eventsDirector',
+  };
+
+  private userStatusKeyMap: Record<string, string> = {
+    ACTIVE: 'hotelUsers.userStatus.active',
+    INVITED: 'hotelUsers.userStatus.invited',
+    INACTIVE: 'hotelUsers.userStatus.inactive',
   };
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private authService: AuthService,
+    private translateService: TranslateService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -129,7 +145,7 @@ export class HotelUsers implements OnInit {
   /** Flips a user between ACTIVE and INACTIVE. For an INVITED user, this is how you activate them. */
   toggleStatus(user: any) {
     if (user.role === 'SAHA_ADMIN' && user.status === 'ACTIVE') {
-      alert('A SAHA Admin account cannot be deactivated — this prevents the platform being locked out.');
+      alert(this.translateService.instant('hotelUsers.cannotDeactivateAdminAlert'));
       return;
     }
     const newStatus = user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
@@ -188,6 +204,16 @@ export class HotelUsers implements OnInit {
 
   getRoleLabel(role: string): string {
     return this.roles.find(r => r.value === role)?.label || role;
+  }
+
+  /** Translation key for a role, e.g. 'SALES_REP' -> 'hotelUsers.roleOptions.salesRep'. */
+  getRoleLabelKey(role: string): string {
+    return this.roleKeyMap[role] || role;
+  }
+
+  /** Translation key for a user status, e.g. 'ACTIVE' -> 'hotelUsers.userStatus.active'. */
+  getUserStatusKey(status: string): string {
+    return this.userStatusKeyMap[status] || status;
   }
 
   getInitials(name: string): string {

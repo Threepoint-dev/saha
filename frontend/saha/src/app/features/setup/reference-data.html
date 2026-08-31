@@ -1,56 +1,36 @@
 <div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
-  <!-- Top Bar -->
-  <header class="bg-[#34203a] h-[70px] flex items-center justify-between px-10 py-[18px] w-full">
-    <div class="flex items-center gap-3">
-      <div class="w-[34px] h-[34px] rounded-[8px] bg-white/10 flex items-center justify-center">
-        <img src="/logo.svg" alt="SAHA logo" class="w-full h-full object-contain" />
-      </div>
-      <div class="flex flex-col gap-px leading-none">
-        <p class="text-white font-bold text-[16px] tracking-[0.16px]">SAHA</p>
-        <p class="text-[#f6ddae] text-[11px]">Halls, Packages &amp; Add-ons</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-3">
-      <div class="bg-[#46294f] px-[10px] py-[5px] rounded-md">
-        <p class="text-[#34203a] text-[10px] font-semibold">SAHA ADMIN</p>
-      </div>
-      <p class="text-[#f6ddae] text-[12px] font-medium">pilot&#64;saha.sa</p>
-      <div class="bg-[#46294f] px-[14px] py-2 rounded-[18px]">
-        <p class="text-white text-[12px] font-semibold">SA</p>
-      </div>
-    </div>
-  </header>
+  <app-admin-page-header [subtitle]="'referenceData.headerTitle' | translate" />
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1440px] mx-auto">
+  <main class="flex flex-col gap-5 px-4 md:px-10 py-5 md:py-7 w-full max-w-[1440px] mx-auto">
     <!-- Title -->
     <div class="flex flex-col gap-1">
-      <h1 class="text-[#34203a] font-bold text-[26px] leading-none">Halls, Packages &amp; Add-ons Setup</h1>
-      <p class="text-[#55514a] text-[13px] leading-none">Lightweight reference data for quote generation &middot; Not a full pricing engine</p>
+      <h1 class="text-[#34203a] font-bold text-[22px] md:text-[26px] leading-tight">{{ 'referenceData.pageTitle' | translate }}</h1>
+      <p class="text-[#55514a] text-[13px] leading-snug">{{ 'referenceData.pageSubtitle' | translate }}</p>
     </div>
 
     <!-- Tabs: bordered button group like Figma -->
-    <div class="flex items-center border border-[#e4dfd5] rounded-[12px] bg-white w-fit overflow-hidden">
+    <div class="flex items-center border border-[#e4dfd5] rounded-[12px] bg-white w-full sm:w-fit overflow-x-auto">
       <button
         type="button"
         (click)="setTab('halls')"
         [ngClass]="activeTab() === 'halls' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
         class="px-5 py-2.5 text-[13px] font-semibold transition-colors border-r border-[#e4dfd5]">
-        Halls
+        {{ 'referenceData.tabs.halls' | translate }}
       </button>
       <button
         type="button"
         (click)="setTab('packages')"
         [ngClass]="activeTab() === 'packages' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
         class="px-5 py-2.5 text-[13px] font-semibold transition-colors border-r border-[#e4dfd5]">
-        Packages
+        {{ 'referenceData.tabs.packages' | translate }}
       </button>
       <button
         type="button"
         (click)="setTab('addons')"
         [ngClass]="activeTab() === 'addons' ? 'bg-[#34203a] text-white' : 'text-[#55514a] hover:bg-[#faf7f2]'"
         class="px-5 py-2.5 text-[13px] font-semibold transition-colors">
-        Add-ons
+        {{ 'referenceData.tabs.addons' | translate }}
       </button>
     </div>
 
@@ -69,12 +49,12 @@
     <div class="bg-[#f6ddae] border border-[#ce8a28] rounded-[8px] px-[14px] py-2 flex items-center justify-between">
       <p class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px]">
         @switch (activeTab()) {
-          @case ('halls') { HALLS }
-          @case ('packages') { PACKAGES }
-          @case ('addons') { ADD-ONS }
+          @case ('halls') { {{ 'referenceData.sectionLabel.halls' | translate }} }
+          @case ('packages') { {{ 'referenceData.sectionLabel.packages' | translate }} }
+          @case ('addons') { {{ 'referenceData.sectionLabel.addons' | translate }} }
         }
       </p>
-      <span class="text-[#34203a] text-[11px] font-medium">{{ rowCount() }} active</span>
+      <span class="text-[#34203a] text-[11px] font-medium">{{ 'referenceData.activeCount' | translate:{ count: rowCount() } }}</span>
     </div>
 
     <!-- Toolbar: Add button -->
@@ -83,32 +63,33 @@
         type="button"
         (click)="openCreate()"
         class="bg-[#34203a] hover:bg-[#46294f] rounded-[10px] px-4 py-2.5 text-white text-[13px] font-semibold transition-colors">
-        {{ addButtonLabel() }}
+        {{ addButtonKey() | translate }}
       </button>
     </div>
 
     <!-- Content: Table per tab -->
     <div class="bg-white border border-[#e4dfd5] rounded-[12px] overflow-hidden">
       @if (loading()) {
-        <div class="px-5 py-6 text-[#55514a] text-[13px]">Loading...</div>
+        <div class="px-5 py-6 text-[#55514a] text-[13px]">{{ 'referenceData.loading' | translate }}</div>
       } @else {
         @switch (activeTab()) {
           @case ('halls') {
             @if (halls().length === 0) {
               <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
-                No active halls. Click <span class="font-semibold text-[#34203a]">Add Hall</span> to create one.
+                {{ 'referenceData.emptyHallsPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.halls' | translate }}</span> {{ 'referenceData.emptyHallsSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[760px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
-                    <th class="text-left px-5 py-3">Hall Name</th>
-                    <th class="text-left px-5 py-3">Short</th>
-                    <th class="text-right px-5 py-3">Capacity</th>
-                    <th class="text-right px-5 py-3">Base Price</th>
-                    <th class="text-left px-5 py-3">Setup</th>
-                    <th class="text-left px-5 py-3">Status</th>
-                    <th class="text-right px-5 py-3">Actions</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.hallName' | translate }}</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.short' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.capacity' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.basePrice' | translate }}</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.setup' | translate }}</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.status' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.actions' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -120,17 +101,17 @@
                       <td class="px-5 py-3 text-right">{{ formatPrice(hall.basePrice) }}</td>
                       <td class="px-5 py-3 text-[#55514a]">{{ hall.defaultSetup || '—' }}</td>
                       <td class="px-5 py-3">
-                        <span class="inline-flex items-center rounded-[6px] px-2.5 py-0.5 text-[11px] font-semibold bg-emerald-100 text-emerald-700">Active</span>
+                        <app-status-badge status="active" [label]="'referenceData.active' | translate" />
                       </td>
                       <td class="px-5 py-3">
                         <div class="flex items-center justify-end gap-2">
                           <button type="button" (click)="openEditHall(hall)"
                             class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Edit
+                            {{ 'referenceData.edit' | translate }}
                           </button>
                           <button type="button" (click)="archiveHall(hall)"
                             class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Archive
+                            {{ 'referenceData.archive' | translate }}
                           </button>
                         </div>
                       </td>
@@ -138,22 +119,24 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
           @case ('packages') {
             @if (packages().length === 0) {
               <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
-                No active packages. Click <span class="font-semibold text-[#34203a]">Add Package</span> to create one.
+                {{ 'referenceData.emptyPackagesPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.packages' | translate }}</span> {{ 'referenceData.emptyPackagesSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[640px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
-                    <th class="text-left px-5 py-3">Name</th>
-                    <th class="text-left px-5 py-3">Description</th>
-                    <th class="text-right px-5 py-3">Price</th>
-                    <th class="text-center px-5 py-3">Taxable</th>
-                    <th class="text-right px-5 py-3">Actions</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.name' | translate }}</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.description' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.price' | translate }}</th>
+                    <th class="text-center px-5 py-3">{{ 'referenceData.table.taxable' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.actions' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,20 +147,20 @@
                       <td class="px-5 py-3 text-right">{{ formatPrice(pkg.price) }}</td>
                       <td class="px-5 py-3 text-center">
                         @if (pkg.isTaxable) {
-                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">Yes</span>
+                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">{{ 'referenceData.yes' | translate }}</span>
                         } @else {
-                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">No</span>
+                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">{{ 'referenceData.no' | translate }}</span>
                         }
                       </td>
                       <td class="px-5 py-3">
                         <div class="flex items-center justify-end gap-2">
                           <button type="button" (click)="openEditPackage(pkg)"
                             class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Edit
+                            {{ 'referenceData.edit' | translate }}
                           </button>
                           <button type="button" (click)="archivePackage(pkg)"
                             class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Archive
+                            {{ 'referenceData.archive' | translate }}
                           </button>
                         </div>
                       </td>
@@ -185,21 +168,23 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
           @case ('addons') {
             @if (addons().length === 0) {
               <div class="px-5 py-8 text-center text-[#55514a] text-[13px]">
-                No active add-ons. Click <span class="font-semibold text-[#34203a]">Add Add-on</span> to create one.
+                {{ 'referenceData.emptyAddonsPrefix' | translate }} <span class="font-semibold text-[#34203a]">{{ 'referenceData.addButton.addons' | translate }}</span> {{ 'referenceData.emptyAddonsSuffix' | translate }}
               </div>
             } @else {
-              <table class="w-full text-[13px]">
+              <div class="overflow-x-auto">
+              <table class="w-full text-[13px] min-w-[520px]">
                 <thead class="bg-[#efebf3]">
                   <tr class="text-[#34203a] text-[11px] font-semibold tracking-[0.22px] uppercase">
-                    <th class="text-left px-5 py-3">Name</th>
-                    <th class="text-right px-5 py-3">Price</th>
-                    <th class="text-center px-5 py-3">Taxable</th>
-                    <th class="text-right px-5 py-3">Actions</th>
+                    <th class="text-left px-5 py-3">{{ 'referenceData.table.name' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.price' | translate }}</th>
+                    <th class="text-center px-5 py-3">{{ 'referenceData.table.taxable' | translate }}</th>
+                    <th class="text-right px-5 py-3">{{ 'referenceData.table.actions' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -209,20 +194,20 @@
                       <td class="px-5 py-3 text-right">{{ formatPrice(addon.price) }}</td>
                       <td class="px-5 py-3 text-center">
                         @if (addon.isTaxable) {
-                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">Yes</span>
+                          <span class="inline-flex items-center rounded-[6px] bg-emerald-100 text-emerald-700 text-[11px] font-semibold px-2 py-0.5">{{ 'referenceData.yes' | translate }}</span>
                         } @else {
-                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">No</span>
+                          <span class="inline-flex items-center rounded-[6px] bg-[#efebf3] text-[#55514a] text-[11px] font-semibold px-2 py-0.5">{{ 'referenceData.no' | translate }}</span>
                         }
                       </td>
                       <td class="px-5 py-3">
                         <div class="flex items-center justify-end gap-2">
                           <button type="button" (click)="openEditAddon(addon)"
                             class="text-[#34203a] hover:bg-[#efebf3] border border-[#e4dfd5] rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Edit
+                            {{ 'referenceData.edit' | translate }}
                           </button>
                           <button type="button" (click)="archiveAddon(addon)"
                             class="text-red-600 hover:bg-red-50 border border-red-200 rounded-[8px] px-3 py-1.5 text-[12px] font-semibold transition-colors">
-                            Archive
+                            {{ 'referenceData.archive' | translate }}
                           </button>
                         </div>
                       </td>
@@ -230,6 +215,7 @@
                   }
                 </tbody>
               </table>
+              </div>
             }
           }
         }
@@ -254,36 +240,36 @@
           @if (modalTab() === 'halls') {
             <form [formGroup]="hallForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
               <div class="flex flex-col gap-1.5">
-                <label class="text-[#34203a] text-[12px] font-medium" for="hall-name">Name</label>
+                <label class="text-[#34203a] text-[12px] font-medium" for="hall-name">{{ 'referenceData.form.name' | translate }}</label>
                 <input id="hall-name" type="text" formControlName="name"
-                  placeholder="Grand Ballroom"
+                  [placeholder]="'referenceData.form.namePlaceholderHall' | translate"
                   class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
                   [class.border-red-500]="hallForm.controls.name.invalid && hallForm.controls.name.touched" />
                 @if (hallForm.controls.name.invalid && hallForm.controls.name.touched) {
-                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                  <span class="text-red-600 text-[11px]">{{ 'referenceData.form.nameRequired' | translate }}</span>
                 }
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-capacity">Capacity</label>
-                  <input id="hall-capacity" type="number" formControlName="capacity" min="0" placeholder="300"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-capacity">{{ 'referenceData.form.capacity' | translate }}</label>
+                  <input id="hall-capacity" type="number" formControlName="capacity" min="0" [placeholder]="'referenceData.form.capacityPlaceholder' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-price">Base Price (SAR)</label>
-                  <input id="hall-price" type="number" formControlName="basePrice" min="0" step="0.01" placeholder="12000.00"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-price">{{ 'referenceData.form.basePrice' | translate }}</label>
+                  <input id="hall-price" type="number" formControlName="basePrice" min="0" step="0.01" [placeholder]="'referenceData.form.basePricePlaceholder' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-setup">Default Setup</label>
-                  <input id="hall-setup" type="text" formControlName="defaultSetup" placeholder="Theater"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-setup">{{ 'referenceData.form.defaultSetup' | translate }}</label>
+                  <input id="hall-setup" type="text" formControlName="defaultSetup" [placeholder]="'referenceData.form.defaultSetupPlaceholder' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-code">Short Code</label>
-                  <input id="hall-code" type="text" formControlName="shortCode" placeholder="BR-01"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="hall-code">{{ 'referenceData.form.shortCode' | translate }}</label>
+                  <input id="hall-code" type="text" formControlName="shortCode" [placeholder]="'referenceData.form.shortCodePlaceholder' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
               </div>
@@ -291,30 +277,30 @@
           } @else if (modalTab() === 'packages') {
             <form [formGroup]="packageForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
               <div class="flex flex-col gap-1.5">
-                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-name">Name</label>
-                <input id="pkg-name" type="text" formControlName="name" placeholder="Standard Wedding Package"
+                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-name">{{ 'referenceData.form.name' | translate }}</label>
+                <input id="pkg-name" type="text" formControlName="name" [placeholder]="'referenceData.form.namePlaceholderPackage' | translate"
                   class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
                   [class.border-red-500]="packageForm.controls.name.invalid && packageForm.controls.name.touched" />
                 @if (packageForm.controls.name.invalid && packageForm.controls.name.touched) {
-                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                  <span class="text-red-600 text-[11px]">{{ 'referenceData.form.nameRequired' | translate }}</span>
                 }
               </div>
               <div class="flex flex-col gap-1.5">
-                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-description">Description</label>
-                <textarea id="pkg-description" formControlName="description" rows="3" placeholder="What's included in the package"
+                <label class="text-[#34203a] text-[12px] font-medium" for="pkg-description">{{ 'referenceData.form.description' | translate }}</label>
+                <textarea id="pkg-description" formControlName="description" rows="3" [placeholder]="'referenceData.form.descriptionPlaceholder' | translate"
                   class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-none"></textarea>
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="pkg-price">Price (SAR)</label>
-                  <input id="pkg-price" type="number" formControlName="price" min="0" step="0.01" placeholder="25000.00"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="pkg-price">{{ 'referenceData.form.price' | translate }}</label>
+                  <input id="pkg-price" type="number" formControlName="price" min="0" step="0.01" [placeholder]="'referenceData.form.pricePlaceholderPackage' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
                 <div class="flex items-end">
                   <label class="flex items-center gap-2 text-[#34203a] text-[13px] font-medium">
                     <input type="checkbox" formControlName="isTaxable"
                       class="w-4 h-4 rounded border-[#e4dfd5] text-[#34203a] focus:ring-[#34203a]" />
-                    Taxable
+                    {{ 'referenceData.form.taxable' | translate }}
                   </label>
                 </div>
               </div>
@@ -322,25 +308,25 @@
           } @else {
             <form [formGroup]="addonForm" (ngSubmit)="submit()" class="flex flex-col gap-4">
               <div class="flex flex-col gap-1.5">
-                <label class="text-[#34203a] text-[12px] font-medium" for="addon-name">Name</label>
-                <input id="addon-name" type="text" formControlName="name" placeholder="Extra Sound System"
+                <label class="text-[#34203a] text-[12px] font-medium" for="addon-name">{{ 'referenceData.form.name' | translate }}</label>
+                <input id="addon-name" type="text" formControlName="name" [placeholder]="'referenceData.form.namePlaceholderAddon' | translate"
                   class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors"
                   [class.border-red-500]="addonForm.controls.name.invalid && addonForm.controls.name.touched" />
                 @if (addonForm.controls.name.invalid && addonForm.controls.name.touched) {
-                  <span class="text-red-600 text-[11px]">Name is required.</span>
+                  <span class="text-red-600 text-[11px]">{{ 'referenceData.form.nameRequired' | translate }}</span>
                 }
               </div>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-[#34203a] text-[12px] font-medium" for="addon-price">Price (SAR)</label>
-                  <input id="addon-price" type="number" formControlName="price" min="0" step="0.01" placeholder="1500.00"
+                  <label class="text-[#34203a] text-[12px] font-medium" for="addon-price">{{ 'referenceData.form.price' | translate }}</label>
+                  <input id="addon-price" type="number" formControlName="price" min="0" step="0.01" [placeholder]="'referenceData.form.pricePlaceholderAddon' | translate"
                     class="bg-white border border-[#e4dfd5] rounded-[10px] px-[14px] py-3 h-[44px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors" />
                 </div>
                 <div class="flex items-end">
                   <label class="flex items-center gap-2 text-[#34203a] text-[13px] font-medium">
                     <input type="checkbox" formControlName="isTaxable"
                       class="w-4 h-4 rounded border-[#e4dfd5] text-[#34203a] focus:ring-[#34203a]" />
-                    Taxable
+                    {{ 'referenceData.form.taxable' | translate }}
                   </label>
                 </div>
               </div>
@@ -351,11 +337,11 @@
         <div class="flex items-center justify-end gap-2 border-t border-[#e4dfd5] px-5 py-4">
           <button type="button" (click)="closeModal()" [disabled]="saving()"
             class="border border-[#e4dfd5] text-[#34203a] hover:bg-[#efebf3] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold transition-colors disabled:opacity-60">
-            Cancel
+            {{ 'referenceData.cancel' | translate }}
           </button>
           <button type="button" (click)="submit()" [disabled]="saving()"
             class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-4 py-2.5 text-white text-[13px] font-semibold transition-colors">
-            {{ saving() ? 'Saving...' : (modalMode() === 'create' ? 'Create' : 'Save Changes') }}
+            {{ (saving() ? 'referenceData.saving' : (modalMode() === 'create' ? 'referenceData.create' : 'referenceData.saveChanges')) | translate }}
           </button>
         </div>
       </div>

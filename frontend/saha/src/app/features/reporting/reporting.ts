@@ -2,19 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { ReportingSummary } from './reporting.model';
 import { ReportingService } from './reporting.service';
 import { SourceChannelsService } from '../setup/source-channels.service';
+import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
 
 /** Chart.js is loaded globally via CDN (see index.html). */
 declare const Chart: any;
 
 interface Kpi {
-  label: string;
+  labelKey: string;
   value: string;
-  hint?: string;
+  hintKey?: string;
   barColor?: string;
 }
 
@@ -25,13 +27,14 @@ const STATUS_COLORS = ['#34203a', '#f6ddae', '#2e7d5b', '#d14343', '#e0922f', '#
 
 @Component({
   selector: 'app-reporting',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader],
   templateUrl: './reporting.html'
 })
 export class Reporting implements OnInit, OnDestroy {
   private service = inject(ReportingService);
   private sourceChannelsService = inject(SourceChannelsService);
   private authService = inject(AuthService);
+  private translateService = inject(TranslateService);
 
   get tenantId(): string {
     return this.authService.getTenantId();
@@ -52,17 +55,21 @@ export class Reporting implements OnInit, OnDestroy {
 
   private charts: Record<string, any> = {};
 
+  private get locale(): string {
+    return this.translateService.currentLang() === 'ar' ? 'ar-SA' : 'en-US';
+  }
+
   readonly kpis = computed<Kpi[]>(() => {
     const s = this.summary();
     if (!s) return [];
     return [
-      { label: 'Total Inquiries', value: this.num(s.totalInquiries), hint: 'All inquiries received', barColor: 'bg-[#34203a]' },
-      { label: 'New', value: this.num(s.newInquiries ?? 0), hint: 'Awaiting first contact', barColor: 'bg-[#4B9ED6]' },
-      { label: 'Won', value: this.num(s.wonInquiries), hint: 'Confirmed bookings', barColor: 'bg-[#2E7D5B]' },
-      { label: 'Lost', value: this.num(s.lostInquiries), hint: 'Closed without booking', barColor: 'bg-[#D14343]' },
-      { label: 'Conversion Rate', value: `${(s.conversionRate ?? 0).toFixed(1)}%`, hint: 'Won ÷ (Won + Lost)', barColor: 'bg-[#ce8a28]' },
-      { label: 'Median First Response', value: this.formatHours(s.avgResponseTimeHours), hint: 'median(first_response → created)', barColor: 'bg-[#E0922F]' },
-      { label: 'Total Quote Value', value: this.currency(s.totalQuoteValue), hint: 'Sum of estimated value', barColor: 'bg-[#34203a]' },
+      { labelKey: 'reporting.kpi.totalInquiries', value: this.num(s.totalInquiries), hintKey: 'reporting.kpi.allReceived', barColor: 'bg-[#34203a]' },
+      { labelKey: 'reporting.kpi.new', value: this.num(s.newInquiries ?? 0), hintKey: 'reporting.kpi.awaitingContact', barColor: 'bg-[#4B9ED6]' },
+      { labelKey: 'reporting.kpi.won', value: this.num(s.wonInquiries), hintKey: 'reporting.kpi.confirmedBookings', barColor: 'bg-[#2E7D5B]' },
+      { labelKey: 'reporting.kpi.lost', value: this.num(s.lostInquiries), hintKey: 'reporting.kpi.closedNoBooking', barColor: 'bg-[#D14343]' },
+      { labelKey: 'reporting.kpi.conversionRate', value: `${(s.conversionRate ?? 0).toFixed(1)}%`, hintKey: 'reporting.kpi.wonDividedTotal', barColor: 'bg-[#ce8a28]' },
+      { labelKey: 'reporting.kpi.medianFirstResponse', value: this.formatHours(s.avgResponseTimeHours), hintKey: 'reporting.kpi.medianFormula', barColor: 'bg-[#E0922F]' },
+      { labelKey: 'reporting.kpi.totalQuoteValue', value: this.currency(s.totalQuoteValue), hintKey: 'reporting.kpi.sumEstimated', barColor: 'bg-[#34203a]' },
     ];
   });
 
@@ -70,11 +77,11 @@ export class Reporting implements OnInit, OnDestroy {
     const s = this.summary();
     if (!s) return [];
     const statuses = [
-      { label: 'New', count: s.newInquiries ?? 0, color: 'bg-[#4B9ED6]' },
-      { label: 'Contacted', count: Math.max(0, s.totalInquiries - (s.newInquiries ?? 0) - s.wonInquiries - s.lostInquiries), color: 'bg-[#3d8f8a]' },
-      { label: 'Quoted', count: 0, color: 'bg-[#ce8a28]' },
-      { label: 'Won', count: s.wonInquiries, color: 'bg-[#2E7D5B]' },
-      { label: 'Lost', count: s.lostInquiries, color: 'bg-[#D14343]' },
+      { labelKey: 'status.new', count: s.newInquiries ?? 0, color: 'bg-[#4B9ED6]' },
+      { labelKey: 'status.contacted', count: Math.max(0, s.totalInquiries - (s.newInquiries ?? 0) - s.wonInquiries - s.lostInquiries), color: 'bg-[#3d8f8a]' },
+      { labelKey: 'status.quoted', count: 0, color: 'bg-[#ce8a28]' },
+      { labelKey: 'status.won', count: s.wonInquiries, color: 'bg-[#2E7D5B]' },
+      { labelKey: 'status.lost', count: s.lostInquiries, color: 'bg-[#D14343]' },
     ];
     const max = Math.max(...statuses.map(s => s.count), 1);
     return statuses.map(s => ({ ...s, height: Math.max(24, Math.round((s.count / max) * 120)) }));
@@ -235,9 +242,9 @@ export class Reporting implements OnInit, OnDestroy {
   private monthLabel(key: string): string {
     // key is "YYYY-MM"
     const [year, month] = key.split('-');
-    const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const idx = Number(month) - 1;
-    return idx >= 0 && idx < 12 ? `${names[idx]} ${year.slice(2)}` : key;
+    const date = new Date(Number(year), idx, 1);
+    return date.toLocaleDateString(this.locale, { month: 'short', year: '2-digit' });
   }
 
   private titleCase(value: string): string {
@@ -245,11 +252,11 @@ export class Reporting implements OnInit, OnDestroy {
   }
 
   private num(value: number): string {
-    return (value ?? 0).toLocaleString('en-US');
+    return (value ?? 0).toLocaleString(this.locale);
   }
 
   private currency(value: number): string {
-    return (value ?? 0).toLocaleString('en-US', {
+    return (value ?? 0).toLocaleString(this.locale, {
       style: 'currency',
       currency: 'SAR',
       maximumFractionDigits: 0
