@@ -1,45 +1,45 @@
 <div class="flex-1 bg-[#FAF7F2] min-h-screen">
 
   <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+  <div class="border-b border-[#E8E0D8] bg-white px-4 md:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div>
       <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'pipeline.title' | translate }}</h1>
       <p class="text-[#7A736B] text-sm">{{ 'pipeline.subtitle' | translate }}</p>
     </div>
     <div class="flex items-center gap-2">
-      <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-lg px-3 py-2 bg-white">
-        <svg class="w-4 h-4 text-[#9C9690]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-lg px-3 py-2 bg-white flex-1 sm:w-40">
+        <svg class="w-4 h-4 text-[#9C9690] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
         </svg>
-        <input type="text" [(ngModel)]="searchQuery" [placeholder]="'pipeline.searchPlaceholder' | translate" class="text-sm focus:outline-none w-40 bg-transparent"/>
+        <input type="text" [(ngModel)]="searchQuery" [placeholder]="'pipeline.searchPlaceholder' | translate" class="text-sm focus:outline-none w-full bg-transparent"/>
       </div>
       <a routerLink="/inquiries/new"
-        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
+        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors shrink-0">
         {{ 'pipeline.newInquiry' | translate }}
       </a>
     </div>
   </div>
 
   <!-- Toolbar: View Toggle + Filters + Inline Search -->
-  <div class="px-8 py-3 flex items-center gap-3">
+  <div class="px-4 md:px-8 py-3 flex items-center gap-2 overflow-x-auto flex-nowrap md:flex-wrap [&>*]:shrink-0">
     <!-- Board/List toggle -->
     <div class="flex items-center border border-[#D9D0C4] rounded-xl overflow-hidden bg-white">
       <button (click)="viewMode = 'board'"
         [class]="viewMode === 'board'
-          ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17] border-r border-[#D9D0C4]'
-          : 'px-4 py-2 text-sm text-[#7A736B] border-r border-[#D9D0C4] hover:bg-[#FAF7F2]'">
+          ? 'px-3.5 py-1.5 text-xs md:text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17] border-r border-[#D9D0C4]'
+          : 'px-3.5 py-1.5 text-xs md:text-sm text-[#7A736B] border-r border-[#D9D0C4] hover:bg-[#FAF7F2]'">
         {{ 'pipeline.board' | translate }}
       </button>
       <button (click)="viewMode = 'list'"
         [class]="viewMode === 'list'
-          ? 'px-4 py-2 text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17]'
-          : 'px-4 py-2 text-sm text-[#7A736B] hover:bg-[#FAF7F2]'">
+          ? 'px-3.5 py-1.5 text-xs md:text-sm font-semibold bg-[#F0EBE3] text-[#1B1A17]'
+          : 'px-3.5 py-1.5 text-xs md:text-sm text-[#7A736B] hover:bg-[#FAF7F2]'">
         {{ 'pipeline.list' | translate }}
       </button>
     </div>
 
     <!-- Filter button -->
-    <select [(ngModel)]="filterStatus" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
+    <select [(ngModel)]="filterStatus" class="border border-[#D9D0C4] rounded-xl px-3 py-1.5 text-xs md:text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
       <option value="">{{ 'pipeline.allStatuses' | translate }}</option>
       @for (status of statuses; track status) {
         <option [value]="status">{{ statusLabelKey(status) | translate }}</option>
@@ -47,24 +47,12 @@
     </select>
 
     <!-- All sources dropdown -->
-    <select [(ngModel)]="filterSource" class="border border-[#D9D0C4] rounded-xl px-4 py-2 text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
+    <select [(ngModel)]="filterSource" class="border border-[#D9D0C4] rounded-xl px-3 py-1.5 text-xs md:text-sm text-[#1B1A17] bg-white hover:bg-[#FAF7F2] transition-colors focus:outline-none focus:border-[#34203A]">
       <option value="">{{ 'pipeline.allSources' | translate }}</option>
       @for (channel of sourceChannels; track channel.id) {
         <option [value]="channel.id">{{ channel.name }}</option>
       }
     </select>
-
-    <!-- Spacer -->
-    <div class="flex-1"></div>
-
-    <!-- Inline search -->
-    <div class="flex items-center gap-2 border border-[#D9D0C4] rounded-xl px-3 py-2 bg-white w-52">
-      <svg class="w-4 h-4 text-[#9C9690] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
-      </svg>
-      <input type="text" [(ngModel)]="searchQuery" [placeholder]="'pipeline.searchInquiries' | translate"
-        class="text-sm focus:outline-none flex-1 bg-transparent text-[#1B1A17] placeholder-[#B0A99F]"/>
-    </div>
   </div>
 
   <!-- Loading -->
@@ -76,7 +64,7 @@
 
   <!-- Empty State -->
   @if (!isLoading && inquiries.length === 0) {
-    <div class="flex flex-col items-center justify-center h-64 gap-4">
+    <div class="flex flex-col items-center justify-center h-64 gap-4 px-4 text-center">
       <p class="text-[#1B1A17] font-semibold">{{ 'pipeline.emptyTitle' | translate }}</p>
       <p class="text-[#7A736B] text-sm">{{ 'pipeline.emptySubtitle' | translate }}</p>
       <a routerLink="/inquiries/new"
@@ -88,7 +76,7 @@
 
   <!-- Board View -->
   @if (!isLoading && viewMode === 'board') {
-    <div class="px-8 py-4 flex gap-4 overflow-x-auto pb-8">
+    <div class="px-4 md:px-8 py-4 flex gap-4 overflow-x-auto pb-8">
       @for (status of statuses; track status) {
         <div class="min-w-[240px] flex-1 max-w-[300px]"
              (dragover)="onDragOver($event)"
@@ -97,7 +85,7 @@
           <div class="flex items-center gap-2 mb-3 px-1">
             <span [class]="'w-2.5 h-2.5 rounded-full ' + statusDotColors[status]"></span>
             <span class="text-[#1B1A17] text-sm font-semibold">{{ statusLabelKey(status) | translate }}</span>
-            <span class="text-[#9C9690] text-xs ml-auto font-medium">{{ getByStatus(status).length }}</span>
+            <span class="text-[#9C9690] text-xs ms-auto font-medium">{{ getByStatus(status).length }}</span>
           </div>
           <!-- Cards -->
           <div class="flex flex-col gap-2">
@@ -163,42 +151,47 @@
 
   <!-- List View -->
   @if (!isLoading && viewMode === 'list') {
-    <div class="px-8 py-4">
+    <div class="px-4 md:px-8 py-4">
       <div class="bg-white rounded-xl border border-[#E8E0D8] overflow-hidden">
-        <!-- Table Header -->
-        <div class="grid grid-cols-6 px-6 py-3 border-b border-[#E8E0D8] text-[#9C9690] text-xs font-semibold uppercase tracking-wider">
-          <span class="col-span-2">{{ 'pipeline.table.client' | translate }}</span>
-          <span>{{ 'pipeline.table.event' | translate }}</span>
-          <span>{{ 'pipeline.table.date' | translate }}</span>
-          <span>{{ 'pipeline.table.value' | translate }}</span>
-          <span>{{ 'pipeline.table.status' | translate }}</span>
-        </div>
-        <!-- Table Rows -->
-        @for (inquiry of filtered; track inquiry.id) {
-          <a [routerLink]="['/inquiries', inquiry.id]"
-            class="grid grid-cols-6 px-6 py-4 border-b border-[#E8E0D8] last:border-b-0 hover:bg-[#FAF7F2] transition-colors items-center">
-            <div class="col-span-2 flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
-                <span class="text-white text-[11px] font-semibold">{{ getInitials(inquiry.clientName) }}</span>
-              </div>
-              <div>
-                <p class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</p>
-                @if (inquiry.sourceChannelId) {
-                  <p class="text-[#9C9690] text-xs">{{ getChannelName(inquiry.sourceChannelId) }}</p>
-                }
-              </div>
+        <!-- Table Scroll Wrapper -->
+        <div class="overflow-x-auto">
+          <div class="min-w-[650px]">
+            <!-- Table Header -->
+            <div class="grid grid-cols-6 px-6 py-3 border-b border-[#E8E0D8] text-[#9C9690] text-xs font-semibold uppercase tracking-wider">
+              <span class="col-span-2">{{ 'pipeline.table.client' | translate }}</span>
+              <span>{{ 'pipeline.table.event' | translate }}</span>
+              <span>{{ 'pipeline.table.date' | translate }}</span>
+              <span>{{ 'pipeline.table.value' | translate }}</span>
+              <span>{{ 'pipeline.table.status' | translate }}</span>
             </div>
-            <span class="text-[#55514A] text-sm">{{ inquiry.eventType }}</span>
-            <span class="text-[#55514A] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
-            <span class="text-[#55514A] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
-            <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold w-fit ' + statusBadge[inquiry.status || 'NEW']">
-              {{ statusLabelKey(inquiry.status) | translate }}
-            </span>
-          </a>
-        }
-        @if (filtered.length === 0 && !isLoading) {
-          <div class="px-6 py-8 text-center text-[#9C9690] text-sm">{{ 'pipeline.noMatch' | translate }}</div>
-        }
+            <!-- Table Rows -->
+            @for (inquiry of filtered; track inquiry.id) {
+              <a [routerLink]="['/inquiries', inquiry.id]"
+                class="grid grid-cols-6 px-6 py-4 border-b border-[#E8E0D8] last:border-b-0 hover:bg-[#FAF7F2] transition-colors items-center">
+                <div class="col-span-2 flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
+                    <span class="text-white text-[11px] font-semibold">{{ getInitials(inquiry.clientName) }}</span>
+                  </div>
+                  <div>
+                    <p class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</p>
+                    @if (inquiry.sourceChannelId) {
+                      <p class="text-[#9C9690] text-xs">{{ getChannelName(inquiry.sourceChannelId) }}</p>
+                    }
+                  </div>
+                </div>
+                <span class="text-[#55514A] text-sm">{{ inquiry.eventType }}</span>
+                <span class="text-[#55514A] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
+                <span class="text-[#55514A] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
+                <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold w-fit ' + statusBadge[inquiry.status || 'NEW']">
+                  {{ statusLabelKey(inquiry.status) | translate }}
+                </span>
+              </a>
+            }
+            @if (filtered.length === 0 && !isLoading) {
+              <div class="px-6 py-8 text-center text-[#9C9690] text-sm">{{ 'pipeline.noMatch' | translate }}</div>
+            }
+          </div>
+        </div>
       </div>
     </div>
   }
