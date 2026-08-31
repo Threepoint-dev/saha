@@ -25,6 +25,13 @@
     "signedInSubtitle": "Welcome back. Taking you to your dashboard...",
     "goToDashboard": "Go to dashboard"
   },
+  "bottomTab": {
+    "dashboard": "Dashboard",
+    "inquiries": "Inquiries",
+    "new": "New",
+    "quotes": "Quotes",
+    "settings": "Settings"
+  },
   "sidebar": {
     "section": {
       "sales": "SALES",
@@ -695,7 +702,15 @@
     "notes": "Notes",
     "terms": "Terms",
     "defaultFooter": "Thank you for your business.",
-    "printSavePdf": "Print / Save as PDF"
+    "printSavePdf": "Print / Save as PDF",
+    "pilotBadge": "Pilot",
+    "readOnlyBadge": "Read only",
+    "guestsSuffix": "guests",
+    "totalInclVat": "Total incl. VAT",
+    "nonTaxInvoiceNote": "This is a price quote, not a ZATCA tax invoice.",
+    "copyQuoteLink": "Copy quote link",
+    "downloadPdf": "Download PDF",
+    "copied": "Copied!"
   },
   "eventsList": {
     "title": "Events Team Request Tracker",

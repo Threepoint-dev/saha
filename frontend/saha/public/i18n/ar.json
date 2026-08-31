@@ -25,6 +25,13 @@
     "signedInSubtitle": "أهلًا فيك. جاري تحويلك للوحة التحكم...",
     "goToDashboard": "الذهاب للوحة التحكم"
   },
+  "bottomTab": {
+    "dashboard": "الرئيسية",
+    "inquiries": "الاستفسارات",
+    "new": "جديد",
+    "quotes": "العروض",
+    "settings": "الإعدادات"
+  },
   "sidebar": {
     "section": {
       "sales": "المبيعات",
@@ -695,7 +702,15 @@
     "notes": "ملاحظات",
     "terms": "الشروط",
     "defaultFooter": "شكرًا لتعاملكم معنا.",
-    "printSavePdf": "طباعة / حفظ كملف PDF"
+    "printSavePdf": "طباعة / حفظ كملف PDF",
+    "pilotBadge": "تجريبي",
+    "readOnlyBadge": "للعرض فقط",
+    "guestsSuffix": "ضيف",
+    "totalInclVat": "الإجمالي شامل الضريبة",
+    "nonTaxInvoiceNote": "هذا عرض سعر وليس فاتورة ضريبية معتمدة من هيئة الزكاة والضريبة.",
+    "copyQuoteLink": "نسخ رابط العرض",
+    "downloadPdf": "تحميل PDF",
+    "copied": "تم النسخ!"
   },
   "eventsList": {
     "title": "متابعة طلبات فريق الفعاليات",

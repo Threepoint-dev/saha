@@ -1,9 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-bottom-tab-bar',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './bottom-tab-bar.html'
 })
 export class BottomTabBar {
