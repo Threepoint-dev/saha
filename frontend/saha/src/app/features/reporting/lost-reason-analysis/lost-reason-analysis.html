@@ -90,24 +90,24 @@
           <p class="text-[#8a8478] text-[12px]">Count · percentage of lost · estimated value lost · urgency</p>
         </div>
         <div class="overflow-x-auto">
-        <table class="w-full text-left min-w-[560px]">
+        <table class="w-full min-w-[560px]">
           <thead>
             <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
-              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px]">Lost Reason</th>
-              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Count</th>
-              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">% of Lost</th>
-              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Est. Value Lost</th>
-              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-right">Urgency</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-start">Lost Reason</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-end">Count</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-end">% of Lost</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-end">Est. Value Lost</th>
+              <th class="px-6 py-3 text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.1px] text-end">Urgency</th>
             </tr>
           </thead>
           <tbody>
             @for (row of d.breakdown; track row.reason) {
               <tr class="border-b border-[#efebf3]">
-                <td class="px-6 py-3 text-[#34203a] text-[13px] font-medium">{{ row.reason }}</td>
-                <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ row.count }}</td>
-                <td class="px-6 py-3 text-[#55514a] text-[13px] text-right">{{ row.percentOfLost | number:'1.0-0' }}%</td>
-                <td class="px-6 py-3 text-[#55514a] text-[13px] text-right">{{ formatSar(row.estimatedValueLost) }}</td>
-                <td class="px-6 py-3 text-right">
+                <td class="px-6 py-3 text-[#34203a] text-[13px] font-medium text-start">{{ row.reason }}</td>
+                <td class="px-6 py-3 text-[#34203a] text-[13px] text-end">{{ row.count }}</td>
+                <td class="px-6 py-3 text-[#55514a] text-[13px] text-end">{{ row.percentOfLost | number:'1.0-0' }}%</td>
+                <td class="px-6 py-3 text-[#55514a] text-[13px] text-end">{{ formatSar(row.estimatedValueLost) }}</td>
+                <td class="px-6 py-3 text-end">
                   <span [class]="'px-2.5 py-0.5 rounded-full text-[11px] font-semibold ' + urgencyClass(row.urgency)">{{ row.urgency }}</span>
                 </td>
               </tr>
@@ -115,10 +115,10 @@
           </tbody>
           <tfoot>
             <tr class="bg-[#faf7f2] font-semibold">
-              <td class="px-6 py-3 text-[#34203a] text-[13px]">Total lost</td>
-              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ d.totalLost }}</td>
-              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">100%</td>
-              <td class="px-6 py-3 text-[#34203a] text-[13px] text-right">{{ formatSar(totalValueLost()) }}</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-start">Total lost</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-end">{{ d.totalLost }}</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-end">100%</td>
+              <td class="px-6 py-3 text-[#34203a] text-[13px] text-end">{{ formatSar(totalValueLost()) }}</td>
               <td></td>
             </tr>
           </tfoot>

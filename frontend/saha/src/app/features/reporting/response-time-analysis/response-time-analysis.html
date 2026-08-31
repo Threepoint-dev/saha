@@ -90,26 +90,26 @@
             <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
           </div>
           <div class="overflow-x-auto">
-          <table class="w-full text-left min-w-[460px]">
+          <table class="w-full min-w-[460px]">
             <thead>
               <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Name</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Median</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Avg</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">SLA</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Conv%</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-start">Name</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Median</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Avg</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">SLA</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Conv%</th>
               </tr>
             </thead>
             <tbody>
               @for (row of d.byOwner; track row.name) {
                 <tr class="border-b border-[#efebf3]">
-                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium">{{ row.name }}</td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.medianHours) }}</td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.avgHours) }}</td>
-                  <td class="px-5 py-2.5 text-right">
+                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium text-start">{{ row.name }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ formatHours(row.medianHours) }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ formatHours(row.avgHours) }}</td>
+                  <td class="px-5 py-2.5 text-end">
                     <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-semibold ' + slaClass(row.sla)">{{ row.sla }}</span>
                   </td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ row.conversionRate | number:'1.0-0' }}%</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ row.conversionRate | number:'1.0-0' }}%</td>
                 </tr>
               }
               @if (d.byOwner.length === 0) {
@@ -127,26 +127,26 @@
             <p class="text-[#8a8478] text-[11px]">Median / avg / SLA / conversion</p>
           </div>
           <div class="overflow-x-auto">
-          <table class="w-full text-left min-w-[460px]">
+          <table class="w-full min-w-[460px]">
             <thead>
               <tr class="border-b border-[#efebf3] bg-[#faf7f2]">
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px]">Source</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Median</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Avg</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">SLA</th>
-                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-right">Conv%</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-start">Source</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Median</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Avg</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">SLA</th>
+                <th class="px-5 py-2.5 text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.1px] text-end">Conv%</th>
               </tr>
             </thead>
             <tbody>
               @for (row of d.bySource; track row.name) {
                 <tr class="border-b border-[#efebf3]">
-                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium">{{ row.name }}</td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.medianHours) }}</td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ formatHours(row.avgHours) }}</td>
-                  <td class="px-5 py-2.5 text-right">
+                  <td class="px-5 py-2.5 text-[#34203a] text-[13px] font-medium text-start">{{ row.name }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ formatHours(row.medianHours) }}</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ formatHours(row.avgHours) }}</td>
+                  <td class="px-5 py-2.5 text-end">
                     <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-semibold ' + slaClass(row.sla)">{{ row.sla }}</span>
                   </td>
-                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-right">{{ row.conversionRate | number:'1.0-0' }}%</td>
+                  <td class="px-5 py-2.5 text-[#55514a] text-[13px] text-end">{{ row.conversionRate | number:'1.0-0' }}%</td>
                 </tr>
               }
               @if (d.bySource.length === 0) {
