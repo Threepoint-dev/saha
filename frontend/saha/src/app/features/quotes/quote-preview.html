@@ -45,7 +45,7 @@
               @if (q.hotel?.name) { <p class="text-[#c9b9d0] text-[11px] truncate">{{ q.hotel!.name }}</p> }
             </div>
           </div>
-          <div class="text-right shrink-0">
+          <div class="text-end shrink-0">
             <span class="inline-block bg-white/15 text-white text-[10px] font-semibold uppercase tracking-[0.1px] px-2 py-0.5 rounded-full">
               {{ 'quotePreview.readOnlyBadge' | translate }}
             </span>
@@ -109,7 +109,7 @@
     </div>
 
     <!-- Fixed action bar -->
-    <div class="fixed left-0 right-0 bottom-0 z-20 px-4 py-3 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent print:hidden">
+    <div class="fixed start-0 end-0 bottom-0 z-20 px-4 py-3 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent print:hidden">
       <div class="w-full max-w-[560px] mx-auto flex flex-col gap-2">
         <button type="button" (click)="copyLink()"
           class="w-full bg-[#34203a] hover:bg-[#46294f] text-white text-[15px] font-semibold py-3.5 rounded-[12px] transition-colors">
