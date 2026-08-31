@@ -3,7 +3,7 @@
   <!-- Sales shell header: back arrow + icon + title + subtitle -->
   <header class="bg-white border-b border-[#e4dfd5] px-4 md:px-10 py-3 md:py-4 flex items-center gap-3 sticky top-0 z-20">
     <a [routerLink]="['/inquiries', inquiryId()]"
-       class="w-9 h-9 -ml-1 flex items-center justify-center rounded-full text-[#55514a] hover:bg-[#faf7f2] transition-colors shrink-0">
+       class="w-9 h-9 -ms-1 flex items-center justify-center rounded-full text-[#55514a] hover:bg-[#faf7f2] transition-colors shrink-0">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
       </svg>
@@ -63,8 +63,8 @@
         <div class="hidden md:grid grid-cols-[1.6fr_1fr_1fr_auto] gap-3 px-4 pb-1">
           <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px]">{{ 'quoteList.table.quote' | translate }}</p>
           <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px]">{{ 'quoteList.table.status' | translate }}</p>
-          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-right">{{ 'quoteList.table.total' | translate }}</p>
-          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-right">{{ 'quoteList.table.actions' | translate }}</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-end">{{ 'quoteList.table.total' | translate }}</p>
+          <p class="text-[#8a8478] text-[11px] font-semibold uppercase tracking-[0.14px] text-end">{{ 'quoteList.table.actions' | translate }}</p>
         </div>
 
         @for (quote of quotes(); track quote.id) {
@@ -99,7 +99,7 @@
             </div>
 
             <!-- Desktop total -->
-            <p class="hidden md:block text-[#34203a] text-[14px] font-semibold text-right">
+            <p class="hidden md:block text-[#34203a] text-[14px] font-semibold text-end">
               {{ (quote.total ?? 0) | number:'1.0-0' }} SAR
             </p>
 
