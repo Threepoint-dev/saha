@@ -1,15 +1,14 @@
 <div class="flex-1 bg-[#FAF7F2] min-h-screen">
 
   <!-- Header -->
-  <div class="border-b border-[#E8E0D8] bg-white px-8 py-4 flex items-center justify-between">
+  <div class="border-b border-[#E8E0D8] bg-white px-4 md:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
     <div>
       <h1 class="text-[#1B1A17] text-xl font-bold">{{ 'inquiryDetail.title' | translate }}</h1>
       <a routerLink="/inquiries" class="text-[#7A736B] text-sm hover:text-[#1B1A17]">{{ 'inquiryDetail.backToInquiries' | translate }}</a>
     </div>
     <div class="flex items-center gap-2">
-
       <a routerLink="/inquiries/new"
-        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors">
+        class="bg-[#CE8A28] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b87922] transition-colors shrink-0">
         {{ 'inquiryDetail.newInquiry' | translate }}
       </a>
     </div>
@@ -23,74 +22,74 @@
   }
 
   @if (!isLoading && inquiry) {
-    <div class="px-8 py-6">
+    <div class="px-4 md:px-8 py-4 md:py-6">
 
       <!-- Inquiry Hero Row -->
-      <div class="flex items-start justify-between mb-6">
-        <div class="flex items-center gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+        <div class="flex items-center gap-4 min-w-0">
           <div class="w-12 h-12 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
             <span class="text-white text-sm font-semibold">{{ getInitials(inquiry.clientName) }}</span>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h2 class="text-[#1B1A17] text-2xl font-bold">{{ inquiry.clientName }}</h2>
-              <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold ' + statusBadge[inquiry.status || 'NEW']">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-[#1B1A17] text-xl sm:text-2xl font-bold truncate">{{ inquiry.clientName }}</h2>
+              <span [class]="'px-2.5 py-0.5 rounded-full text-xs font-semibold shrink-0 ' + statusBadge[inquiry.status || 'NEW']">
                 {{ statusLabelKey(inquiry.status) | translate }}
               </span>
             </div>
-            <p class="text-[#7A736B] text-sm">
+            <p class="text-[#7A736B] text-xs sm:text-sm truncate">
               {{ 'inquiryDetail.inquiryNumberLine' | translate:{ number: inquiry.inquiryNumber, eventType: inquiry.eventType, guests: inquiry.guestCount } }}
             </p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
           @if (inquiry.status === 'NEW') {
             <button (click)="moveToContacted()"
-              class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+              class="bg-[#34203A] text-white px-4 py-2 text-xs sm:text-sm rounded-full font-semibold hover:bg-[#46294f] transition-colors">
               {{ 'inquiryDetail.moveToContacted' | translate }}
             </button>
             <button disabled
-              class="border border-[#D9D0C4] text-[#9C9690] px-5 py-2.5 rounded-full text-sm font-semibold cursor-not-allowed opacity-60">
+              class="border border-[#D9D0C4] text-[#9C9690] px-4 py-2 text-xs sm:text-sm rounded-full font-semibold cursor-not-allowed opacity-60">
               {{ 'inquiryDetail.createQuoteB2' | translate }}
             </button>
           }
           @if (inquiry.status !== 'NEW') {
             <a [routerLink]="['/events', inquiry.id]"
-              class="border-2 border-[#34203A] text-[#34203A] px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#FAF7F2] transition-colors">
+              class="border-2 border-[#34203A] text-[#34203A] px-4 py-2 text-xs sm:text-sm rounded-full font-semibold hover:bg-[#FAF7F2] transition-colors">
               {{ 'inquiryDetail.eventSetup' | translate }}
             </a>
             <a [routerLink]="['/quotes', inquiry.id]"
-              class="bg-[#34203A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-[#46294f] transition-colors">
+              class="bg-[#34203A] text-white px-4 py-2 text-xs sm:text-sm rounded-full font-semibold hover:bg-[#46294f] transition-colors">
               {{ 'inquiryDetail.createQuote' | translate }}
             </a>
           }
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Left Column (2/3) -->
-        <div class="col-span-2 flex flex-col gap-4">
+        <div class="lg:col-span-2 flex flex-col gap-4">
 
           <!-- Client details -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-6">
             <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'inquiryDetail.clientDetails' | translate }}</h3>
             <div class="flex flex-col divide-y divide-[#F0EBE3]">
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.name' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.clientName }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.name' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm font-medium text-right truncate">{{ inquiry.clientName }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.phone' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ inquiry.clientPhone || '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.phone' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ inquiry.clientPhone || '—' }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.email' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ inquiry.clientEmail || '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.email' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ inquiry.clientEmail || '—' }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.sourceChannel' | translate }}</span>
-                <span class="inline-flex items-center rounded-full border border-[#D9D0C4] bg-[#FAF7F2] px-3 py-0.5 text-xs text-[#1B1A17]">
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.sourceChannel' | translate }}</span>
+                <span class="inline-flex items-center rounded-full border border-[#D9D0C4] bg-[#FAF7F2] px-3 py-0.5 text-xs text-[#1B1A17] shrink-0">
                   {{ getChannelName(inquiry.sourceChannelId) || '—' }}
                 </span>
               </div>
@@ -98,34 +97,34 @@
           </div>
 
           <!-- Event details -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-6">
             <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'inquiryDetail.eventDetails' | translate }}</h3>
             <div class="flex flex-col divide-y divide-[#F0EBE3]">
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.eventType' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.eventType || '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.eventType' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm font-medium text-right truncate">{{ inquiry.eventType || '—' }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.eventDate' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ formatDate(inquiry.eventDate || '') }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.eventDate' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ formatDate(inquiry.eventDate || '') }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.guestCount' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ inquiry.guestCount || '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.guestCount' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ inquiry.guestCount || '—' }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.hall' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ inquiry.hallId || '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.hall' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ inquiry.hallId || '—' }}</span>
               </div>
-              <div class="flex items-center justify-between py-3">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.estimatedValue' | translate }}</span>
-                <span class="text-[#1B1A17] text-sm">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
+              <div class="flex items-center justify-between py-3 gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.estimatedValue' | translate }}</span>
+                <span class="text-[#1B1A17] text-sm text-right truncate">{{ inquiry.estimatedValue ? (inquiry.estimatedValue | number) + ' SAR' : '—' }}</span>
               </div>
             </div>
           </div>
 
           <!-- Notes -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-6">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-6">
             <h3 class="text-[#1B1A17] font-semibold text-base mb-3">{{ 'inquiryDetail.notes' | translate }}</h3>
             @if (inquiry.notes) {
               <p class="text-[#7A736B] text-sm">{{ inquiry.notes }}</p>
@@ -140,7 +139,7 @@
         <div class="flex flex-col gap-4">
 
           <!-- First Response -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-5">
             <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">{{ 'inquiryDetail.firstResponse' | translate }}</p>
             @if (inquiry.status === 'NEW') {
               <span class="inline-flex items-center gap-1.5 bg-[#FDF4E7] text-[#CE8A28] text-xs font-semibold px-3 py-1.5 rounded-full border border-[#F6DEB0]">
@@ -162,17 +161,17 @@
           </div>
 
           <!-- Owner & Status -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-5">
             <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'inquiryDetail.ownerStatus' | translate }}</h3>
             <div class="flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <span class="text-[#7A736B] text-sm">{{ 'inquiryDetail.owner' | translate }}</span>
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-[#7A736B] text-sm shrink-0">{{ 'inquiryDetail.owner' | translate }}</span>
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="w-6 h-6 rounded-full bg-[#34203A] flex items-center justify-center shrink-0">
                     <span class="text-white text-xs font-medium">{{ getInitials(inquiry.clientName).substring(0,1) }}</span>
                   </div>
-                  <span class="text-[#1B1A17] text-sm font-medium">{{ inquiry.ownerId || ('inquiryDetail.unassigned' | translate) }}</span>
-                  <button (click)="reassign()" class="text-[#CE8A28] text-xs font-semibold hover:underline ml-1">{{ 'inquiryDetail.reassign' | translate }}</button>
+                  <span class="text-[#1B1A17] text-sm font-medium truncate">{{ inquiry.ownerId || ('inquiryDetail.unassigned' | translate) }}</span>
+                  <button (click)="reassign()" class="text-[#CE8A28] text-xs font-semibold hover:underline ms-1 shrink-0">{{ 'inquiryDetail.reassign' | translate }}</button>
                 </div>
               </div>
               <div class="flex items-center justify-between">
@@ -193,7 +192,7 @@
           </div>
 
           <!-- Status History -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-5">
             <h3 class="text-[#1B1A17] font-semibold text-base mb-4">{{ 'inquiryDetail.statusHistory' | translate }}</h3>
             <div class="flex flex-col gap-2">
               <div class="flex items-start gap-2">
@@ -216,7 +215,7 @@
           </div>
 
           <!-- Actions -->
-          <div class="bg-white rounded-xl border border-[#E8E0D8] p-5">
+          <div class="bg-white rounded-xl border border-[#E8E0D8] p-4 md:p-5">
             <p class="text-[#9C9690] text-xs font-semibold tracking-wider uppercase mb-3">{{ 'inquiryDetail.actions' | translate }}</p>
             <div class="flex flex-col gap-2">
               @if (inquiry.status !== 'WON' && inquiry.status !== 'LOST') {
@@ -243,10 +242,10 @@
 
   <!-- Mark Lost Modal -->
   @if (showMarkLost) {
-    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="showMarkLost = false">
-      <div class="bg-white rounded-2xl shadow-xl w-[520px] overflow-hidden" (click)="$event.stopPropagation()">
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" (click)="showMarkLost = false">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-[520px] overflow-hidden max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
         <!-- Modal Header -->
-        <div class="px-6 pt-6 pb-5">
+        <div class="px-6 pt-6 pb-4 shrink-0">
           <div class="flex items-start gap-4">
             <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
               <svg class="w-5 h-5 text-[#D14343]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,14 +259,14 @@
           </div>
         </div>
 
-        <div class="px-6 pb-5">
+        <div class="px-6 pb-5 overflow-y-auto flex-1">
           <!-- Reason for loss -->
           <div class="flex items-center justify-between mb-3">
             <p class="text-[#1B1A17] text-sm font-semibold">{{ 'markLostModal.reasonForLoss' | translate }}</p>
             <span class="text-[#D14343] text-xs font-semibold tracking-wide">{{ 'markLostModal.required' | translate }}</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-2 mb-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
             @for (reason of lossReasons; track reason) {
               <button type="button" (click)="lossReason = reason"
                 [class]="lossReason === reason
@@ -290,7 +289,7 @@
           }
 
           <!-- Note -->
-          <div class="mb-5">
+          <div class="mb-2">
             <p class="text-[#9C9690] text-xs font-semibold tracking-wider mb-2">{{ 'markLostModal.noteOptional' | translate }}</p>
             <textarea [(ngModel)]="lossNote" rows="3" [placeholder]="'markLostModal.notePlaceholder' | translate"
               class="w-full border border-[#D9D0C4] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#34203A] resize-none text-[#1B1A17] placeholder-[#B0A99F]">
@@ -299,7 +298,7 @@
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-[#F0EBE3] bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3">
+        <div class="border-t border-[#F0EBE3] bg-[#FAF7F2] px-6 py-4 flex justify-end gap-3 shrink-0">
           <button (click)="showMarkLost = false; showLostError = false"
             class="px-5 py-2.5 border border-[#D9D0C4] rounded-full text-sm text-[#1B1A17] font-medium hover:bg-white transition-colors">
             {{ 'markLostModal.cancel' | translate }}
@@ -315,15 +314,15 @@
 
   <!-- Mark as Won — Confirmation Check Modal -->
   @if (showWonCheck) {
-    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="closeWonCheck()">
-      <div class="bg-white rounded-2xl shadow-xl w-[520px] overflow-hidden" (click)="$event.stopPropagation()">
-        <div class="px-6 pt-6 pb-5">
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" (click)="closeWonCheck()">
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-[520px] overflow-hidden max-h-[90vh] flex flex-col" (click)="$event.stopPropagation()">
+        <div class="px-6 pt-6 pb-4 shrink-0">
           <h2 class="text-[#1B1A17] font-semibold text-lg">{{ 'wonCheckModal.title' | translate }}</h2>
           <p class="text-[#7A736B] text-sm">{{ inquiry?.clientName }} · {{ inquiry?.eventType }} · {{ inquiry?.guestCount }} guests</p>
         </div>
 
         @if (wonSuccess) {
-          <div class="px-6 pb-6">
+          <div class="px-6 pb-6 overflow-y-auto flex-1">
             <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
               <p class="text-green-700 font-semibold text-sm mb-1">{{ 'wonCheckModal.markedWon' | translate }}</p>
               <p class="text-green-700 text-xs">{{ 'wonCheckModal.beoShared' | translate }}</p>
@@ -334,11 +333,11 @@
             </button>
           </div>
         } @else if (wonCheckLoading) {
-          <div class="px-6 pb-6">
+          <div class="px-6 pb-6 overflow-y-auto flex-1">
             <p class="text-[#7A736B] text-sm">{{ 'wonCheckModal.checking' | translate }}</p>
           </div>
         } @else {
-          <div class="px-6 pb-5">
+          <div class="px-6 pb-4 overflow-y-auto flex-1">
             <p class="text-[#1B1A17] text-sm font-semibold mb-2">{{ 'wonCheckModal.checklistTitle' | translate }}</p>
             <div class="flex flex-col gap-2 mb-4">
               <div class="flex items-center justify-between border border-[#EFE9E0] rounded-lg px-3 py-2">
@@ -364,13 +363,13 @@
             </div>
 
             @if (!wonCheckCustomerConfirmed) {
-              <div class="bg-[#FDF4E7] border border-[#F6DEB0] rounded-lg px-3 py-2 mb-4">
+              <div class="bg-[#FDF4E7] border border-[#F6DEB0] rounded-lg px-3 py-2 mb-2">
                 <p class="text-[#B06D1A] text-xs">{{ 'wonCheckModal.notConfirmedWarning' | translate }}</p>
               </div>
             }
           </div>
 
-          <div class="border-t border-[#F0EBE3] bg-[#FAF7F2] px-6 py-4 flex flex-col gap-2">
+          <div class="border-t border-[#F0EBE3] bg-[#FAF7F2] px-6 py-4 flex flex-col gap-2 shrink-0">
             @if (!wonCheckCustomerConfirmed) {
               <button (click)="goCompleteConfirmation()"
                 class="w-full bg-[#2E7D5B] text-white py-2.5 rounded-full text-sm font-semibold hover:bg-[#256a4c] transition-colors">
