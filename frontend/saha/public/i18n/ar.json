@@ -853,7 +853,8 @@
       "white": "أبيض",
       "none": "بدون"
     },
-    "section5": { "title": "تصميم القاعة (التنسيق)", "subtitle": "اسحب العناصر على اللوحة عشان تصمم القاعة" },
+    "section5": { "title": "تصميم القاعة (التنسيق)", "titleShort": "تصميم القاعة", "subtitle": "اسحب العناصر على اللوحة عشان تصمم القاعة" },
+    "selectLayoutElements": "اختر العناصر اللي تبي تضمّنها في موجز التنسيق",
     "elements": "العناصر",
     "frontStage": "الأمام / المنصة",
     "dragElementsHere": "اسحب العناصر هنا",
@@ -948,7 +949,20 @@
     "customerSummaryLink": "رابط ملخص العميل",
     "copied": "تم النسخ!",
     "copy": "نسخ",
-    "openSummary": "فتح الملخص ↗"
+    "openSummary": "فتح الملخص ↗",
+    "notSetYet": "ما تم التحديد",
+    "notSelectedYet": "ما تم الاختيار",
+    "mobile": {
+      "reviewSend": "المراجعة والإرسال",
+      "reviewActions": "المراجعة والإجراءات"
+    },
+    "summ": {
+      "guestsCount": "{{count}} ضيف",
+      "elementsSelected": "{{count}} عنصر مختار",
+      "addonsSelected": "{{count}} إضافة مختارة",
+      "segments": "{{count}} فقرات · {{min}} دقيقة",
+      "hotelTeamOnly": "فريق الفندق فقط"
+    }
   },
   "reporting": {
     "headerTitle": "القياس والتقارير",

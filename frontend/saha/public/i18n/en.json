@@ -853,7 +853,8 @@
       "white": "White",
       "none": "None"
     },
-    "section5": { "title": "Design the Hall (Layout)", "subtitle": "Drag elements onto the canvas to design your hall" },
+    "section5": { "title": "Design the Hall (Layout)", "titleShort": "Design the Hall", "subtitle": "Drag elements onto the canvas to design your hall" },
+    "selectLayoutElements": "Select the elements to include in the layout brief",
     "elements": "Elements",
     "frontStage": "Front / Stage",
     "dragElementsHere": "Drag elements here",
@@ -948,7 +949,20 @@
     "customerSummaryLink": "Customer Summary Link",
     "copied": "Copied!",
     "copy": "Copy",
-    "openSummary": "Open summary ↗"
+    "openSummary": "Open summary ↗",
+    "notSetYet": "Not set yet",
+    "notSelectedYet": "Not selected yet",
+    "mobile": {
+      "reviewSend": "Review & Send",
+      "reviewActions": "Review & Actions"
+    },
+    "summ": {
+      "guestsCount": "{{count}} guests",
+      "elementsSelected": "{{count}} elements selected",
+      "addonsSelected": "{{count}} add-ons selected",
+      "segments": "{{count}} segments · {{min}} min",
+      "hotelTeamOnly": "Hotel team only"
+    }
   },
   "reporting": {
     "headerTitle": "Measurement & Reporting",

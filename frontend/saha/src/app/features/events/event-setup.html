@@ -1,10 +1,47 @@
 <div class="min-h-screen bg-[#faf7f2] flex flex-col pb-12">
-  <app-admin-page-header [subtitle]="'eventSetup.headerTitle' | translate" />
+  <!-- Desktop / tablet: admin shell header -->
+  <div class="hidden md:block">
+    <app-admin-page-header [subtitle]="'eventSetup.headerTitle' | translate" />
+  </div>
+
+  <!-- Mobile: sales-shell header (back arrow + title + subtitle + saved pill) -->
+  <header class="md:hidden sticky top-0 z-20 bg-[#34203a] px-4 py-3 flex items-center gap-3">
+    @if (mobileView() === 'review') {
+      <button type="button" (click)="mobileView.set('setup')" aria-label="Back"
+        class="w-8 h-8 -ms-1 flex items-center justify-center rounded-full text-[#f6ddae] hover:bg-white/10 transition-colors shrink-0">
+        <svg class="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+    } @else {
+      <a [routerLink]="['/quotes', inquiryId()]" aria-label="Back"
+        class="w-8 h-8 -ms-1 flex items-center justify-center rounded-full text-[#f6ddae] hover:bg-white/10 transition-colors shrink-0">
+        <svg class="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </a>
+    }
+    <div class="flex-1 min-w-0">
+      <p class="text-white font-bold text-[16px] leading-tight truncate">
+        {{ (mobileView() === 'review' ? 'eventSetup.mobile.reviewActions' : 'eventSetup.title') | translate }}
+      </p>
+      <p class="text-[#f6ddae] text-[11px] leading-tight truncate">
+        {{ inquiry()?.clientName || ('eventSetup.inquiryFallback' | translate) }}
+        @if (inquiry()?.eventDate) { · {{ inquiry()!.eventDate | date:'mediumDate' }} }
+        @if (inquiry()?.guestCount) { · {{ inquiry()!.guestCount }} {{ 'eventSetup.guestsSuffix' | translate }} }
+      </p>
+    </div>
+    @if (setup()) {
+      <span class="shrink-0 text-[9px] font-bold uppercase px-2.5 py-1 rounded-full bg-[#dff0e8] text-[#1f5c41] tracking-[0.4px]">{{ 'eventSetup.saved' | translate }}</span>
+    } @else {
+      <span class="shrink-0 text-[9px] font-bold uppercase px-2.5 py-1 rounded-full bg-[#f7e7d6] text-[#b06d1a] tracking-[0.4px]">{{ 'eventSetup.notSaved' | translate }}</span>
+    }
+  </header>
 
   <!-- Body -->
-  <main class="flex flex-col gap-5 px-10 py-7 w-full max-w-[1320px] mx-auto">
-    <!-- Title row -->
-    <div class="flex items-end justify-between gap-4">
+  <main class="flex flex-col gap-5 px-4 md:px-10 py-4 md:py-7 w-full max-w-[1320px] mx-auto pb-28 md:pb-7">
+    <!-- Title row (desktop only) -->
+    <div class="hidden md:flex items-end justify-between gap-4">
       <div class="flex flex-col gap-1">
         <div class="flex items-center gap-2">
           <a routerLink="/quotes" class="text-[#8a8478] hover:text-[#34203a] text-[13px] font-medium transition-colors">{{ 'eventSetup.workspace' | translate }}</a>
@@ -36,7 +73,10 @@
     @if (loading()) {
       <div class="rounded-[12px] bg-white border border-[#e4dfd5] px-5 py-4 text-[#55514a] text-[13px]">{{ 'eventSetup.loading' | translate }}</div>
     } @else {
-      <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- DESKTOP / TABLET (md+): original 2-column layout, untouched  -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="hidden md:grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
         <!-- ════════════════════════════════════════ -->
         <!-- LEFT COLUMN: 9 Numbered Section Cards   -->
         <!-- ════════════════════════════════════════ -->
@@ -633,6 +673,490 @@
           }
         </div>
       </div>
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- MOBILE (< md): accordion shell + Review & Actions view       -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="md:hidden">
+        @if (mobileView() === 'setup') {
+          <div class="flex flex-col gap-2.5">
+
+            <!-- Hall selector (kept outside the numbered sections) -->
+            <div class="bg-white border border-[#e4dfd5] rounded-[14px] px-4 py-3 flex flex-col gap-1.5">
+              <label class="text-[#8a8478] text-[10px] font-semibold uppercase tracking-[0.5px]">{{ 'eventSetup.hall' | translate }}</label>
+              <select [(ngModel)]="form.hallId"
+                class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
+                <option [ngValue]="null">{{ 'eventSetup.selectHall' | translate }}</option>
+                @for (h of halls(); track h.id) { <option [ngValue]="h.id">{{ h.name }}</option> }
+              </select>
+            </div>
+
+            <!-- ─── SECTION 1: Booking Date & Time ─── -->
+            <app-accordion-section [sectionNumber]="1" [title]="'eventSetup.section1.title' | translate"
+              [summary]="section1Summary()" [isFilled]="section1Filled()">
+              <div class="flex flex-col gap-4">
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.eventDate' | translate }}</label>
+                    <input type="date" [(ngModel)]="form.eventDate"
+                      class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.durationHours' | translate }}</label>
+                    <input type="number" min="1" [(ngModel)]="form.durationHours"
+                      class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.selectTimeSlot' | translate }}</label>
+                  <div class="flex flex-wrap gap-2">
+                    @for (slot of timeSlots; track slot) {
+                      <button type="button" (click)="selectTimeSlot(slot)"
+                        [class]="form.startTime === slot
+                          ? 'bg-[#34203a] text-white border border-[#34203a] rounded-[8px] px-4 py-2 text-[13px] font-semibold transition-all'
+                          : 'bg-[#faf7f2] text-[#34203a] border border-[#e4dfd5] rounded-[8px] px-4 py-2 text-[13px] font-medium hover:border-[#34203a] transition-all'">
+                        {{ formatSlotLabel(slot) }}
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.startTime' | translate }}</label>
+                    <input type="time" [(ngModel)]="form.startTime" (ngModelChange)="recomputeDuration()"
+                      class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                  </div>
+                  <div class="flex flex-col gap-1">
+                    <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.endTime' | translate }}</label>
+                    <input type="time" [(ngModel)]="form.endTime" (ngModelChange)="recomputeDuration()"
+                      class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                  </div>
+                </div>
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 2: Number of Guests ─── -->
+            <app-accordion-section [sectionNumber]="2" [title]="'eventSetup.section2.title' | translate"
+              [summary]="section2Summary()" [isFilled]="section2Filled()">
+              <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-center gap-6 py-2">
+                  <button type="button" (click)="decrementGuests()"
+                    class="w-[44px] h-[44px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[20px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">−</button>
+                  <div class="flex flex-col items-center">
+                    <input type="number" [(ngModel)]="form.guestCount" min="0"
+                      class="text-[#34203a] text-[40px] font-bold leading-none w-32 text-center bg-transparent focus:outline-none border-b-2 border-transparent focus:border-[#34203a] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <span class="text-[#8a8478] text-[11px] mt-1">{{ 'eventSetup.guests' | translate }}</span>
+                  </div>
+                  <button type="button" (click)="incrementGuests()"
+                    class="w-[44px] h-[44px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[20px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">+</button>
+                </div>
+                @if (selectedHallCapacity(); as cap) {
+                  <p class="text-center text-[#ce8a28] text-[12px] font-medium">{{ 'eventSetup.maxCapacity' | translate:{ cap: cap } }}</p>
+                }
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 3: Setup Type ─── -->
+            <app-accordion-section [sectionNumber]="3" [title]="'eventSetup.section3.title' | translate"
+              [summary]="section3Summary()" [isFilled]="section3Filled()">
+              <div class="grid grid-cols-2 gap-3">
+                @for (card of setupTypeCards; track card.value) {
+                  <button type="button" (click)="selectSetupType(card.value)"
+                    [class]="form.setupType === card.value
+                      ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[12px] p-4 flex flex-col items-center gap-2 text-center transition-all'
+                      : 'bg-white border border-[#e4dfd5] rounded-[12px] p-4 flex flex-col items-center gap-2 text-center hover:border-[#34203a] transition-all'">
+                    <span class="text-[24px]">{{ card.icon }}</span>
+                    <span class="text-[#34203a] text-[13px] font-semibold">{{ card.labelKey | translate }}</span>
+                    <span class="text-[#8a8478] text-[11px] leading-tight">{{ card.descKey | translate }}</span>
+                  </button>
+                }
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 4: Table & Chair Colors ─── -->
+            <app-accordion-section [sectionNumber]="4" [title]="'eventSetup.section4.title' | translate"
+              [summary]="section4Summary()" [isFilled]="section4Filled()">
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.tableColor' | translate }}</label>
+                  <div class="flex flex-wrap gap-3">
+                    @for (sw of colorSwatches; track sw.value) {
+                      <button type="button" (click)="selectTableColor(sw.value)" class="flex flex-col items-center gap-1">
+                        <div [class]="(form.tableColor ?? '') === sw.value
+                          ? 'w-[44px] h-[44px] rounded-[8px] border-2 border-[#34203a] flex items-center justify-center transition-all'
+                          : 'w-[44px] h-[44px] rounded-[8px] border border-[#e4dfd5] flex items-center justify-center hover:border-[#34203a] transition-all'"
+                          [style.background-color]="sw.hex === 'transparent' ? '#faf7f2' : sw.hex">
+                          @if ((form.tableColor ?? '') === sw.value) {
+                            <span class="text-white text-[14px] font-bold" [class.text-[#34203a]]="sw.hex === '#f5f5f0' || sw.hex === '#d4c5a9' || sw.hex === 'transparent'">✓</span>
+                          }
+                        </div>
+                        <span class="text-[#8a8478] text-[10px]">{{ sw.labelKey | translate }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.chairColor' | translate }}</label>
+                  <div class="flex flex-wrap gap-3">
+                    @for (sw of colorSwatches; track sw.value) {
+                      <button type="button" (click)="selectChairColor(sw.value)" class="flex flex-col items-center gap-1">
+                        <div [class]="(form.chairColor ?? '') === sw.value
+                          ? 'w-[44px] h-[44px] rounded-[8px] border-2 border-[#34203a] flex items-center justify-center transition-all'
+                          : 'w-[44px] h-[44px] rounded-[8px] border border-[#e4dfd5] flex items-center justify-center hover:border-[#34203a] transition-all'"
+                          [style.background-color]="sw.hex === 'transparent' ? '#faf7f2' : sw.hex">
+                          @if ((form.chairColor ?? '') === sw.value) {
+                            <span class="text-white text-[14px] font-bold" [class.text-[#34203a]]="sw.hex === '#f5f5f0' || sw.hex === '#d4c5a9' || sw.hex === 'transparent'">✓</span>
+                          }
+                        </div>
+                        <span class="text-[#8a8478] text-[10px]">{{ sw.labelKey | translate }}</span>
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 5: Design the Hall — mobile chip list (no drag canvas) ─── -->
+            <app-accordion-section [sectionNumber]="5" [title]="'eventSetup.section5.titleShort' | translate"
+              [summary]="section5Summary()" [isFilled]="section5Filled()">
+              <div class="flex flex-col gap-3">
+                <p class="text-[#55514a] text-[12px]">{{ 'eventSetup.selectLayoutElements' | translate }}</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (chip of layoutChips; track chip) {
+                    <button type="button" (click)="toggleLayoutChip(chip)"
+                      [class]="isLayoutChipSelected(chip)
+                        ? 'bg-[#34203a] text-white border border-[#34203a] rounded-[8px] px-3.5 py-2 text-[12.5px] font-semibold transition-all'
+                        : 'bg-white text-[#34203a] border border-[#e4dfd5] rounded-[8px] px-3.5 py-2 text-[12.5px] font-medium hover:border-[#34203a] transition-all'">
+                      {{ layoutChipLabelKey(chip) | translate }}
+                    </button>
+                  }
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.layoutNotes' | translate }}</label>
+                  <textarea [(ngModel)]="form.layoutNotes" rows="2" [placeholder]="'eventSetup.layoutNotesPlaceholder' | translate"
+                    class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+                </div>
+                <input type="text" [(ngModel)]="form.attachmentUrl" [placeholder]="'eventSetup.attachLayoutPlaceholder' | translate"
+                  class="bg-[#faf7f2] border border-[#e4dfd5] rounded-full px-4 py-2 h-[38px] text-[12px] text-[#34203a] placeholder-[#8a8478] focus:outline-none focus:border-[#ce8a28] transition-colors" />
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 6: Additional Options (Add-ons) ─── -->
+            <app-accordion-section [sectionNumber]="6" [title]="'eventSetup.section6.title' | translate"
+              [summary]="section6Summary()" [isFilled]="section6Filled()">
+              <div class="flex flex-col gap-3">
+                @if (addons().length === 0) {
+                  <p class="text-[#8a8478] text-[12px]">{{ 'eventSetup.noAddons' | translate }}</p>
+                } @else {
+                  <div class="flex flex-col gap-2">
+                    @for (a of addons(); track a.id) {
+                      <button type="button" (click)="toggleAddonSelection(a.id)"
+                        class="flex items-center gap-3 bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3 text-left transition-all hover:border-[#34203a]">
+                        <div class="flex-1">
+                          <p class="text-[#34203a] text-[13px] font-semibold">{{ a.name }}</p>
+                          @if (a.price != null) {
+                            <p class="text-[#8a8478] text-[11px]">SAR {{ a.price | number:'1.2-2' }}</p>
+                          }
+                        </div>
+                        <div [class]="isAddonSelected(a.id)
+                          ? 'w-[24px] h-[24px] rounded-[6px] bg-[#ce8a28] border-2 border-[#ce8a28] flex items-center justify-center shrink-0'
+                          : 'w-[24px] h-[24px] rounded-[6px] bg-white border-2 border-[#e4dfd5] flex items-center justify-center shrink-0'">
+                          @if (isAddonSelected(a.id)) {
+                            <span class="text-white text-[12px] font-bold">✓</span>
+                          }
+                        </div>
+                      </button>
+                    }
+                  </div>
+                }
+                @if (setup() && eventAddons().length > 0) {
+                  <div class="border-t border-[#e4dfd5] pt-3 flex flex-col gap-2">
+                    <p class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.savedAddons' | translate }}</p>
+                    @for (ea of eventAddons(); track ea.id) {
+                      <div class="flex items-center gap-3 border border-[#efebf3] rounded-[10px] px-3 py-2.5">
+                        <div class="flex-1 min-w-0">
+                          <p class="text-[#34203a] text-[13px] font-medium truncate">{{ ea.addonName || addonName(ea.addonId) }}</p>
+                          @if (ea.unitPrice != null) {
+                            <p class="text-[#8a8478] text-[11px]">SAR {{ ea.unitPrice | number:'1.2-2' }}</p>
+                          }
+                        </div>
+                        <input type="number" min="1" [(ngModel)]="ea.quantity" (blur)="updateAddonQty(ea)"
+                          class="w-[60px] bg-white border border-[#e4dfd5] rounded-[8px] px-2.5 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                        <button type="button" (click)="removeAddon(ea)"
+                          class="text-[#a02f2f] border border-[#e8c9c9] hover:bg-[#f7dede] text-[12px] font-medium px-3 h-[36px] rounded-[8px] transition-colors">{{ 'eventSetup.remove' | translate }}</button>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (setup()) {
+                  <div class="flex flex-wrap items-end gap-2 border-t border-[#efebf3] pt-3">
+                    <div class="flex flex-col gap-1 flex-1 min-w-[160px]">
+                      <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.addonLabel' | translate }}</label>
+                      <select [(ngModel)]="addAddonModel.addonId"
+                        class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
+                        <option value="">{{ 'eventSetup.selectAddon' | translate }}</option>
+                        @for (a of addons(); track a.id) { <option [value]="a.id">{{ a.name }}</option> }
+                      </select>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.qty' | translate }}</label>
+                      <input type="number" min="1" [(ngModel)]="addAddonModel.quantity"
+                        class="w-[60px] bg-white border border-[#e4dfd5] rounded-[8px] px-2.5 py-2 h-[38px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors" />
+                    </div>
+                    <button type="button" (click)="addAddon()" [disabled]="addingAddon()"
+                      class="bg-[#34203a] hover:bg-[#46294f] disabled:opacity-60 rounded-[10px] px-5 h-[38px] text-white text-[13px] font-semibold transition-colors">
+                      {{ (addingAddon() ? 'eventSetup.adding' : 'eventSetup.addButton') | translate }}
+                    </button>
+                  </div>
+                }
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 7: Catering Style ─── -->
+            <app-accordion-section [sectionNumber]="7" [title]="'eventSetup.section7.title' | translate"
+              [summary]="section7Summary()" [isFilled]="section7Filled()">
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.servingStyle' | translate }}</label>
+                  <div class="grid grid-cols-2 gap-3">
+                    @for (cs of cateringStyleCards; track cs.value) {
+                      <button type="button" (click)="selectCateringStyle(cs.value)"
+                        [class]="form.cateringStyle === cs.value
+                          ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[12px] px-4 py-3 text-center transition-all'
+                          : 'bg-white border border-[#e4dfd5] rounded-[12px] px-4 py-3 text-center hover:border-[#34203a] transition-all'">
+                        <p class="text-[#34203a] text-[13px] font-semibold">{{ cs.labelKey | translate }}</p>
+                        <p class="text-[#8a8478] text-[11px]">{{ cs.priceLabel }}</p>
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.mainMeal' | translate }}</label>
+                  <div class="grid grid-cols-2 gap-3">
+                    @for (meal of mealCards; track meal.value) {
+                      <button type="button" (click)="selectMainMeal(meal.value)"
+                        [class]="(form.mainMeal ?? '') === meal.value
+                          ? 'bg-[#ece6f1] border-2 border-[#34203a] rounded-[10px] px-3 py-2 text-center transition-all'
+                          : 'bg-white border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-center hover:border-[#34203a] transition-all'">
+                        <p class="text-[#34203a] text-[13px] font-semibold">{{ meal.labelKey | translate }}</p>
+                        <p class="text-[#8a8478] text-[10px]">{{ meal.priceLabel }}</p>
+                      </button>
+                    }
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.banquetHeadcount' | translate }}</label>
+                  <div class="flex items-center gap-4">
+                    <button type="button" (click)="decrementBanquetHeadcount()"
+                      class="w-[36px] h-[36px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[18px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">−</button>
+                    <input type="number" [(ngModel)]="form.banquetHeadcount" min="0"
+                      class="text-[#34203a] text-[24px] font-bold min-w-[60px] w-20 text-center bg-transparent focus:outline-none border-b-2 border-transparent focus:border-[#34203a] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                    <button type="button" (click)="incrementBanquetHeadcount()"
+                      class="w-[36px] h-[36px] rounded-full border-2 border-[#e4dfd5] bg-white text-[#34203a] text-[18px] font-bold flex items-center justify-center hover:border-[#34203a] transition-colors">+</button>
+                  </div>
+                </div>
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 8: Event Agenda ─── -->
+            <app-accordion-section [sectionNumber]="8" [title]="'eventSetup.section8.title' | translate"
+              [summary]="section8Summary()" [isFilled]="section8Filled()">
+              <div class="flex flex-col gap-3">
+                @if (agendaSegments.length > 0) {
+                  <div class="flex flex-col gap-2">
+                    @for (seg of agendaSegments; track $index) {
+                      <div class="flex items-center gap-3 bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2.5">
+                        <div class="w-[26px] h-[26px] rounded-full bg-[#34203a] flex items-center justify-center shrink-0">
+                          <span class="text-white font-bold text-[11px]">{{ $index + 1 }}</span>
+                        </div>
+                        <div class="flex-1 min-w-0 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                          <span class="text-[#34203a] text-[12px] font-medium">{{ seg.time }}</span>
+                          <span class="text-[#34203a] text-[12px] font-semibold">{{ seg.title }}</span>
+                          <span class="bg-[#efebf3] text-[#55514a] text-[10px] font-medium px-2 py-0.5 rounded-full">{{ seg.durationMinutes }} {{ 'eventSetup.min' | translate }}</span>
+                        </div>
+                        <button type="button" (click)="removeAgendaSegment($index)"
+                          class="text-[#a02f2f] text-[14px] hover:text-red-600 w-[24px] h-[24px] flex items-center justify-center shrink-0">×</button>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (showAddSegment) {
+                  <div class="bg-[#faf7f2] border border-dashed border-[#ce8a28] rounded-[10px] px-3 py-3 flex flex-col gap-2.5">
+                    <div class="flex gap-2">
+                      <div class="flex flex-col gap-1">
+                        <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.time' | translate }}</label>
+                        <input type="time" [(ngModel)]="newSegment.time"
+                          class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+                      </div>
+                      <div class="flex flex-col gap-1 w-[90px]">
+                        <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.duration' | translate }}</label>
+                        <input type="number" min="5" step="5" [(ngModel)]="newSegment.durationMinutes"
+                          class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a]" />
+                      </div>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.segmentTitle' | translate }}</label>
+                      <input type="text" [(ngModel)]="newSegment.title" [placeholder]="'eventSetup.segmentTitlePlaceholder' | translate"
+                        class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a]" />
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" (click)="addAgendaSegment()"
+                        class="bg-[#34203a] hover:bg-[#46294f] rounded-[8px] px-4 h-[36px] text-white text-[12px] font-semibold transition-colors">{{ 'eventSetup.add' | translate }}</button>
+                      <button type="button" (click)="showAddSegment = false"
+                        class="text-[#8a8478] hover:text-[#34203a] text-[12px] font-medium h-[36px] transition-colors">{{ 'eventSetup.cancel' | translate }}</button>
+                    </div>
+                  </div>
+                } @else {
+                  <button type="button" (click)="showAddSegment = true"
+                    class="bg-white border border-dashed border-[#ce8a28] text-[#ce8a28] rounded-[10px] px-4 py-2.5 text-[13px] font-semibold hover:bg-[#fef8ee] transition-colors">
+                    {{ 'eventSetup.addSegment' | translate }}
+                  </button>
+                }
+                @if (agendaSegments.length > 0) {
+                  <div class="flex items-center justify-between border-t border-[#e4dfd5] pt-3">
+                    <span class="text-[#8a8478] text-[12px] font-medium">{{ 'eventSetup.totalAgendaDuration' | translate }}</span>
+                    <span class="text-[#34203a] text-[13px] font-bold">{{ totalAgendaDuration() }} {{ 'eventSetup.min' | translate }}</span>
+                  </div>
+                }
+              </div>
+            </app-accordion-section>
+
+            <!-- ─── SECTION 9: Internal Notes & Attachments ─── -->
+            <app-accordion-section [sectionNumber]="9" [title]="'eventSetup.section9.title' | translate"
+              [summary]="section9Summary()" [isFilled]="section9Filled()">
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.internalNotes' | translate }}</label>
+                  <textarea [(ngModel)]="form.internalNotes" rows="3" [placeholder]="'eventSetup.internalNotesPlaceholder' | translate"
+                    class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.opsNotes' | translate }}</label>
+                  <textarea [(ngModel)]="form.opsNotes" rows="3" [placeholder]="'eventSetup.opsNotesPlaceholder' | translate"
+                    class="bg-[#faf7f2] border border-[#e4dfd5] rounded-[10px] px-3 py-2 text-[13px] text-[#34203a] placeholder-[#c9c3b8] focus:outline-none focus:border-[#34203a] transition-colors resize-y"></textarea>
+                </div>
+                <input type="text" [(ngModel)]="form.attachmentUrl" [placeholder]="'eventSetup.attachAnyPlaceholder' | translate"
+                  class="bg-[#faf7f2] border border-[#ce8a28] rounded-full px-4 py-2 h-[38px] text-[12px] text-[#34203a] placeholder-[#ce8a28] focus:outline-none focus:border-[#34203a] transition-colors" />
+                <div class="flex flex-col gap-1">
+                  <label class="text-[#8a8478] text-[10px] font-medium uppercase tracking-[0.12px]">{{ 'eventSetup.preparationStatus' | translate }}</label>
+                  <select [(ngModel)]="form.preparationStatus"
+                    class="bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2.5 text-[13px] text-[#34203a] focus:outline-none focus:border-[#34203a] transition-colors">
+                    <option [ngValue]="null">{{ 'eventSetup.selectPlaceholder' | translate }}</option>
+                    <option value="pending">{{ 'eventSetup.prepStatus.pending' | translate }}</option>
+                    <option value="in_progress">{{ 'eventSetup.prepStatus.inProgress' | translate }}</option>
+                    <option value="ready">{{ 'eventSetup.prepStatus.ready' | translate }}</option>
+                  </select>
+                </div>
+              </div>
+            </app-accordion-section>
+
+          </div>
+        } @else {
+          <!-- ═══ REVIEW & ACTIONS (mobile) ═══ -->
+          <div class="flex flex-col gap-3">
+            <div class="rounded-[14px] overflow-hidden">
+              <div class="bg-[#46294f] px-4 py-3.5">
+                <p class="text-[#f6ddae] text-[9px] font-bold uppercase tracking-[0.5px]">{{ 'eventSetup.summary.title' | translate }}</p>
+                <p class="text-white text-[16px] font-bold mt-1">{{ selectedHallName() !== '—' ? selectedHallName() : ('eventSetup.summary.hallNotSelected' | translate) }}</p>
+                <p class="text-[#f6ddae] text-[11.5px] mt-0.5">{{ inquiry()?.clientName || ('eventSetup.summary.client' | translate) }}</p>
+              </div>
+              <div class="bg-[#34203a] px-4 py-3 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.date' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ form.eventDate ? (form.eventDate | date:'mediumDate') : '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.time' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ form.startTime || '—' }} — {{ form.endTime || '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.guests' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ form.guestCount ?? '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.setupType' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ setupTypeLabel(form.setupType) || '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.colors' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ (colorLabel(form.tableColor) || '—') + ' / ' + (colorLabel(form.chairColor) || '—') }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.extras' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ selectedExtrasLabel() }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.catering' | translate }}</span>
+                  <span class="text-white text-[12.5px] font-bold text-end">{{ cateringLabel(form.cateringStyle) || '—' }}</span>
+                </div>
+                <div class="flex items-center justify-between gap-3 border-t border-white/10 pt-2.5">
+                  <span class="text-[#f6ddae] text-[10.5px]">{{ 'eventSetup.summary.quoteValue' | translate }}</span>
+                  <span class="text-[#f6ddae] text-[15px] font-bold">—</span>
+                </div>
+              </div>
+              <div class="bg-[#46294f] px-4 py-3.5 flex flex-col gap-2.5 rounded-b-[14px]">
+                <p class="text-[#f6ddae] text-[9px] font-bold uppercase tracking-[0.5px]">{{ 'eventSetup.summary.status' | translate }}</p>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#f6ddae] text-[11.5px] flex-1">{{ 'eventSetup.summary.customerConfirmation' | translate }}</span>
+                  <app-status-badge status="inactive" [label]="'eventSetup.summary.notSentYet' | translate" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#f6ddae] text-[11.5px] flex-1">{{ 'eventSetup.summary.internalBeo' | translate }}</span>
+                  <app-status-badge status="inactive" [label]="'eventSetup.summary.notSharedYet' | translate" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#f6ddae] text-[11.5px] flex-1">{{ 'eventSetup.summary.hallAvailability' | translate }}</span>
+                  <app-status-badge status="warning" [label]="'eventSetup.summary.tentativeHold' | translate" />
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <button type="button" (click)="save()" [disabled]="saving()"
+                class="bg-[#46294f] hover:bg-[#5a3566] disabled:opacity-60 rounded-[10px] py-3 text-white text-[13px] font-bold transition-colors">
+                {{ (saving() ? 'eventSetup.saving' : 'eventSetup.saveQuotePackage') | translate }}
+              </button>
+              <button type="button" (click)="save()" [disabled]="saving()"
+                class="bg-[#ce8a28] hover:bg-[#b87922] disabled:opacity-60 rounded-[10px] py-3 text-[#34203a] text-[13px] font-bold transition-colors">
+                {{ 'eventSetup.generateEventConfirmation' | translate }}
+              </button>
+              <button type="button" (click)="save()" [disabled]="saving()"
+                class="bg-[#ce8a28] hover:bg-[#b87922] disabled:opacity-60 rounded-[10px] py-3 text-[#34203a] text-[13px] font-bold transition-colors">
+                {{ 'eventSetup.sendQuotePackage' | translate }}
+              </button>
+              <button type="button" (click)="sendConfirmation()" [disabled]="confirming()"
+                class="bg-[#46294f] hover:bg-[#5a3566] disabled:opacity-60 rounded-[10px] py-3 text-white text-[13px] font-bold transition-colors">
+                {{ (confirming() ? 'eventSetup.sending' : 'eventSetup.markCustomerConfirmed') | translate }}
+              </button>
+            </div>
+
+            @if (summaryUrl()) {
+              <div class="bg-[#efebf3] border border-[#e4dfd5] rounded-[12px] px-4 py-3 flex flex-col gap-2">
+                <p class="text-[#34203a] text-[11px] font-semibold uppercase tracking-[0.12px]">{{ 'eventSetup.customerSummaryLink' | translate }}</p>
+                <div class="flex items-center gap-2">
+                  <input type="text" [value]="summaryUrl()" readonly
+                    class="flex-1 min-w-0 bg-white border border-[#e4dfd5] rounded-[8px] px-3 py-2 h-[36px] text-[12px] text-[#55514a] focus:outline-none" />
+                  <button type="button" (click)="copyLink()"
+                    class="bg-[#34203a] hover:bg-[#46294f] rounded-[8px] px-3 h-[36px] text-white text-[12px] font-semibold transition-colors whitespace-nowrap">
+                    {{ (copied() ? 'eventSetup.copied' : 'eventSetup.copy') | translate }}
+                  </button>
+                </div>
+                <a [href]="summaryUrl()" target="_blank" class="text-[#8a6d1a] text-[12px] font-medium hover:underline">{{ 'eventSetup.openSummary' | translate }}</a>
+              </div>
+            }
+          </div>
+        }
+      </div>
     }
   </main>
+
+  <!-- Mobile: sticky "Review & Send" bar above the bottom tab bar -->
+  @if (!loading() && mobileView() === 'setup') {
+    <div class="md:hidden fixed inset-x-0 bottom-[64px] z-20 px-4 pt-2 pb-3 bg-gradient-to-t from-[#faf7f2] via-[#faf7f2] to-transparent">
+      <button type="button" (click)="mobileView.set('review')"
+        class="w-full bg-[#34203a] hover:bg-[#46294f] text-white rounded-[12px] py-3.5 font-bold text-[14px] transition-colors">
+        {{ 'eventSetup.mobile.reviewSend' | translate }} →
+      </button>
+    </div>
+  }
 </div>

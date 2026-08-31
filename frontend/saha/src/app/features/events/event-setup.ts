@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -6,6 +6,8 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthService } from '../../core/services/auth.service';
 import { AdminPageHeader } from '../../shared/admin-page-header/admin-page-header';
+import { AccordionSection } from '../../shared/mobile/accordion-section/accordion-section';
+import { StatusBadge } from '../../shared/mobile/status-badge/status-badge';
 import {
   Addon,
   CATERING_STYLES,
@@ -66,7 +68,7 @@ interface MealCard {
 
 @Component({
   selector: 'app-event-setup',
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, AdminPageHeader, AccordionSection, StatusBadge],
   templateUrl: './event-setup.html'
 })
 export class EventSetupPage implements OnInit {
@@ -412,6 +414,129 @@ export class EventSetupPage implements OnInit {
   selectedExtrasLabel(): string {
     const count = this.selectedAddonIds.size + this.eventAddons().length;
     return count > 0 ? this.translateService.instant('eventSetup.extrasSelected', { count }) : '—';
+  }
+
+  // ──────────────────────────────────────────────
+  //  Mobile: accordion shell + Review view
+  // ──────────────────────────────────────────────
+  /** Which mobile screen is showing: the 9-section setup accordion, or the
+   *  Review & Actions summary. Desktop ignores this (always shows both columns). */
+  readonly mobileView = signal<'setup' | 'review'>('setup');
+
+  private t(key: string, params?: Record<string, unknown>): string {
+    return this.translateService.instant(key, params);
+  }
+
+  private notSet(): string { return this.t('eventSetup.notSetYet'); }
+  private notSelected(): string { return this.t('eventSetup.notSelectedYet'); }
+
+  /** Translated label for a single table/chair colour value. */
+  colorLabel(value: string | null | undefined): string {
+    if (!value) return '';
+    const sw = this.colorSwatches.find(s => s.value === value);
+    return sw ? this.t(sw.labelKey) : value;
+  }
+
+  setupTypeLabel(value: string | null | undefined): string {
+    if (!value) return '';
+    const card = this.setupTypeCards.find(c => c.value === value);
+    return card ? this.t(card.labelKey) : value;
+  }
+
+  cateringLabel(value: string | null | undefined): string {
+    if (!value) return '';
+    const card = this.cateringStyleCards.find(c => c.value === value);
+    return card ? this.t(card.labelKey) : value;
+  }
+
+  // -- live 1-line summaries shown on each collapsed accordion header --
+  section1Summary(): string {
+    // Angular has no ar-SA locale data registered, so — like the rest of this
+    // page's `| date` pipes — dates are formatted with the default en-US locale.
+    const date = this.form.eventDate
+      ? formatDate(this.form.eventDate, 'd MMM y', 'en-US')
+      : null;
+    const time = this.form.startTime && this.form.endTime
+      ? `${this.formatSlotLabel(this.form.startTime)} – ${this.formatSlotLabel(this.form.endTime)}`
+      : this.form.startTime
+        ? this.formatSlotLabel(this.form.startTime)
+        : null;
+    const parts = [date, time].filter(Boolean);
+    return parts.length ? parts.join(' · ') : this.notSet();
+  }
+  section1Filled(): boolean { return !!this.form.eventDate || !!this.form.startTime; }
+
+  section2Summary(): string {
+    return this.form.guestCount != null
+      ? this.t('eventSetup.summ.guestsCount', { count: this.form.guestCount })
+      : this.notSet();
+  }
+  section2Filled(): boolean { return this.form.guestCount != null; }
+
+  section3Summary(): string {
+    return this.setupTypeLabel(this.form.setupType) || this.notSelected();
+  }
+  section3Filled(): boolean { return !!this.form.setupType; }
+
+  section4Summary(): string {
+    const table = this.colorLabel(this.form.tableColor);
+    const chair = this.colorLabel(this.form.chairColor);
+    if (!table && !chair) return this.notSelected();
+    return `${table || '—'} / ${chair || '—'}`;
+  }
+  section4Filled(): boolean { return !!this.form.tableColor || !!this.form.chairColor; }
+
+  layoutChipCount(): number {
+    return new Set(this.layoutElements.map(e => e.type)).size;
+  }
+  section5Summary(): string {
+    return this.t('eventSetup.summ.elementsSelected', { count: this.layoutChipCount() });
+  }
+  section5Filled(): boolean { return this.layoutChipCount() > 0 || !!this.form.layoutNotes; }
+
+  section6Count(): number {
+    return this.selectedAddonIds.size + this.eventAddons().length;
+  }
+  section6Summary(): string {
+    return this.t('eventSetup.summ.addonsSelected', { count: this.section6Count() });
+  }
+  section6Filled(): boolean { return this.section6Count() > 0; }
+
+  section7Summary(): string {
+    return this.cateringLabel(this.form.cateringStyle) || this.notSelected();
+  }
+  section7Filled(): boolean { return !!this.form.cateringStyle; }
+
+  section8Summary(): string {
+    if (this.agendaSegments.length === 0) return this.notSet();
+    return this.t('eventSetup.summ.segments', {
+      count: this.agendaSegments.length,
+      min: this.totalAgendaDuration()
+    });
+  }
+  section8Filled(): boolean { return this.agendaSegments.length > 0; }
+
+  section9Summary(): string {
+    return (this.form.internalNotes || this.form.opsNotes || this.form.attachmentUrl)
+      ? this.t('eventSetup.summ.hotelTeamOnly')
+      : this.notSet();
+  }
+  section9Filled(): boolean {
+    return !!(this.form.internalNotes || this.form.opsNotes || this.form.attachmentUrl);
+  }
+
+  // -- Section 5 mobile: multi-select chip list (drag-and-drop is desktop only) --
+  isLayoutChipSelected(type: string): boolean {
+    return this.layoutElements.some(e => e.type === type);
+  }
+  toggleLayoutChip(type: string): void {
+    if (this.isLayoutChipSelected(type)) {
+      this.layoutElements = this.layoutElements.filter(e => e.type !== type);
+    } else {
+      // Default to the centre of the canvas so the same record still renders
+      // sensibly if it is later opened on the desktop drag-and-drop canvas.
+      this.layoutElements.push({ type, x: 50, y: 50 });
+    }
   }
 
   // ──────────────────────────────────────────────
